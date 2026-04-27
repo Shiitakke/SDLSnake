@@ -78,6 +78,10 @@
     <IncludePath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_image-2.8.8\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_mixer-2.8.1\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2-2.32.10\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_image-2.8.8\lib\x86;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_mixer-2.8.1\lib\x86;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2-2.32.10\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_image-2.8.8\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_mixer-2.8.1\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2-2.32.10\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_image-2.8.8\lib\x64;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_mixer-2.8.1\lib\x64;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2-2.32.10\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -85,6 +89,9 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -101,10 +108,12 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_mixer.LIB;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -114,6 +123,9 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,7 +149,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="IdManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="vec.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AngularVelocity.hpp" />
+    <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="common.hpp" />
+    <ClInclude Include="ComponentManager.hpp" />
+    <ClInclude Include="IdManager.hpp" />
+    <ClInclude Include="Renderer.hpp" />
+    <ClInclude Include="SpriteAnim.hpp" />
+    <ClInclude Include="Sprite.hpp" />
+    <ClInclude Include="SpriteManager.hpp" />
+    <ClInclude Include="SpriteView.hpp" />
+    <ClInclude Include="Transform.hpp" />
+    <ClInclude Include="vec.hpp" />
+    <ClInclude Include="Velocity.hpp" />
+    <ClInclude Include="Window.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
