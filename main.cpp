@@ -11,8 +11,6 @@
 #include <unordered_map>
 
 #include "common.hpp"
-#include "Window.hpp"
-#include "Renderer.hpp"
 #include "IdManager.hpp"
 #include "SpriteManager.hpp"
 #include "Sprite.hpp"
@@ -23,10 +21,10 @@
 #include "Velocity.hpp"
 #include "AngularVelocity.hpp"
 #include "Camera.hpp"
+#include "util.hpp"
 
+#include "RenderingSystem.hpp"
 
-#include <immintrin.h>
-#include <chrono>
 #include <iostream>
 
 namespace snakedir {
@@ -80,8 +78,6 @@ void updateLinearVelocities();
 void updateAngularVelocities();
 u32 createSnakeSegment(SnakeSegment ss);
 void destroySnakeSegment();
-void render(float delta);
-Transform lerp(const Transform& a, const Transform& b, float delta);
 
 // Engine stuff
 bool quit = false;
@@ -94,7 +90,7 @@ static ComponentManager<SnakeSegment> snake_segments;
 static ComponentManager<LinearVelocity> linear_velocities;
 static ComponentManager<AngularVelocity> angular_velocities;
 static ComponentManager<Camera> cameras;
-
+static RenderingSystem* rendering_system;
 // Gameplay stuff
 constexpr u32 BOARD_WIDTH = 16;
 constexpr u32 BOARD_HEIGHT = 16;
@@ -124,6 +120,9 @@ int main(int argc, char* args[]) {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				quit = true;
+			}
+			if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED) {
+				rendering_system->handleWindowResize();
 			}
 			if (e.type == SDL_KEYDOWN) {
 				if (paused) {
@@ -164,8 +163,7 @@ int main(int argc, char* args[]) {
 			
 			period -= TIME_STEP;
 		}
-		
-		render(period / TIME_STEP);
+		rendering_system->render(period / TIME_STEP);
 		end = SDL_GetTicks64();
 		period += (end - start) * GAME_SPEED_SCALAR * !paused;
 		start = end;
@@ -219,10 +217,10 @@ void generateAppleParticles() {
 }
 
 std::tuple<float, float> boardPosToWorldPos(BoardPos pos) {
-	static constexpr float tile_width = SCREEN_WIDTH / static_cast<float>(BOARD_WIDTH);
-	static constexpr float tile_height = SCREEN_HEIGHT / static_cast<float>(BOARD_HEIGHT);
-	float x = static_cast<float>(pos.x) * tile_width - SCREEN_WIDTH / 2.f + (tile_width / 2.f);
-	float y = static_cast<float>(pos.y) * tile_width - SCREEN_HEIGHT / 2.f + (tile_height / 2.f);
+	static constexpr float tile_width = INTERNAL_WINDOW_WIDTH / static_cast<float>(BOARD_WIDTH);
+	static constexpr float tile_height = INTERNAL_WINDOW_HEIGHT / static_cast<float>(BOARD_HEIGHT);
+	float x = static_cast<float>(pos.x) * tile_width - INTERNAL_WINDOW_WIDTH / 2.f + (tile_width / 2.f);
+	float y = static_cast<float>(pos.y) * tile_width - INTERNAL_WINDOW_HEIGHT / 2.f + (tile_height / 2.f);
 	return {x, -y};
 }
 
@@ -399,8 +397,8 @@ void updateAnims() {
 	static float since_last_update = 0.0;
 	since_last_update += TIME_STEP;
 	#pragma omp parallel for
-	for (int i = 0; i < anims._n_components; ++i) {
-		SpriteAnim& anim = anims._components[i];
+	for (int i = 0; i < anims.n_components; ++i) {
+		SpriteAnim& anim = anims.components[i];
 		if (anim.paused) {
 			continue;
 		}
@@ -421,8 +419,8 @@ void updateAnims() {
 
 void updateLinearVelocities() {
 	#pragma omp parallel for
-	for (int i = 0; i < linear_velocities._n_components; ++i) {
-		LinearVelocity& v = linear_velocities._components[i];
+	for (int i = 0; i < linear_velocities.n_components; ++i) {
+		LinearVelocity& v = linear_velocities.components[i];
 		Transform& t = transforms.getNextComponent(v.id);
 		t.pos = t.pos + v.velocity;
 		v.velocity = v.acceleration + v.velocity * (1 - v.friction);
@@ -431,56 +429,12 @@ void updateLinearVelocities() {
 
 void updateAngularVelocities() {
 	#pragma omp parallel for
-	for (int i = 0; i < angular_velocities._n_components; ++i) {
-		AngularVelocity& v = angular_velocities._components[i];
+	for (int i = 0; i < angular_velocities.n_components; ++i) {
+		AngularVelocity& v = angular_velocities.components[i];
 		Transform& t = transforms.getNextComponent(v.id);
 		t.rot = t.rot + v.velocity;
 		v.velocity = v.acceleration + v.velocity * (1 - v.friction);
 	}
-}
-
-void render(float delta) {  
-	SDL_Renderer* r = Renderer::instance().r;
-	SDL_RenderClear(r);	
-
-	for (int c = 0; c < cameras._n_components; ++c) {
-		const Camera& cam = cameras._components[c];
-		SDL_RenderSetViewport(r, &(cam.viewport));
-		const Transform& cam_transform = transforms.getComponent(cam.id);
-		for (int i = 0; i < views._n_components; ++i) {
-			const SpriteView& view = views._components[i];
-			const Transform& curr_t = transforms.getComponent(view.id);
-			const Transform& next_t = transforms.getNextComponent(view.id);
-			const Transform t = lerp(curr_t, next_t, delta);
-			SDL_Rect src_rect = view.src_rect;
-			SDL_Rect dst_rect = {
-				(SCREEN_WIDTH / 2) - cam_transform.pos.x + (t.pos.x - (src_rect.w * t.scale.x) / 2),
-				(SCREEN_HEIGHT / 2) - cam_transform.pos.y + (-(t.pos.y) - (src_rect.h * t.scale.y) / 2),
-				src_rect.w * t.scale.x,
-				src_rect.h * t.scale.y
-			};
-			SDL_RenderCopyEx(
-				r,
-				sprite_manager.getSprite(view.sprite_path).t,
-				&src_rect,
-				&dst_rect,
-				t.rot,
-				NULL,
-				view.flip_flags
-			);
-		}	
-	}
-	SDL_RenderPresent(r);
-}
-
-Transform lerp(const Transform& a, const Transform& b, float delta) {
-	Transform ret = a;
-	ret.pos = {
-		a.pos.x + ((b.pos.x - a.pos.x) * delta),
-		a.pos.y + ((b.pos.y- a.pos.y) * delta),
-	};
-	ret.rot = a.rot + ((b.rot - a.rot) * delta);
-	return ret;
 }
 
 // Initialises sdl
@@ -506,6 +460,15 @@ bool initSdl() {
 }
 
 void initGame() {
+	u32 cameraid = getNextId();
+	transforms.createComponent(cameraid, { cameraid });
+	rendering_system = new RenderingSystem(
+		transforms,
+		views,
+		sprite_manager,
+		{ cameraid, {0, 0, INTERNAL_WINDOW_WIDTH, INTERNAL_WINDOW_HEIGHT}, 1.f}
+	);
+	
 	// sprites init
 	sprite_manager.loadSprite(snake_sprite_path);
 	sprite_manager.loadSprite(apple_sprite_path);
@@ -541,12 +504,10 @@ void initGame() {
 	generateApplePos();
 
 	// camera init
-	u32 cameraid = getNextId();
-	cameras.createComponent(cameraid, {cameraid, {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}});
-	transforms.createComponent(cameraid, {cameraid});
 	
 	changePause();
 	transforms.next_transforms = transforms.components;
+
 
 }
 

@@ -151,7 +151,9 @@
   <ItemGroup>
     <ClCompile Include="IdManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RenderingSystem.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="util.cpp" />
     <ClCompile Include="vec.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,15 +162,15 @@
     <ClInclude Include="common.hpp" />
     <ClInclude Include="ComponentManager.hpp" />
     <ClInclude Include="IdManager.hpp" />
-    <ClInclude Include="Renderer.hpp" />
+    <ClInclude Include="RenderingSystem.hpp" />
     <ClInclude Include="SpriteAnim.hpp" />
     <ClInclude Include="Sprite.hpp" />
     <ClInclude Include="SpriteManager.hpp" />
     <ClInclude Include="SpriteView.hpp" />
     <ClInclude Include="Transform.hpp" />
+    <ClInclude Include="util.hpp" />
     <ClInclude Include="vec.hpp" />
     <ClInclude Include="Velocity.hpp" />
-    <ClInclude Include="Window.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
