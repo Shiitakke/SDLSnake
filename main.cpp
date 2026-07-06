@@ -358,7 +358,7 @@ u32 createSnakeSegment(SnakeSegment ss) {
 	ss.id = new_segment_id;
 	std::tuple<float, float> t_pos = boardPosToWorldPos(ss.pos);
 	transforms.createComponent(new_segment_id, { new_segment_id, {std::get<0>(t_pos), std::get<1>(t_pos)}, {2, 2}, 0.0f });
-	views.createComponent(new_segment_id, {new_segment_id, snake_sprite_path, {0, 0, 32, 32}});
+	views.createComponent(new_segment_id, {new_segment_id, snake_sprite_path, {0, 0, 32, 32}, 11});
 	anims.createComponent(new_segment_id, {new_segment_id, 4, 4, 32, 32, 56, { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 }} );
 	anims.getComponent(new_segment_id).current_frame = 8;
 	snake_segments.createComponent(new_segment_id, ss);
@@ -394,15 +394,10 @@ void changePause() {
 }
 
 void updateAnims() {
-	static float since_last_update = 0.0;
-	since_last_update += TIME_STEP;
 	#pragma omp parallel for
 	for (int i = 0; i < anims.n_components; ++i) {
 		SpriteAnim& anim = anims.components[i];
-		if (anim.paused) {
-			continue;
-		}
-		anim.since_last_update += TIME_STEP;
+		anim.since_last_update += TIME_STEP * !anim.paused;
 		float frametime = 1000.f / anim.framerate;
 		while (anim.since_last_update >= frametime) {
 			anim.current_frame = anim.anim_graph[anim.current_frame];
@@ -479,7 +474,7 @@ void initGame() {
 	u32 board_id = getNextId();
 	transforms.createComponent(board_id, {board_id});
 	transforms.getComponent(board_id).scale = { 31.25, 31.25 };
-	views.createComponent(board_id, SpriteView(board_id, board_sprite_path, { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h }));
+	views.createComponent(board_id, SpriteView(board_id, board_sprite_path, { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h }, 9 ));
 
 	// snake init
 	BoardPos ss1_pos = { 3, BOARD_HEIGHT / 2 };
@@ -500,7 +495,7 @@ void initGame() {
 
 	// apple init
 	transforms.createComponent(apple_id, { apple_id });
-	views.createComponent(apple_id, SpriteView(apple_id, apple_sprite_path, { 0, 0, 64, 64 }));
+	views.createComponent(apple_id, SpriteView(apple_id, apple_sprite_path, { 0, 0, 64, 64 }, 11));
 	generateApplePos();
 
 	// camera init
