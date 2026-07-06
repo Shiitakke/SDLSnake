@@ -5,7 +5,7 @@
 #include "Transform.hpp"
 
 struct Camera {
-  u32 _id;
-  SDL_Rect _viewport;
-  float _zoom = 1.f;
+  u32 id;
+  SDL_Rect viewport;
+  float zoom = 1.f;
 };

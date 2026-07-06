@@ -3,9 +3,9 @@
 #include "Sprite.hpp"
 
 struct SpriteView {
-  u32 _id;
-  std::string _sprite_path;
-  SDL_Rect _src_rect;
-  u32 _zindex = 0;
-  SDL_RendererFlip _flip_flags = SDL_FLIP_NONE;
+  u32 id;
+  std::string sprite_path;
+  SDL_Rect src_rect;
+  u32 zindex = 0;
+  SDL_RendererFlip flip_flags = SDL_FLIP_NONE;
 };

@@ -19,13 +19,13 @@ bool SpriteManager::loadSprite(const std::string& path) {
     printf("Failed to create texture from surface. %s\n", SDL_GetError());
     return false;
   }
-  _sprites.push_back({t, s->w, s->h});
-  _sprite_map.emplace(path, _n_sprites);
-  ++_n_sprites;
+  sprites.push_back({t, s->w, s->h});
+  sprite_map.emplace(path, n_sprites);
+  ++n_sprites;
   SDL_FreeSurface(s);
   return true;
 }
 
 Sprite& SpriteManager::getSprite(const std::string& path) {
-  return _sprites[_sprite_map[path]];
+  return sprites[sprite_map[path]];
 }

@@ -14,8 +14,8 @@ public:
   bool loadSprite(const std::string& path);
   Sprite& getSprite(const std::string& path);
 private:
-  u32 _n_sprites = 0;
-  std::vector<Sprite> _sprites = {};
-  std::unordered_map<std::string, u32> _sprite_map;
+  u32 n_sprites = 0;
+  std::vector<Sprite> sprites = {};
+  std::unordered_map<std::string, u32> sprite_map;
 };
 

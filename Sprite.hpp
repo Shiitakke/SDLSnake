@@ -5,7 +5,7 @@
 #include "common.hpp"
 
 struct Sprite {
-  SDL_Texture* _t = nullptr;
-  i32 _w = 0;
-  i32 _h = 0;
+  SDL_Texture* t = nullptr;
+  i32 w = 0;
+  i32 h = 0;
 };

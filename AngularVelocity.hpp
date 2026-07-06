@@ -4,8 +4,8 @@
 #include "vec.hpp"
 
 struct AngularVelocity {
-  u32 _id;
-  float _velocity = 0.f;
-  float _acceleration = 0.f;
-  float _friction = 0.1f;
+  u32 id;
+  float velocity = 0.f;
+  float acceleration = 0.f;
+  float friction = 0.1f;
 };
