@@ -11,19 +11,22 @@
 #include <unordered_map>
 
 #include "common.hpp"
+#include "util.hpp"
+
 #include "IdManager.hpp"
 #include "SpriteManager.hpp"
+
 #include "Sprite.hpp"
 #include "SpriteAnim.hpp"
 #include "SpriteView.hpp"
 #include "Transform.hpp"
 #include "ComponentManager.hpp"
-#include "Velocity.hpp"
+#include "LinearVelocity.hpp"
 #include "AngularVelocity.hpp"
 #include "Camera.hpp"
-#include "util.hpp"
 
 #include "RenderingSystem.hpp"
+#include "EntityComponentSystem.hpp"
 
 #include <iostream>
 
@@ -73,9 +76,18 @@ void generateApplePos();
 void generateAppleParticles();
 std::tuple<float, float> boardPosToWorldPos(BoardPos pos);
 void updateSnake(snakedir::direction& d);
-void updateAnims();
-void updateLinearVelocities();
-void updateAngularVelocities();
+void updateAnims(
+	ComponentManager<SpriteAnim>& anims,
+	ComponentManager<SpriteView>& views
+);
+void updateLinearVelocities(
+	ComponentManager<Transform>& transforms,
+	ComponentManager<LinearVelocity>& linear_velocities
+);
+void updateAngularVelocities(
+	ComponentManager<Transform>& transforms,
+	ComponentManager<AngularVelocity>& angular_velocities
+);
 u32 createSnakeSegment(SnakeSegment ss);
 void destroySnakeSegment();
 
@@ -83,14 +95,9 @@ void destroySnakeSegment();
 bool quit = false;
 static IdManager id_manager;
 static SpriteManager sprite_manager;
-static ComponentManager<Transform> transforms;
-static ComponentManager<SpriteView> views;
-static ComponentManager<SpriteAnim> anims;
-static ComponentManager<SnakeSegment> snake_segments;
-static ComponentManager<LinearVelocity> linear_velocities;
-static ComponentManager<AngularVelocity> angular_velocities;
-static ComponentManager<Camera> cameras;
 static RenderingSystem* rendering_system;
+static EntityComponentSystem ecs;
+
 // Gameplay stuff
 constexpr u32 BOARD_WIDTH = 16;
 constexpr u32 BOARD_HEIGHT = 16;
@@ -98,6 +105,7 @@ std::string snake_sprite_path = "./assets/snake.png";
 std::string apple_sprite_path = "./assets/apple.png";
 std::string board_sprite_path = "./assets/board.png";
 std::string pause_sprite_path = "./assets/pause.png";
+static ComponentManager<SnakeSegment> snake_segments;
 std::deque<u32> snake;
 u32 apple_id = getNextId();
 
@@ -115,7 +123,7 @@ int main(int argc, char* args[]) {
 	u64 end = start;
 	float period = 0;
 	bool paused = true;
-
+	
 	while (quit == false) {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
@@ -151,15 +159,23 @@ int main(int argc, char* args[]) {
 		}
 		
 		while (period > TIME_STEP) {
+			ComponentManager<Transform>& transforms = ecs.getComponentManager<Transform>();
 			transforms.components = transforms.next_transforms;
 
 			updateSnake(next_dir);
-			updateAnims();
+			updateAnims(
+				ecs.getComponentManager<SpriteAnim>(),
+				ecs.getComponentManager<SpriteView>()
+			);
 		
-			transforms.next_transforms = transforms.components;
-
-			updateLinearVelocities();
-			updateAngularVelocities();
+			updateLinearVelocities(
+				ecs.getComponentManager<Transform>(),
+				ecs.getComponentManager<LinearVelocity>()
+			);
+			updateAngularVelocities(
+				ecs.getComponentManager<Transform>(),
+				ecs.getComponentManager<AngularVelocity>()
+			);
 			
 			period -= TIME_STEP;
 		}
@@ -173,7 +189,7 @@ int main(int argc, char* args[]) {
 }
 
 u32 getNextId() {
-	return id_manager.getNextId();
+	return ecs.getNextId();
 }
 
 void generateApplePos() {
@@ -195,11 +211,12 @@ void generateApplePos() {
 	}
 
 	std::tuple<float, float> new_apple_pos = boardPosToWorldPos({x, y});
-	transforms.getComponent(apple_id).pos = {std::get<0>(new_apple_pos), std::get<1>(new_apple_pos)};
+	ecs.getc<Transform>(apple_id).pos = {std::get<0>(new_apple_pos), std::get<1>(new_apple_pos)};
+	ecs.getNextc(apple_id).pos = { std::get<0>(new_apple_pos), std::get<1>(new_apple_pos)};
 }
 
 void generateAppleParticles() {
-	const Transform apple_transform = transforms.getComponent(apple_id);
+	const Transform apple_transform = ecs.getc<Transform>(apple_id);
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<i32> view_range{ 0, 56 };
@@ -208,11 +225,23 @@ void generateAppleParticles() {
 	std::uniform_real_distribution<float> rot_range{ 0, 30 };
 	for (i32 i = 0; i < 10; ++i) {
 		u32 nextid = getNextId();
-		Transform p_t = {nextid, {apple_transform.pos.x, apple_transform.pos.y}, {scale_range(mt), scale_range(mt)}};
-		transforms.createComponent(nextid, p_t);
-		views.createComponent(nextid, { nextid, apple_sprite_path, {view_range(mt), view_range(mt), 8, 8} });
-		linear_velocities.createComponent(nextid, { nextid, {vel_range(mt), vel_range(mt)}, 0.1f });
-		angular_velocities.createComponent(nextid, {nextid, rot_range(mt)});
+		ecs.createEntity(nextid,
+			Transform	{ .id = nextid, 
+									.pos = {apple_transform.pos.x, apple_transform.pos.y}, 
+									.scale = {scale_range(mt), scale_range(mt)} 
+								},
+			SpriteView{ .id = nextid, 
+									.sprite_path = apple_sprite_path, 
+									.src_rect = {view_range(mt), view_range(mt), 8, 8} 
+								},
+			LinearVelocity{ .id = nextid, 
+											.velocity = {vel_range(mt), vel_range(mt)}, 
+											.friction = 0.1f 
+										},
+			AngularVelocity { .id = nextid, 
+												.velocity = rot_range(mt) 
+											}
+		);
 	}
 }
 
@@ -240,15 +269,15 @@ void updateSnake(snakedir::direction& d) {
 	if (head.out_dir + head.in_dir == 0) {
 		// Straight
 		if (head.curr_type != STRAIGHT) {
-			views.getComponent(head.id).flip_flags = SDL_FLIP_NONE;
-			anims.getComponent(head.id).current_frame += 8;
+			ecs.getc<SpriteView>(head.id).flip_flags = SDL_FLIP_NONE;
+			ecs.getc<SpriteAnim>(head.id).current_frame += 8;
 			head.curr_type = STRAIGHT;
 		}
 	}
 	else {
 		//curved
 		// Set flipping for curved sprites (it runs left-to-up, clockwise)
-		SpriteView& hv = views.getComponent(head.id);
+		SpriteView& hv = ecs.getc<SpriteView>(head.id);
 		switch (head.in_dir) {
 		case snakedir::LEFT:
 			hv.flip_flags = head.out_dir == snakedir::DOWN ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
@@ -264,7 +293,7 @@ void updateSnake(snakedir::direction& d) {
 			break;
 		}
 		if (head.curr_type != CURVED) {
-			anims.getComponent(head.id).current_frame -= 8;
+			ecs.getc<SpriteAnim>(head.id).current_frame -= 8;
 			head.curr_type = CURVED;
 		}
 	}
@@ -313,15 +342,18 @@ void updateSnake(snakedir::direction& d) {
 				// Set the new tail to play a reverse animation of the segment shrinking
 				u32 new_tail_id = snake.front();
 				SnakeSegment& new_tail = snake_segments.getComponent(new_tail_id);
-				SpriteAnim& new_tail_anim = anims.getComponent(new_tail_id);
+				SpriteAnim& new_tail_anim = ecs.getc<SpriteAnim>(new_tail_id);
 				new_tail_anim.anim_graph = {0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14};
-				Transform& new_tail_transform = transforms.getComponent(new_tail_id);
-				SpriteView& new_tail_view = views.getComponent(new_tail_id);
+				Transform& new_tail_transform = ecs.getc<Transform>(new_tail_id);
+				Transform& new_tail_next = ecs.getNextc(new_tail_id);
+				SpriteView& new_tail_view = ecs.getc<SpriteView>(new_tail_id);
 				if (new_tail.curr_type == STRAIGHT) {
 					new_tail_transform.rot += 180;
+					new_tail_next.rot += 180;
 					new_tail_anim.current_frame = 15;
 				} else {
 					new_tail_transform.rot += 90;
+					new_tail_next.rot += 90;
 					new_tail_anim.current_frame = 7;
 					if (new_tail_view.flip_flags == SDL_FLIP_VERTICAL) {
 						new_tail_view.flip_flags = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
@@ -340,14 +372,18 @@ void updateSnake(snakedir::direction& d) {
 				break;
 		}
 		u32 new_segment_id = createSnakeSegment({0, new_pos, in_dir, d, STRAIGHT});
-		Transform& t = transforms.getComponent(new_segment_id);
+		Transform& t = ecs.getc<Transform>(new_segment_id);
+		Transform& t_next = ecs.getNextc(new_segment_id);
 		switch (in_dir) {
 			case snakedir::DOWN:
 				t.rot += 90;
+				t_next.rot += 90;
 			case snakedir::RIGHT:
 				t.rot += 90;
+				t_next.rot += 90;
 			case snakedir::UP:
 				t.rot += 90;
+				t_next.rot += 90;
 		}
 		since_last_update -= time_per_move;
 	}
@@ -357,10 +393,25 @@ u32 createSnakeSegment(SnakeSegment ss) {
 	u32 new_segment_id = getNextId();
 	ss.id = new_segment_id;
 	std::tuple<float, float> t_pos = boardPosToWorldPos(ss.pos);
-	transforms.createComponent(new_segment_id, { new_segment_id, {std::get<0>(t_pos), std::get<1>(t_pos)}, {2, 2}, 0.0f });
-	views.createComponent(new_segment_id, {new_segment_id, snake_sprite_path, {0, 0, 32, 32}, 11});
-	anims.createComponent(new_segment_id, {new_segment_id, 4, 4, 32, 32, 56, { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 }} );
-	anims.getComponent(new_segment_id).current_frame = 8;
+	ecs.createEntity( new_segment_id,
+		Transform	{	.id = new_segment_id, 
+								.pos = {std::get<0>(t_pos), std::get<1>(t_pos)}, 
+								.scale = {2, 2} 
+							},
+		SpriteView{ .id = new_segment_id, 
+								.sprite_path = snake_sprite_path, 
+								.src_rect = {0, 0, 32, 32}, 
+								.zindex = 11 
+							},
+		SpriteAnim{ .id = new_segment_id, 
+								.rows = 4, .cols = 4, 
+								.cellw = 32, .cellh = 32, 
+								.framerate = 56, 
+								.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 }, 
+								.current_frame = 8
+							}
+
+	);
 	snake_segments.createComponent(new_segment_id, ss);
 	snake.emplace_back(new_segment_id);
 	board[ss.pos.x][ss.pos.y] = tile::SNAKE;
@@ -369,9 +420,7 @@ u32 createSnakeSegment(SnakeSegment ss) {
 
 void destroySnakeSegment() {
 	u32 id = snake.front();
-	transforms.destroyComponent(id);
-	views.destroyComponent(id);
-	anims.destroyComponent(id);
+	ecs.destroyEntity(id);
 	BoardPos pos = snake_segments.getComponent(id).pos;
 	board[pos.x][pos.y] = tile::EMPTY;
 	snake_segments.destroyComponent(id);
@@ -383,17 +432,28 @@ void changePause() {
 	static u32 pauseid = getNextId();
 	static bool is_paused = false;
 	if (!is_paused) {
-		transforms.createComponent(pauseid, { pauseid, { 0, 0, }, {4, 4} });
 		Sprite& pause_sprite = sprite_manager.getSprite(pause_sprite_path);
-		views.createComponent(pauseid, { pauseid, pause_sprite_path, {0, 0, pause_sprite.w, pause_sprite.h} });
+		ecs.createEntity(pauseid, 
+			Transform	{ .id = pauseid,
+									.scale = {4, 4}
+								},
+			SpriteView{ .id = pauseid,
+									.sprite_path = pause_sprite_path,
+									.src_rect = {0, 0, pause_sprite.w, pause_sprite.h},
+									.zindex = 15
+								}
+		);
 	} else {
-		transforms.destroyComponent(pauseid);
-		views.destroyComponent(pauseid);
+		ecs.destroyEntity(pauseid);
+		pauseid = getNextId();
 	}
 	is_paused = !is_paused;
 }
 
-void updateAnims() {
+void updateAnims(
+	ComponentManager<SpriteAnim>& anims,
+	ComponentManager<SpriteView>& views
+) {
 	#pragma omp parallel for
 	for (int i = 0; i < anims.n_components; ++i) {
 		SpriteAnim& anim = anims.components[i];
@@ -412,7 +472,10 @@ void updateAnims() {
 	}
 }
 
-void updateLinearVelocities() {
+void updateLinearVelocities(
+	ComponentManager<Transform>& transforms,
+	ComponentManager<LinearVelocity>& linear_velocities
+) {
 	#pragma omp parallel for
 	for (int i = 0; i < linear_velocities.n_components; ++i) {
 		LinearVelocity& v = linear_velocities.components[i];
@@ -422,7 +485,10 @@ void updateLinearVelocities() {
 	}
 }
 
-void updateAngularVelocities() {
+void updateAngularVelocities(
+	ComponentManager<Transform>& transforms,
+	ComponentManager<AngularVelocity>& angular_velocities
+) {
 	#pragma omp parallel for
 	for (int i = 0; i < angular_velocities.n_components; ++i) {
 		AngularVelocity& v = angular_velocities.components[i];
@@ -455,13 +521,21 @@ bool initSdl() {
 }
 
 void initGame() {
+	ecs.registerComponentType<Transform>();
+	ecs.registerComponentType<SpriteView>();
+	ecs.registerComponentType<SpriteAnim>();
+	ecs.registerComponentType<LinearVelocity>();
+	ecs.registerComponentType<AngularVelocity>();
+
 	u32 cameraid = getNextId();
-	transforms.createComponent(cameraid, { cameraid });
+	ecs.createComponent<Transform>(cameraid, { cameraid });
 	rendering_system = new RenderingSystem(
-		transforms,
-		views,
+		ecs.getComponentManager<Transform>(),
+		ecs.getComponentManager<SpriteView>(),
 		sprite_manager,
-		{ cameraid, {0, 0, INTERNAL_WINDOW_WIDTH, INTERNAL_WINDOW_HEIGHT}, 1.f}
+		Camera{ .id = cameraid, 
+						.viewport = {0, 0, INTERNAL_WINDOW_WIDTH, INTERNAL_WINDOW_HEIGHT}
+					}
 	);
 	
 	// sprites init
@@ -472,38 +546,49 @@ void initGame() {
 
 	// board init
 	u32 board_id = getNextId();
-	transforms.createComponent(board_id, {board_id});
-	transforms.getComponent(board_id).scale = { 31.25, 31.25 };
-	views.createComponent(board_id, SpriteView(board_id, board_sprite_path, { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h }, 9 ));
+
+	ecs.createEntity(board_id, 
+		Transform	{ .id = board_id, 
+								.scale = {31.25, 31.25}
+							},
+		SpriteView{ .id = board_id, 
+								.sprite_path = board_sprite_path, 
+								.src_rect = { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h }, 
+								.zindex = 9 
+							}
+	);
 
 	// snake init
 	BoardPos ss1_pos = { 3, BOARD_HEIGHT / 2 };
 	BoardPos ss2_pos = { 4, BOARD_HEIGHT / 2 };
 	u32 ss1_id = createSnakeSegment({ 0, ss1_pos, snakedir::LEFT, snakedir::RIGHT, STRAIGHT });
 	createSnakeSegment({ 0, ss2_pos, snakedir::LEFT, snakedir::RIGHT, STRAIGHT });
-	transforms.getComponent(ss1_id).rot = 180;
-	SpriteAnim& ss1_anim = anims.getComponent(ss1_id);
+	ecs.getc<Transform>(ss1_id).rot = 180;
+	ecs.getNextc(ss1_id).rot = 180;
+
+	SpriteAnim& ss1_anim = ecs.getc<SpriteAnim>(ss1_id);
 	ss1_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
 	ss1_anim.current_frame = 15;
-	views.getComponent(ss1_id).src_rect = {
-		ss1_anim.current_frame % ss1_anim.cols * ss1_anim.cellw,
-		ss1_anim.current_frame / ss1_anim.cols * ss1_anim.cellh,
-		ss1_anim.cellw,
-		ss1_anim.cellh
+	ecs.getc<SpriteView>(ss1_id).src_rect = {
+		.x = ss1_anim.current_frame % ss1_anim.cols * ss1_anim.cellw,
+		.y = ss1_anim.current_frame / ss1_anim.cols * ss1_anim.cellh,
+		.w = ss1_anim.cellw,
+		.h = ss1_anim.cellh
 	};
 	snakedir::direction next_dir = snakedir::RIGHT;
 
 	// apple init
-	transforms.createComponent(apple_id, { apple_id });
-	views.createComponent(apple_id, SpriteView(apple_id, apple_sprite_path, { 0, 0, 64, 64 }, 11));
+	ecs.createEntity(apple_id,
+		Transform	{ .id = apple_id 
+							},
+		SpriteView{ .id = apple_id, 
+								.sprite_path = apple_sprite_path, 
+								.src_rect = { 0, 0, 64, 64 }, 
+								.zindex = 11 
+							}
+	);
 	generateApplePos();
-
-	// camera init
-	
 	changePause();
-	transforms.next_transforms = transforms.components;
-
-
 }
 
 // Cleans up sdl

@@ -159,11 +159,11 @@ public:
   void destroyComponent(const u32& entity_to_remove) {
     u32 index_to_remove = id_map[entity_to_remove];
     id_map[entity_to_remove] = -1;
+    n_components--;
     for (u32 i = index_to_remove; i < n_components; ++i) {
       components[i] = components[i+1];
       id_map[components[i].id]--;
     }
-    n_components--;
   }
 
   bool exists(const u32& id) {
