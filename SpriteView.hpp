@@ -3,7 +3,6 @@
 #include "Sprite.hpp"
 
 struct SpriteView {
-  u32 id;
   std::string sprite_path;
   SDL_Rect src_rect;
   u32 zindex = 10;

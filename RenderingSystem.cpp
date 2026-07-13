@@ -20,8 +20,8 @@ void RenderingSystem::render(float delta) {
 
 	for (i32 i = 0; i < views.n_components; ++i) {
 		const SpriteView& view = views.components[i];
-		const Transform& curr_t = transforms.getComponent(view.id);
-		const Transform& next_t = transforms.getNextComponent(view.id);
+		const Transform& curr_t = transforms.getComponent(views.idFromIndex(i));
+		const Transform& next_t = transforms.getNextComponent(views.idFromIndex(i));
 		const Transform t = lerp(curr_t, next_t, delta);
 		SDL_Rect src_rect = view.src_rect;
 		// Start at middle of viewport, translate by camera, then translate by position, center based on scale, multiply to scale from internal to actual size

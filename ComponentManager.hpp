@@ -38,6 +38,11 @@ public:
     return id_map[id] != -1;
   }
 
+  // Given an index into the components array, returns the id of the component at the index
+  u32 idFromIndex(const u32& index) {
+    return entity_map[index];
+  }
+
   void destroyComponent(const u32& entity_to_remove) {
     u32 index_to_remove = id_map[entity_to_remove];
     u32 last_index = n_components - 1;
@@ -89,6 +94,11 @@ public:
     return next_transforms[id_map[id]];
   }
 
+  // Given an index into the components array, returns the id of the component at the index
+  u32 idFromIndex(const u32& index) {
+    return entity_map[index];
+  }
+
   void destroyComponent(const u32& entity_to_remove) {
     u32 index_to_remove = id_map[entity_to_remove];
     u32 last_index = n_components - 1;
@@ -132,28 +142,38 @@ class ComponentManager<SpriteView> : public ComponentManagerInterface {
 public:
   ComponentManager<SpriteView>() {
     id_map.fill(-1);
+    entity_map.fill(-1);
   };
   ~ComponentManager<SpriteView>() = default;
 
   void createComponent(const u32& id, const SpriteView& component) {
-    int i = n_components;
+    u32 i = n_components;
     while (i > 0) {
       if (components[i - 1].zindex <= component.zindex) {
         break;
       }
       else {
         components[i] = components[i - 1];
-        id_map[components[i].id]++;
+        entity_map[i] = entity_map[i - 1];
+        id_map[entity_map[i]]++;
+        //id_map[components[i].id]++;
+        
       }
       --i;
     }
     components[i] = component;
     id_map[id] = i;
+    entity_map[i] = id;
     ++n_components;
   }
 
   SpriteView& getComponent(const u32& id) {
     return components[id_map[id]];
+  }
+
+  // Given an index into the components array, returns the id of the component at the index
+  u32 idFromIndex(const u32& index) {
+    return entity_map[index];
   }
 
   void destroyComponent(const u32& entity_to_remove) {
@@ -162,7 +182,10 @@ public:
     n_components--;
     for (u32 i = index_to_remove; i < n_components; ++i) {
       components[i] = components[i+1];
-      id_map[components[i].id]--;
+      entity_map[i] = entity_map[i+1];
+      //id_map[components[i].id]--;
+      id_map[entity_map[i]]--;
+      
     }
   }
 
@@ -184,4 +207,5 @@ public:
   u32 n_components = 0;
   std::array<SpriteView, 5000> components; // TODO: Swap over to using a heap (faster for sorted)
   std::array<i32, 5000> id_map; // maps entity ids to index
+  std::array<i32, 5000> entity_map; // maps index to entity id
 };

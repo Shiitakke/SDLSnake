@@ -7,7 +7,6 @@
 #include "common.hpp"
 
 struct SpriteAnim {
-  u32 id;
   i32 rows;
   i32 cols;
   i32 cellw;

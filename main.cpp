@@ -226,19 +226,18 @@ void generateAppleParticles() {
 	for (i32 i = 0; i < 10; ++i) {
 		u32 nextid = getNextId();
 		ecs.createEntity(nextid,
-			Transform	{ .id = nextid, 
+			Transform	{
 									.pos = {apple_transform.pos.x, apple_transform.pos.y}, 
 									.scale = {scale_range(mt), scale_range(mt)} 
 								},
-			SpriteView{ .id = nextid, 
-									.sprite_path = apple_sprite_path, 
+			SpriteView{ .sprite_path = apple_sprite_path, 
 									.src_rect = {view_range(mt), view_range(mt), 8, 8} 
 								},
-			LinearVelocity{ .id = nextid, 
+			LinearVelocity{
 											.velocity = {vel_range(mt), vel_range(mt)}, 
 											.friction = 0.1f 
 										},
-			AngularVelocity { .id = nextid, 
+			AngularVelocity {
 												.velocity = rot_range(mt) 
 											}
 		);
@@ -394,16 +393,15 @@ u32 createSnakeSegment(SnakeSegment ss) {
 	ss.id = new_segment_id;
 	std::tuple<float, float> t_pos = boardPosToWorldPos(ss.pos);
 	ecs.createEntity( new_segment_id,
-		Transform	{	.id = new_segment_id, 
+		Transform	{
 								.pos = {std::get<0>(t_pos), std::get<1>(t_pos)}, 
 								.scale = {2, 2} 
 							},
-		SpriteView{ .id = new_segment_id, 
-								.sprite_path = snake_sprite_path, 
+		SpriteView{ .sprite_path = snake_sprite_path, 
 								.src_rect = {0, 0, 32, 32}, 
 								.zindex = 11 
 							},
-		SpriteAnim{ .id = new_segment_id, 
+		SpriteAnim{
 								.rows = 4, .cols = 4, 
 								.cellw = 32, .cellh = 32, 
 								.framerate = 56, 
@@ -434,11 +432,10 @@ void changePause() {
 	if (!is_paused) {
 		Sprite& pause_sprite = sprite_manager.getSprite(pause_sprite_path);
 		ecs.createEntity(pauseid, 
-			Transform	{ .id = pauseid,
+			Transform	{
 									.scale = {4, 4}
 								},
-			SpriteView{ .id = pauseid,
-									.sprite_path = pause_sprite_path,
+			SpriteView{ .sprite_path = pause_sprite_path,
 									.src_rect = {0, 0, pause_sprite.w, pause_sprite.h},
 									.zindex = 15
 								}
@@ -463,7 +460,7 @@ void updateAnims(
 			anim.current_frame = anim.anim_graph[anim.current_frame];
 			anim.since_last_update -= TIME_STEP;
 		}
-		views.getComponent(anim.id).src_rect = {
+		views.getComponent(anims.idFromIndex(i)).src_rect = {
 			anim.current_frame % anim.cols * anim.cellw,
 			anim.current_frame / anim.cols * anim.cellh,
 			anim.cellw,
@@ -479,7 +476,7 @@ void updateLinearVelocities(
 	#pragma omp parallel for
 	for (int i = 0; i < linear_velocities.n_components; ++i) {
 		LinearVelocity& v = linear_velocities.components[i];
-		Transform& t = transforms.getNextComponent(v.id);
+		Transform& t = transforms.getNextComponent(linear_velocities.idFromIndex(i));
 		t.pos = t.pos + v.velocity;
 		v.velocity = v.acceleration + v.velocity * (1 - v.friction);
 	}
@@ -492,7 +489,7 @@ void updateAngularVelocities(
 	#pragma omp parallel for
 	for (int i = 0; i < angular_velocities.n_components; ++i) {
 		AngularVelocity& v = angular_velocities.components[i];
-		Transform& t = transforms.getNextComponent(v.id);
+		Transform& t = transforms.getNextComponent(angular_velocities.idFromIndex(i));
 		t.rot = t.rot + v.velocity;
 		v.velocity = v.acceleration + v.velocity * (1 - v.friction);
 	}
@@ -528,7 +525,7 @@ void initGame() {
 	ecs.registerComponentType<AngularVelocity>();
 
 	u32 cameraid = getNextId();
-	ecs.createComponent<Transform>(cameraid, { cameraid });
+	ecs.createComponent<Transform>(cameraid, { });
 	rendering_system = new RenderingSystem(
 		ecs.getComponentManager<Transform>(),
 		ecs.getComponentManager<SpriteView>(),
@@ -548,11 +545,9 @@ void initGame() {
 	u32 board_id = getNextId();
 
 	ecs.createEntity(board_id, 
-		Transform	{ .id = board_id, 
-								.scale = {31.25, 31.25}
+		Transform	{ .scale = {31.25, 31.25}
 							},
-		SpriteView{ .id = board_id, 
-								.sprite_path = board_sprite_path, 
+		SpriteView{ .sprite_path = board_sprite_path, 
 								.src_rect = { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h }, 
 								.zindex = 9 
 							}
@@ -579,10 +574,8 @@ void initGame() {
 
 	// apple init
 	ecs.createEntity(apple_id,
-		Transform	{ .id = apple_id 
-							},
-		SpriteView{ .id = apple_id, 
-								.sprite_path = apple_sprite_path, 
+		Transform	{ },
+		SpriteView{ .sprite_path = apple_sprite_path, 
 								.src_rect = { 0, 0, 64, 64 }, 
 								.zindex = 11 
 							}
