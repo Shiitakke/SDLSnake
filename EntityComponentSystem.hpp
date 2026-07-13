@@ -23,6 +23,14 @@ public:
     createEntity(id, Fargs...);
   }
 
+  template <typename T, typename... Targs>
+  u32 createEntity(T component, Targs... Fargs) {
+    u32 id = getNextId();
+    createComponent<T>(id, component);
+    createEntity(id, Fargs...);
+    return id;
+  }
+
   template <typename T>
   void createComponent(u32 id, T component) {
     getComponentManager<T>().createComponent(id, component);

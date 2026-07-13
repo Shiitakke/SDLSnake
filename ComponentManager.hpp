@@ -156,8 +156,6 @@ public:
         components[i] = components[i - 1];
         entity_map[i] = entity_map[i - 1];
         id_map[entity_map[i]]++;
-        //id_map[components[i].id]++;
-        
       }
       --i;
     }
@@ -183,7 +181,6 @@ public:
     for (u32 i = index_to_remove; i < n_components; ++i) {
       components[i] = components[i+1];
       entity_map[i] = entity_map[i+1];
-      //id_map[components[i].id]--;
       id_map[entity_map[i]]--;
       
     }
@@ -202,7 +199,6 @@ public:
       destroyComponent(id);
     }
   }
-
 
   u32 n_components = 0;
   std::array<SpriteView, 5000> components; // TODO: Swap over to using a heap (faster for sorted)

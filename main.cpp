@@ -70,7 +70,6 @@ bool initSdl();
 void initGame();
 void close();
 
-u32 getNextId();
 void changePause();
 void generateApplePos();
 void generateAppleParticles();
@@ -93,7 +92,6 @@ void destroySnakeSegment();
 
 // Engine stuff
 bool quit = false;
-static IdManager id_manager;
 static SpriteManager sprite_manager;
 static RenderingSystem* rendering_system;
 static EntityComponentSystem ecs;
@@ -107,7 +105,7 @@ std::string board_sprite_path = "./assets/board.png";
 std::string pause_sprite_path = "./assets/pause.png";
 static ComponentManager<SnakeSegment> snake_segments;
 std::deque<u32> snake;
-u32 apple_id = getNextId();
+u32 apple_id = 0;
 
 tile::tile board[BOARD_WIDTH][BOARD_HEIGHT] = { tile::EMPTY };
 
@@ -188,10 +186,6 @@ int main(int argc, char* args[]) {
 	return 0;
 }
 
-u32 getNextId() {
-	return ecs.getNextId();
-}
-
 void generateApplePos() {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -224,8 +218,7 @@ void generateAppleParticles() {
 	std::uniform_real_distribution<float> scale_range{ 1., 3. };
 	std::uniform_real_distribution<float> rot_range{ 0, 30 };
 	for (i32 i = 0; i < 10; ++i) {
-		u32 nextid = getNextId();
-		ecs.createEntity(nextid,
+		ecs.createEntity(
 			Transform	{
 									.pos = {apple_transform.pos.x, apple_transform.pos.y}, 
 									.scale = {scale_range(mt), scale_range(mt)} 
@@ -389,10 +382,8 @@ void updateSnake(snakedir::direction& d) {
 }
 
 u32 createSnakeSegment(SnakeSegment ss) {
-	u32 new_segment_id = getNextId();
-	ss.id = new_segment_id;
 	std::tuple<float, float> t_pos = boardPosToWorldPos(ss.pos);
-	ecs.createEntity( new_segment_id,
+	u32 new_segment_id = ecs.createEntity(
 		Transform	{
 								.pos = {std::get<0>(t_pos), std::get<1>(t_pos)}, 
 								.scale = {2, 2} 
@@ -410,6 +401,7 @@ u32 createSnakeSegment(SnakeSegment ss) {
 							}
 
 	);
+	ss.id = new_segment_id;
 	snake_segments.createComponent(new_segment_id, ss);
 	snake.emplace_back(new_segment_id);
 	board[ss.pos.x][ss.pos.y] = tile::SNAKE;
@@ -427,11 +419,11 @@ void destroySnakeSegment() {
 
 void changePause() {
 	// pause screen image init
-	static u32 pauseid = getNextId();
+	static u32 pauseid = 0;
 	static bool is_paused = false;
 	if (!is_paused) {
 		Sprite& pause_sprite = sprite_manager.getSprite(pause_sprite_path);
-		ecs.createEntity(pauseid, 
+		pauseid = ecs.createEntity( 
 			Transform	{
 									.scale = {4, 4}
 								},
@@ -442,7 +434,6 @@ void changePause() {
 		);
 	} else {
 		ecs.destroyEntity(pauseid);
-		pauseid = getNextId();
 	}
 	is_paused = !is_paused;
 }
@@ -524,7 +515,7 @@ void initGame() {
 	ecs.registerComponentType<LinearVelocity>();
 	ecs.registerComponentType<AngularVelocity>();
 
-	u32 cameraid = getNextId();
+	u32 cameraid = ecs.getNextId();
 	ecs.createComponent<Transform>(cameraid, { });
 	rendering_system = new RenderingSystem(
 		ecs.getComponentManager<Transform>(),
@@ -542,9 +533,7 @@ void initGame() {
 	sprite_manager.loadSprite(pause_sprite_path);
 
 	// board init
-	u32 board_id = getNextId();
-
-	ecs.createEntity(board_id, 
+	ecs.createEntity(
 		Transform	{ .scale = {31.25, 31.25}
 							},
 		SpriteView{ .sprite_path = board_sprite_path, 
@@ -573,7 +562,7 @@ void initGame() {
 	snakedir::direction next_dir = snakedir::RIGHT;
 
 	// apple init
-	ecs.createEntity(apple_id,
+	apple_id = ecs.createEntity(
 		Transform	{ },
 		SpriteView{ .sprite_path = apple_sprite_path, 
 								.src_rect = { 0, 0, 64, 64 }, 
