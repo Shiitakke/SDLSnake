@@ -509,12 +509,6 @@ bool initSdl() {
 }
 
 void initGame() {
-	ecs.registerComponentType<Transform>();
-	ecs.registerComponentType<SpriteView>();
-	ecs.registerComponentType<SpriteAnim>();
-	ecs.registerComponentType<LinearVelocity>();
-	ecs.registerComponentType<AngularVelocity>();
-
 	u32 cameraid = ecs.getNextId();
 	ecs.createComponent<Transform>(cameraid, { });
 	rendering_system = new RenderingSystem(
