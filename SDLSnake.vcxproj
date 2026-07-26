@@ -151,28 +151,48 @@
   <ItemGroup>
     <ClCompile Include="EntityComponentSystem.cpp" />
     <ClCompile Include="IdManager.cpp" />
+    <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="IScene.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PauseController.cpp" />
     <ClCompile Include="RenderingSystem.cpp" />
+    <ClCompile Include="SnakeGameScene.cpp" />
+    <ClCompile Include="SnakeController.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="TitleMenuController.cpp" />
+    <ClCompile Include="TitleScreenScene.cpp" />
+    <ClCompile Include="UnpauseController.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="vec.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AngularVelocity.hpp" />
+    <ClInclude Include="assets.hpp" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="common.hpp" />
     <ClInclude Include="ComponentManager.hpp" />
     <ClInclude Include="EntityComponentSystem.hpp" />
     <ClInclude Include="IdManager.hpp" />
+    <ClInclude Include="InputSystem.hpp" />
+    <ClInclude Include="IScene.hpp" />
+    <ClInclude Include="PauseController.hpp" />
     <ClInclude Include="RenderingSystem.hpp" />
+    <ClInclude Include="SnakeGameScene.hpp" />
+    <ClInclude Include="SnakeController.hpp" />
     <ClInclude Include="SpriteAnim.hpp" />
     <ClInclude Include="Sprite.hpp" />
     <ClInclude Include="SpriteManager.hpp" />
     <ClInclude Include="SpriteView.hpp" />
+    <ClInclude Include="TitleMenuController.hpp" />
+    <ClInclude Include="TitleScreenScene.hpp" />
     <ClInclude Include="Transform.hpp" />
+    <ClInclude Include="IUserController.hpp" />
+    <ClInclude Include="UnpauseController.hpp" />
     <ClInclude Include="util.hpp" />
     <ClInclude Include="vec.hpp" />
     <ClInclude Include="LinearVelocity.hpp" />
+    <ClInclude Include="World.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

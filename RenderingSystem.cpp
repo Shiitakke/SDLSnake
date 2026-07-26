@@ -18,7 +18,7 @@ void RenderingSystem::render(float delta) {
 	const Transform& cam_next_t = transforms.getNextComponent(camera.id);
 	const Transform cam_final_t = lerp(cam_curr_t, cam_next_t, delta);
 
-	for (i32 i = 0; i < views.n_components; ++i) {
+	for (u32 i = 0; i < views.n_components; ++i) {
 		const SpriteView& view = views.components[i];
 		const Transform& curr_t = transforms.getComponent(views.idFromIndex(i));
 		const Transform& next_t = transforms.getNextComponent(views.idFromIndex(i));

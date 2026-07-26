@@ -25,6 +25,10 @@ bool SpriteManager::loadSprite(const std::string& path) {
   return true;
 }
 
+void SpriteManager::unloadSprite(const std::string& path) {
+  sprite_map.erase(sprite_map.find(path));
+}
+
 Sprite& SpriteManager::getSprite(const std::string& path) {
   return sprites[sprite_map[path]];
 }

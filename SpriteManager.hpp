@@ -13,6 +13,7 @@ public:
   SpriteManager() = default;
   ~SpriteManager() = default;
   bool loadSprite(const std::string& path);
+  void unloadSprite(const std::string& path);
   Sprite& getSprite(const std::string& path);
   void unloadAll();
   inline void setRenderer(SDL_Renderer* _renderer) { renderer = _renderer; };

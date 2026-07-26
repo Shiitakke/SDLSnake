@@ -15,7 +15,7 @@ public:
     ComponentManager<Transform>& _transforms,
     ComponentManager<SpriteView>& _views,
     SpriteManager& _sprite_manager,
-    Camera _camera
+    Camera& _camera
   ) :
     transforms(_transforms),
     views(_views),
@@ -40,7 +40,7 @@ private:
   ComponentManager<Transform>& transforms;
   ComponentManager<SpriteView>& views;
   SpriteManager& sprite_manager;
-  Camera camera;
+  Camera& camera;
   SDL_Window* window = nullptr;
   SDL_Renderer* renderer = nullptr;
   u32 internal_screen_width = INTERNAL_WINDOW_WIDTH;

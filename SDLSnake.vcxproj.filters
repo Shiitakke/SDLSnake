@@ -28,6 +28,18 @@
     <Filter Include="Source Files\Systems">
       <UniqueIdentifier>{42cf943e-2a89-41d5-b78b-d44afff3d040}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UserControllers">
+      <UniqueIdentifier>{b54ce690-37a9-4feb-85c4-c357d6d7963b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UserControllers">
+      <UniqueIdentifier>{89895262-8abb-4b55-8930-61e3ec0d33bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scenes">
+      <UniqueIdentifier>{eff28816-bba4-4785-a28c-6eb274a958f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scenes">
+      <UniqueIdentifier>{018986b4-755d-4027-8688-5bfdc7147b11}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -50,6 +62,33 @@
     </ClCompile>
     <ClCompile Include="RenderingSystem.cpp">
       <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SnakeController.cpp">
+      <Filter>Source Files\UserControllers</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseController.cpp">
+      <Filter>Source Files\UserControllers</Filter>
+    </ClCompile>
+    <ClCompile Include="IScene.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScreenScene.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleMenuController.cpp">
+      <Filter>Source Files\UserControllers</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SnakeGameScene.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="UnpauseController.cpp">
+      <Filter>Source Files\UserControllers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +136,39 @@
     </ClInclude>
     <ClInclude Include="EntityComponentSystem.hpp">
       <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem.hpp">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="IUserController.hpp">
+      <Filter>Header Files\UserControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="SnakeController.hpp">
+      <Filter>Header Files\UserControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseController.hpp">
+      <Filter>Header Files\UserControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="IScene.hpp">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScreenScene.hpp">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="assets.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleMenuController.hpp">
+      <Filter>Header Files\UserControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="World.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SnakeGameScene.hpp">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="UnpauseController.hpp">
+      <Filter>Header Files\UserControllers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

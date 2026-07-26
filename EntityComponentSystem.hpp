@@ -10,11 +10,6 @@
 
 class EntityComponentSystem {
 public:
-  //template <typename T>
-  //void registerComponentType() {
-  //  componentManagerMap.emplace(typeid(T).name(), new ComponentManager<T>);
-  //}
-
   template <typename T>
   ComponentManager<T>& registerComponentType() {
     componentManagerMap.emplace(typeid(T).name(), new ComponentManager<T>);
@@ -70,7 +65,6 @@ public:
 
   template <typename T>
   ComponentManager<T>& getComponentManager() {
-    //static ComponentManager<T>& component_manager = *static_cast<ComponentManager<T>*>(componentManagerMap[typeid(T).name()]);
     static ComponentManager<T>& component_manager = registerComponentType<T>();
     return component_manager;
   }
@@ -83,10 +77,8 @@ public:
     id_manager.returnId(id);
   }
 
-
 private:
   IdManager id_manager;
   std::unordered_map<const char*, ComponentManagerInterface*> componentManagerMap;
-
 };
 
