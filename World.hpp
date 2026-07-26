@@ -31,6 +31,7 @@ public:
   Camera camera;
   SpriteManager sprite_manager;
   TimelineManager timeline_manager;
+  bool paused = false;
 
 private:
 };

@@ -13,7 +13,7 @@ void UnpauseController::handleEvent(const SDL_Event& e) {
 
 // pause screen image init
 void UnpauseController::changePause() {
-	snake.paused = false;
+	world.paused = false;
 	world.ecs.destroyEntity(pauseid);
 	InputSystem::instance().popContext();
 }

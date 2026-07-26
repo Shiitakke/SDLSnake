@@ -13,7 +13,7 @@ void PauseController::handleEvent(const SDL_Event& e) {
 }
 // pause screen image init
 void PauseController::changePause() {
-	snake.paused = true;
+	world.paused = true;
 	Sprite& pause_sprite = world.sprite_manager.getSprite(pause_sprite_path);
 	u32 pauseid = world.ecs.createEntity( 
 		Transform	{

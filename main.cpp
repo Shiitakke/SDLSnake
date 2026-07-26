@@ -81,24 +81,25 @@ int main(int argc, char* args[]) {
 			ComponentManager<Transform>& transforms = world.ecs.getComponentManager<Transform>();
 			transforms.components = transforms.next_transforms;
 
-			world.updateScene();
+			if (!world.paused) {
+				world.updateScene();
 			
-			updateTimelines(world.timeline_manager);
+				updateTimelines(world.timeline_manager);
 
-			updateAnims(
-				world.ecs.getComponentManager<SpriteAnim>(),
-				world.ecs.getComponentManager<SpriteView>()
-			);
+				updateAnims(
+					world.ecs.getComponentManager<SpriteAnim>(),
+					world.ecs.getComponentManager<SpriteView>()
+				);
 		
-			updateLinearVelocities(
-				world.ecs.getComponentManager<Transform>(),
-				world.ecs.getComponentManager<LinearVelocity>()
-			);
-			updateAngularVelocities(
-				world.ecs.getComponentManager<Transform>(),
-				world.ecs.getComponentManager<AngularVelocity>()
-			);
-			
+				updateLinearVelocities(
+					world.ecs.getComponentManager<Transform>(),
+					world.ecs.getComponentManager<LinearVelocity>()
+				);
+				updateAngularVelocities(
+					world.ecs.getComponentManager<Transform>(),
+					world.ecs.getComponentManager<AngularVelocity>()
+				);
+			}
 			period -= TIME_STEP;			
 		}
 		rendering_system->render(period / TIME_STEP);
