@@ -6,6 +6,9 @@
 #include "Sprite.hpp"
 
 bool SpriteManager::loadSprite(const std::string& path) {
+  if (sprite_map.contains(path)) {
+    return false;
+  }
   bool success = true;
   SDL_Surface* s = IMG_Load(path.c_str());
   if (s == nullptr) {

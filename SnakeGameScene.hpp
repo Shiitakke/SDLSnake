@@ -51,9 +51,9 @@ public:
 	};
 
 	SnakeDir next_dir = SnakeDir::RIGHT;
-	bool paused = false;
 
 private:
+	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;
 	SpriteManager* sprite_manager = nullptr;
 
@@ -62,6 +62,8 @@ private:
 	void destroySnakeSegment();
 	void generateApplePos();
 	void generateAppleParticles();
+	void onDeath();
+	void createRetryScreen();
 	std::tuple<float, float> boardPosToWorldPos(BoardPos pos);
 	
 	u32 BOARD_WIDTH = 16;
@@ -72,5 +74,6 @@ private:
 	std::deque<u32> snake;
 	u32 apple_id = 0;
 	std::vector<u32> particles = {};
+	bool paused = false;
 };
 

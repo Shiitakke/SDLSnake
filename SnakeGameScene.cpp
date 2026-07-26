@@ -12,8 +12,10 @@
 #include "IUserController.hpp"
 #include "SnakeController.hpp"
 #include "PauseController.hpp"
+#include "RetryMenuController.hpp"
 
 void SnakeGameScene::initialise(World& world, SpriteManager& sprite_manager) {
+	this->world = &(world);
 	this->ecs = &(world.ecs);
 	this->sprite_manager = &(world.sprite_manager);
 	// sprites init
@@ -80,7 +82,7 @@ void SnakeGameScene::deinitialise(World& world, SpriteManager& sprite_manager) {
 		ecs->destroyEntity(particle);
 	}
 	ecs->destroyEntity(apple_id);
-	InputSystem::instance().popContext();
+	InputSystem::instance().clearContexts();
 }
 
 void SnakeGameScene::update() {
@@ -165,13 +167,17 @@ void SnakeGameScene::updateSnake() {
 		if (new_pos.x < 0 || new_pos.x >= BOARD_WIDTH ||
 			new_pos.y < 0 || new_pos.y >= BOARD_HEIGHT)
 		{
+			onDeath();
 			return;
 		}
 
+		
+		if (board[new_pos.x][new_pos.y] != BoardTile::APPLE) {
+			destroySnakeSegment();
+		}
 		switch (board[new_pos.x][new_pos.y]) {
 		case BoardTile::EMPTY:
-		{
-			destroySnakeSegment();
+		{	
 			// Set the new tail to play a reverse animation of the segment shrinking
 			u32 new_tail_id = snake.front();
 			SnakeSegment& new_tail = snake_segments.getComponent(new_tail_id);
@@ -203,6 +209,7 @@ void SnakeGameScene::updateSnake() {
 			generateApplePos();
 			break;
 		case BoardTile::SNAKE:
+			onDeath();
 			break;
 		}
 		u32 new_segment_id = createSnakeSegment({ 0, new_pos, in_dir, next_dir, SnakeSpriteType::STRAIGHT });
@@ -319,3 +326,79 @@ std::tuple<float, float> SnakeGameScene::boardPosToWorldPos(BoardPos pos) {
 	return { x, -y };
 };
 
+void SnakeGameScene::onDeath() {
+	paused = true;
+	// play death animation
+	// show retry screen
+	createRetryScreen();
+}
+
+void SnakeGameScene::createRetryScreen() {
+	sprite_manager->loadSprite(game_over_sprite_path);
+	sprite_manager->loadSprite(retry_sprite_path);
+	sprite_manager->loadSprite(menu_sprite_path);
+	sprite_manager->loadSprite(quit_sprite_path);
+	sprite_manager->loadSprite(arrow_sprite_path);
+	// retry logo
+	u32 retry_logo_id = ecs->createEntity(
+		Transform{	.pos {.x = 0, .y = 100}, 
+								.scale = {.x = 4, .y = 4}
+		},
+		SpriteView{ .sprite_path = game_over_sprite_path,
+								.src_rect = {0, 0, sprite_manager->getSprite(game_over_sprite_path).w, sprite_manager->getSprite(game_over_sprite_path).h },
+								.zindex = 12
+		}
+	);
+	// retry option
+	u32 retry_option_id = ecs->createEntity(
+		Transform{	.pos {.x = -300, .y = -150},
+								.scale = {.x = 2, .y = 2}
+		},
+		SpriteView{ .sprite_path = retry_sprite_path,
+								.src_rect = {0, 0, sprite_manager->getSprite(retry_sprite_path).w, sprite_manager->getSprite(retry_sprite_path).h },
+								.zindex = 12
+		}
+	);
+	// main menu option
+	u32 retry_menu_id = ecs->createEntity(
+		Transform{	.pos {.x = 0, .y = -150},
+								.scale = {.x = 2, .y = 2}
+
+		},
+		SpriteView{ .sprite_path = menu_sprite_path,
+								.src_rect = {0, 0, sprite_manager->getSprite(menu_sprite_path).w, sprite_manager->getSprite(menu_sprite_path).h },
+								.zindex = 12
+		}
+	);
+	// quit option
+	u32 retry_quit_id = ecs->createEntity(
+		Transform{	.pos {.x = 300, .y = -150}, 
+								.scale = {.x = 2, .y = 2}
+		},
+		SpriteView{ .sprite_path = quit_sprite_path,
+								.src_rect = {0, 0, sprite_manager->getSprite(quit_sprite_path).w, sprite_manager->getSprite(quit_sprite_path).h },
+								.zindex = 12
+		}
+	);
+	// selection arrow
+	u32 arrow_id = ecs->createEntity(
+		Transform{ .pos {.x = -450, .y = -150},
+								.scale = {.x = 2, .y = 2}
+		},
+		SpriteView{ .sprite_path = arrow_sprite_path,
+								.src_rect = {0, 0, sprite_manager->getSprite(arrow_sprite_path).w, sprite_manager->getSprite(arrow_sprite_path).h },
+								.zindex = 12
+		}
+	);
+	// retry screen controller
+	IUserController* retry_controller = new RetryMenuController(
+		*world,
+		retry_logo_id,
+		retry_option_id,
+		retry_menu_id,
+		retry_quit_id,
+		arrow_id
+	);
+	InputSystem::instance().pushContext();
+	InputSystem::instance().addToCurrentContext(retry_controller);
+}

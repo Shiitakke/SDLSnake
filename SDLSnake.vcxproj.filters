@@ -93,6 +93,9 @@
     <ClCompile Include="TimelineManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="RetryMenuController.cpp">
+      <Filter>Source Files\UserControllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.hpp">
@@ -178,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="TimelineManager.hpp">
       <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="RetryMenuController.hpp">
+      <Filter>Header Files\UserControllers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

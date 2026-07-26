@@ -32,8 +32,18 @@ void InputSystem::pushContext() {
 // Pops the last context from the stack
 // The context underneath will still contain controllers
 void InputSystem::popContext() {
+  for (IUserController* c : context_stack.back()) {
+    delete c;
+  }
   context_stack.pop_back();
 };
+
+void InputSystem::clearContexts() {
+  while (context_stack.size() > 0) {
+    popContext();
+  }
+}
+
 // Adds a new controller to the current context
 // Returns id of the added controller
 void InputSystem::addToCurrentContext(IUserController* to_add) {

@@ -36,7 +36,7 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
   );
   //create start option
   start_option_id = ecs.createEntity(
-    Transform{ .pos = {.x = 0, .y = -150},
+    Transform{  .pos = {.x = 0, .y = -150},
                 .scale = {3, 3}
     },
     SpriteView{ .sprite_path = start_sprite_path,
@@ -46,7 +46,7 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
   );
   //create quit option
   quit_option_id = ecs.createEntity(
-    Transform{ .pos = {.x = 0, .y = -300},
+    Transform{  .pos = {.x = 0, .y = -300},
                 .scale = {3, 3}
     },
     SpriteView{ .sprite_path = quit_sprite_path,
@@ -56,7 +56,7 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
   );
   //create arrow? (should this be left to the controller?)
   arrow_id = ecs.createEntity(
-    Transform{ .pos = {.x = -200, .y = -150},
+    Transform{  .pos = {.x = -200, .y = -150},
                 .scale = {2, 2}
     },
     SpriteView{ .sprite_path = arrow_sprite_path,

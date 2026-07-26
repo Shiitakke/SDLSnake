@@ -32,6 +32,7 @@ public:
   // Pops the last context from the stack
   // The context underneath will still contain controllers
   void popContext();
+  void clearContexts();
   // Adds a new controller to the current context
   // Returns id of the added controller
   void addToCurrentContext(IUserController* to_add);
