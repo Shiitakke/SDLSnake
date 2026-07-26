@@ -88,3 +88,4 @@ void TitleScreenScene::deinitialise(World& world, SpriteManager& sprite_manager)
   world.ecs.destroyEntity(board_id);
   InputSystem::instance().popContext();
 }
+

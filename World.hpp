@@ -2,6 +2,7 @@
 
 #include "EntityComponentSystem.hpp"
 #include "SpriteManager.hpp"
+#include "TimelineManager.hpp"
 #include "IScene.hpp"
 #include "Camera.hpp"
 
@@ -29,6 +30,7 @@ public:
   IScene* current_scene = nullptr;
   Camera camera;
   SpriteManager sprite_manager;
+  TimelineManager timeline_manager;
 
 private:
 };

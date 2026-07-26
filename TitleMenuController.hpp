@@ -20,6 +20,7 @@ public:
     arrow_transform(_arrow_transform),
     world(_world)
   {
+    timeline_id = world.timeline_manager.createTimeline({ .length = 1000 });
   }
   void handleEvent(const SDL_Event& e);
 private:
@@ -29,11 +30,16 @@ private:
   };
 
   void changeSelection();
+  void moveArrow(float delta);
 
   MenuSelection current_selection = MenuSelection::START;
   Transform& start_option_transform;
   Transform& quit_option_transform;
   Transform& arrow_transform;
   World& world;
+  u32 timeline_id = 0;
+  Transform start_pos;
+  Transform next_pos;
+  Transform curr_pos;
 };
 

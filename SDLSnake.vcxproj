@@ -159,6 +159,7 @@
     <ClCompile Include="SnakeGameScene.cpp" />
     <ClCompile Include="SnakeController.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="TimelineManager.cpp" />
     <ClCompile Include="TitleMenuController.cpp" />
     <ClCompile Include="TitleScreenScene.cpp" />
     <ClCompile Include="UnpauseController.cpp" />
@@ -184,6 +185,8 @@
     <ClInclude Include="Sprite.hpp" />
     <ClInclude Include="SpriteManager.hpp" />
     <ClInclude Include="SpriteView.hpp" />
+    <ClInclude Include="Timeline.hpp" />
+    <ClInclude Include="TimelineManager.hpp" />
     <ClInclude Include="TitleMenuController.hpp" />
     <ClInclude Include="TitleScreenScene.hpp" />
     <ClInclude Include="Transform.hpp" />

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include "SnakeGameScene.hpp"
+#include "util.hpp"
 
 void TitleMenuController::handleEvent(const SDL_Event& e) {
   if (e.type == SDL_KEYDOWN) {
@@ -32,9 +33,22 @@ void TitleMenuController::handleEvent(const SDL_Event& e) {
 }
 
 void TitleMenuController::changeSelection() {
+  start_pos = arrow_transform;
+  next_pos = arrow_transform;
   if (current_selection == MenuSelection::START) {
-    arrow_transform.pos.y = start_option_transform.pos.y;
+    next_pos.pos.y = start_option_transform.pos.y;
   } else {
-    arrow_transform.pos.y = quit_option_transform.pos.y;
+    next_pos.pos.y = quit_option_transform.pos.y;
   }
+  world.timeline_manager.destroyTimelineChecked(timeline_id);
+  world.timeline_manager.createTimeline({
+    .length = 200,
+    .on_update = [this](float delta)->void {moveArrow(delta);},
+    .delta_curve = [](float delta)->float {return 4 * delta * std::pow(1.f / (1.f + delta), 2);}
+  });
+}
+
+void TitleMenuController::moveArrow(float delta) {
+  Transform curr_pos = lerp(start_pos, next_pos, delta);
+  arrow_transform.pos = curr_pos.pos;
 }

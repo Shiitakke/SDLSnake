@@ -18,6 +18,7 @@
 #include "InputSystem.hpp"
 
 #include "ComponentManager.hpp"
+#include "TimelineManager.hpp"
 
 #include "Transform.hpp"
 #include "SpriteView.hpp"
@@ -30,6 +31,9 @@ bool initSdl();
 void initGame();
 void close();
 
+void updateTimelines(
+	TimelineManager& timeline_manager
+);
 void updateAnims(
 	ComponentManager<SpriteAnim>& anims,
 	ComponentManager<SpriteView>& views
@@ -78,6 +82,8 @@ int main(int argc, char* args[]) {
 			transforms.components = transforms.next_transforms;
 
 			world.updateScene();
+			
+			updateTimelines(world.timeline_manager);
 
 			updateAnims(
 				world.ecs.getComponentManager<SpriteAnim>(),
@@ -102,6 +108,22 @@ int main(int argc, char* args[]) {
 	}
 	close();
 	return 0;
+}
+
+void updateTimelines(
+	TimelineManager& timeline_manager
+) {
+	for (i32 i = 0; i < timeline_manager.timelines.n_components; ++i) {
+		Timeline& timeline = timeline_manager.timelines.components[i];
+		timeline.curr += TIME_STEP;
+		timeline.curr = std::min(timeline.curr, timeline.length);
+		float timeline_delta = timeline.curr / timeline.length;
+		timeline.on_update(timeline.delta_curve(timeline_delta));
+		if (timeline_delta >= 1.0f) {
+			timeline_manager.destroyTimeline(timeline.id);
+			i--;
+		}
+	}
 }
 
 void updateAnims(
