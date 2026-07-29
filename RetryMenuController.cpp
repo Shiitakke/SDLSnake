@@ -1,5 +1,6 @@
 #include "RetryMenuController.hpp"
 #include "TitleScreenScene.hpp"
+#include "SnakeGameScene.hpp"
 #include "util.hpp"
 #include "assets.hpp"
 
@@ -43,11 +44,10 @@ void RetryMenuController::handleEvent(const SDL_Event& e) {
     case SDLK_RETURN:
       switch (selections[curr_selection]) {
       case RetryMenuSelection::RETRY:
+        world.loadScene<SnakeGameScene>();
         break;
       case RetryMenuSelection::MENU:
         world.loadScene<TitleScreenScene>();
-
-        //InputSystem::instance().popContext();
         break;
       case RetryMenuSelection::QUIT:
         SDL_Event quit_e;
@@ -79,6 +79,7 @@ RetryMenuController::~RetryMenuController() {
 void RetryMenuController::changeSelection() {
   start_transform = arrow_transform;
   end_transform = selection_transforms[curr_selection];
+  end_transform.pos.x -= 150;
   curr_transform = arrow_transform;
   world.timeline_manager.destroyTimelineChecked(timeline_id);
   world.timeline_manager.createTimeline({
@@ -91,5 +92,4 @@ void RetryMenuController::changeSelection() {
 void RetryMenuController::moveArrow(float delta) {
   Transform curr_pos = lerp(start_transform, end_transform, delta);
   arrow_transform.pos = curr_pos.pos;
-  arrow_transform.pos.x -= 150;
 }
