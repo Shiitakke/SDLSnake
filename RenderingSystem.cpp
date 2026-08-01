@@ -41,7 +41,7 @@ void RenderingSystem::render(float delta) {
 		};
 		SDL_RenderCopyEx(
 			renderer,
-			sprite_manager.getSprite(view.sprite_path).t,
+			sprite_manager.getSprite(view.sprite_id).t,
 			&src_rect,
 			&dst_rect,
 			t.rot,

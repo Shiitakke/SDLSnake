@@ -15,6 +15,8 @@ public:
   bool loadSprite(const std::string& path);
   void unloadSprite(const std::string& path);
   Sprite& getSprite(const std::string& path);
+  Sprite& getSprite(const u32& id);
+  u32 getSpriteid(const std::string& path);
   void unloadAll();
   inline void setRenderer(SDL_Renderer* _renderer) { renderer = _renderer; };
 private:

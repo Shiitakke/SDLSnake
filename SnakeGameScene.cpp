@@ -29,6 +29,7 @@ void SnakeGameScene::initialise(World& world, SpriteManager& sprite_manager) {
 		Transform{ .scale = {31.25, 31.25}
 		},
 		SpriteView{ .sprite_path = board_sprite_path,
+								.sprite_id = sprite_manager.getSpriteid(board_sprite_path),
 								.src_rect = { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h },
 								.zindex = 9
 		}
@@ -57,6 +58,7 @@ void SnakeGameScene::initialise(World& world, SpriteManager& sprite_manager) {
 	apple_id = ecs->createEntity(
 		Transform{ },
 		SpriteView{ .sprite_path = apple_sprite_path,
+								.sprite_id = sprite_manager.getSpriteid(apple_sprite_path),
 								.src_rect = { 0, 0, 64, 64 },
 								.zindex = 11
 		}
@@ -239,6 +241,7 @@ u32 SnakeGameScene::createSnakeSegment(SnakeSegment ss) {
 								.scale = {2, 2}
 		},
 		SpriteView{ .sprite_path = snake_sprite_path,
+								.sprite_id = sprite_manager->getSpriteid(snake_sprite_path),
 								.src_rect = {0, 0, 32, 32},
 								.zindex = 11
 		},
@@ -305,6 +308,7 @@ void SnakeGameScene::generateAppleParticles() {
 									.scale = {scale_range(mt), scale_range(mt)}
 			},
 			SpriteView{ .sprite_path = apple_sprite_path,
+									.sprite_id = sprite_manager->getSpriteid(apple_sprite_path),
 									.src_rect = {view_range(mt), view_range(mt), 8, 8}
 			},
 			LinearVelocity{
@@ -345,6 +349,7 @@ void SnakeGameScene::createRetryScreen() {
 								.scale = {.x = 4, .y = 4}
 		},
 		SpriteView{ .sprite_path = game_over_sprite_path,
+								.sprite_id = sprite_manager->getSpriteid(game_over_sprite_path),
 								.src_rect = {0, 0, sprite_manager->getSprite(game_over_sprite_path).w, sprite_manager->getSprite(game_over_sprite_path).h },
 								.zindex = 12
 		}
@@ -355,6 +360,7 @@ void SnakeGameScene::createRetryScreen() {
 								.scale = {.x = 2, .y = 2}
 		},
 		SpriteView{ .sprite_path = retry_sprite_path,
+								.sprite_id = sprite_manager->getSpriteid(retry_sprite_path),
 								.src_rect = {0, 0, sprite_manager->getSprite(retry_sprite_path).w, sprite_manager->getSprite(retry_sprite_path).h },
 								.zindex = 12
 		}
@@ -366,6 +372,7 @@ void SnakeGameScene::createRetryScreen() {
 
 		},
 		SpriteView{ .sprite_path = menu_sprite_path,
+								.sprite_id = sprite_manager->getSpriteid(menu_sprite_path),
 								.src_rect = {0, 0, sprite_manager->getSprite(menu_sprite_path).w, sprite_manager->getSprite(menu_sprite_path).h },
 								.zindex = 12
 		}
@@ -376,6 +383,7 @@ void SnakeGameScene::createRetryScreen() {
 								.scale = {.x = 2, .y = 2}
 		},
 		SpriteView{ .sprite_path = quit_sprite_path,
+								.sprite_id = sprite_manager->getSpriteid(quit_sprite_path),
 								.src_rect = {0, 0, sprite_manager->getSprite(quit_sprite_path).w, sprite_manager->getSprite(quit_sprite_path).h },
 								.zindex = 12
 		}
@@ -386,6 +394,7 @@ void SnakeGameScene::createRetryScreen() {
 								.scale = {.x = 2, .y = 2}
 		},
 		SpriteView{ .sprite_path = arrow_sprite_path,
+								.sprite_id = sprite_manager->getSpriteid(arrow_sprite_path),
 								.src_rect = {0, 0, sprite_manager->getSprite(arrow_sprite_path).w, sprite_manager->getSprite(arrow_sprite_path).h },
 								.zindex = 12
 		}

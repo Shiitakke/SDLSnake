@@ -15,11 +15,11 @@ void PauseController::handleEvent(const SDL_Event& e) {
 void PauseController::changePause() {
 	world.paused = true;
 	Sprite& pause_sprite = world.sprite_manager.getSprite(pause_sprite_path);
-	u32 pauseid = world.ecs.createEntity( 
-		Transform	{
-								.scale = {4, 4}
+	u32 pauseid = world.ecs.createEntity(
+		Transform	{	.scale = {4, 4}
 							},
 		SpriteView{ .sprite_path = pause_sprite_path,
+								.sprite_id = world.sprite_manager.getSpriteid(pause_sprite_path),
 								.src_rect = {0, 0, pause_sprite.w, pause_sprite.h},
 								.zindex = 15
 							}

@@ -19,6 +19,7 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
     Transform{ .scale = {31.25, 31.25}
     },
     SpriteView{ .sprite_path = board_sprite_path,
+                .sprite_id = sprite_manager.getSpriteid(board_sprite_path),
                 .src_rect = { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h },
                 .zindex = 9
     }
@@ -30,6 +31,7 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
                .scale = {8, 8}
     },
     SpriteView{ .sprite_path = snake_logo_sprite_path,
+                .sprite_id = sprite_manager.getSpriteid(snake_logo_sprite_path),
                 .src_rect = { 0, 0, sprite_manager.getSprite(snake_logo_sprite_path).w, sprite_manager.getSprite(snake_logo_sprite_path).h },
                 .zindex = 10
     }
@@ -40,6 +42,7 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
                 .scale = {3, 3}
     },
     SpriteView{ .sprite_path = start_sprite_path,
+                .sprite_id = sprite_manager.getSpriteid(start_sprite_path),
                 .src_rect = { 0, 0, sprite_manager.getSprite(start_sprite_path).w, sprite_manager.getSprite(start_sprite_path).h },
                 .zindex = 10
     }
@@ -50,6 +53,7 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
                 .scale = {3, 3}
     },
     SpriteView{ .sprite_path = quit_sprite_path,
+                .sprite_id = sprite_manager.getSpriteid(quit_sprite_path),
                 .src_rect = { 0, 0, sprite_manager.getSprite(quit_sprite_path).w, sprite_manager.getSprite(quit_sprite_path).h },
                 .zindex = 10
     }
@@ -60,6 +64,7 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
                 .scale = {2, 2}
     },
     SpriteView{ .sprite_path = arrow_sprite_path,
+                .sprite_id = sprite_manager.getSpriteid(arrow_sprite_path),
                 .src_rect = { 0, 0, sprite_manager.getSprite(arrow_sprite_path).w, sprite_manager.getSprite(arrow_sprite_path).h },
                 .zindex = 10
     }

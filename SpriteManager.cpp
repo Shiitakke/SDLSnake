@@ -36,6 +36,14 @@ Sprite& SpriteManager::getSprite(const std::string& path) {
   return sprites[sprite_map[path]];
 }
 
+Sprite& SpriteManager::getSprite(const u32& id) {
+  return sprites[id];
+}
+
+u32 SpriteManager::getSpriteid(const std::string& path) {
+  return sprite_map[path];
+}
+
 void SpriteManager::unloadAll() {
   sprite_map.clear();
   for (Sprite& s : sprites) {
