@@ -54,13 +54,13 @@
     <ClCompile Include="IdManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="SpriteManager.cpp">
+    <ClCompile Include="TextureManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="EntityComponentSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="RenderingSystem.cpp">
+    <ClCompile Include="SDLRenderer.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
     <ClCompile Include="InputSystem.cpp">
@@ -96,6 +96,12 @@
     <ClCompile Include="RetryMenuController.cpp">
       <Filter>Source Files\UserControllers</Filter>
     </ClCompile>
+    <ClCompile Include="ITextureFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDLTextureFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.hpp">
@@ -113,13 +119,13 @@
     <ClInclude Include="AngularVelocity.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Sprite.hpp">
+    <ClInclude Include="Texture.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="SpriteAnim.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteView.hpp">
+    <ClInclude Include="Sprite.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="Transform.hpp">
@@ -134,11 +140,8 @@
     <ClInclude Include="IdManager.hpp">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteManager.hpp">
+    <ClInclude Include="TextureManager.hpp">
       <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderingSystem.hpp">
-      <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="EntityComponentSystem.hpp">
       <Filter>Header Files\Systems</Filter>
@@ -184,6 +187,18 @@
     </ClInclude>
     <ClInclude Include="RetryMenuController.hpp">
       <Filter>Header Files\UserControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLRenderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ITextureFactory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLTextureFactory.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

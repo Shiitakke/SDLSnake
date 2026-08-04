@@ -111,7 +111,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
@@ -158,13 +158,15 @@
     <ClCompile Include="IdManager.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="IScene.cpp" />
+    <ClCompile Include="ITextureFactory.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PauseController.cpp" />
-    <ClCompile Include="RenderingSystem.cpp" />
+    <ClCompile Include="SDLRenderer.cpp" />
     <ClCompile Include="RetryMenuController.cpp" />
+    <ClCompile Include="SDLTextureFactory.cpp" />
     <ClCompile Include="SnakeGameScene.cpp" />
     <ClCompile Include="SnakeController.cpp" />
-    <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TimelineManager.cpp" />
     <ClCompile Include="TitleMenuController.cpp" />
     <ClCompile Include="TitleScreenScene.cpp" />
@@ -182,16 +184,19 @@
     <ClInclude Include="EntityComponentSystem.hpp" />
     <ClInclude Include="IdManager.hpp" />
     <ClInclude Include="InputSystem.hpp" />
+    <ClInclude Include="IRenderer.hpp" />
     <ClInclude Include="IScene.hpp" />
+    <ClInclude Include="ITextureFactory.hpp" />
     <ClInclude Include="PauseController.hpp" />
-    <ClInclude Include="RenderingSystem.hpp" />
+    <ClInclude Include="SDLRenderer.hpp" />
     <ClInclude Include="RetryMenuController.hpp" />
+    <ClInclude Include="SDLTextureFactory.hpp" />
     <ClInclude Include="SnakeGameScene.hpp" />
     <ClInclude Include="SnakeController.hpp" />
     <ClInclude Include="SpriteAnim.hpp" />
+    <ClInclude Include="Texture.hpp" />
+    <ClInclude Include="TextureManager.hpp" />
     <ClInclude Include="Sprite.hpp" />
-    <ClInclude Include="SpriteManager.hpp" />
-    <ClInclude Include="SpriteView.hpp" />
     <ClInclude Include="Timeline.hpp" />
     <ClInclude Include="TimelineManager.hpp" />
     <ClInclude Include="TitleMenuController.hpp" />

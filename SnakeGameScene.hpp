@@ -7,16 +7,15 @@
 
 #include "EntityComponentSystem.hpp"
 #include "ComponentManager.hpp"
-#include "SpriteManager.hpp"
+#include "TextureManager.hpp"
 #include "SpriteAnim.hpp"
 #include "assets.hpp"
 
 class SnakeGameScene : public IScene {
 public:
 	SnakeGameScene() = default;
-
-	void initialise(World& world, SpriteManager& sprite_manager) override;
-	void deinitialise(World& world, SpriteManager& sprite_manager) override;
+	void initialise(World& world, TextureManager& texture_manager) override;
+	void deinitialise(World& world, TextureManager& texture_manager) override;
 	void update() override;
 
 	enum class SnakeDir {
@@ -55,7 +54,7 @@ public:
 private:
 	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;
-	SpriteManager* sprite_manager = nullptr;
+	TextureManager* texture_manager = nullptr;
 
 	void updateSnake();
 	u32 createSnakeSegment(SnakeSegment ss);

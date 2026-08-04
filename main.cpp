@@ -13,7 +13,7 @@
 #include "SnakeGameScene.hpp"
 #include "TitleScreenScene.hpp"
 
-#include "RenderingSystem.hpp"
+#include "SDLRenderer.hpp"
 #include "EntityComponentSystem.hpp"
 #include "InputSystem.hpp"
 
@@ -21,7 +21,7 @@
 #include "TimelineManager.hpp"
 
 #include "Transform.hpp"
-#include "SpriteView.hpp"
+#include "Sprite.hpp"
 #include "SpriteAnim.hpp"
 #include "LinearVelocity.hpp"
 #include "AngularVelocity.hpp"
@@ -36,7 +36,7 @@ void updateTimelines(
 );
 void updateAnims(
 	ComponentManager<SpriteAnim>& anims,
-	ComponentManager<SpriteView>& views
+	ComponentManager<Sprite>& sprites
 );
 void updateLinearVelocities(
 	ComponentManager<Transform>& transforms,
@@ -50,7 +50,7 @@ void updateAngularVelocities(
 // Engine stuff
 bool quit = false;
 World world;
-RenderingSystem* rendering_system;
+IRenderer* rendering_system;
 
 int main(int argc, char* args[]) {
 	if (!init()) {
@@ -88,7 +88,7 @@ int main(int argc, char* args[]) {
 
 				updateAnims(
 					world.ecs.getComponentManager<SpriteAnim>(),
-					world.ecs.getComponentManager<SpriteView>()
+					world.ecs.getComponentManager<Sprite>()
 				);
 		
 				updateLinearVelocities(
@@ -129,7 +129,7 @@ void updateTimelines(
 
 void updateAnims(
 	ComponentManager<SpriteAnim>& anims,
-	ComponentManager<SpriteView>& views
+	ComponentManager<Sprite>& sprites
 ) {
 	#pragma omp parallel for
 	for (i32 i = 0; i < anims.n_components; ++i) {
@@ -140,7 +140,7 @@ void updateAnims(
 			anim.current_frame = anim.anim_graph[anim.current_frame];
 			anim.since_last_update -= TIME_STEP;
 		}
-		views.getComponent(anims.idFromIndex(i)).src_rect = {
+		sprites.getComponent(anims.idFromIndex(i)).src_rect = {
 			anim.current_frame % anim.cols * anim.cellw,
 			anim.current_frame / anim.cols * anim.cellh,
 			anim.cellw,
@@ -198,11 +198,12 @@ bool initSdl() {
 
 void initGame() {
 	u32 cameraid = world.ecs.getNextId();
+	world.camera.id = cameraid;
 	world.ecs.createComponent<Transform>(cameraid, { });
-	rendering_system = new RenderingSystem(
+	rendering_system = new SDLRenderer(
 		world.ecs.getComponentManager<Transform>(),
-		world.ecs.getComponentManager<SpriteView>(),
-		world.sprite_manager,
+		world.ecs.getComponentManager<Sprite>(),
+		world.texture_manager,
 		world.camera
 	);
 	world.loadScene<TitleScreenScene>();

@@ -4,23 +4,23 @@
 void TitleScreenScene::update() {
 }
 
-void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
+void TitleScreenScene::initialise(World& world, TextureManager& texture_manager) {
   auto& ecs = world.ecs;
 
   //load assets
-  sprite_manager.loadSprite(snake_logo_sprite_path);
-  sprite_manager.loadSprite(start_sprite_path);
-  sprite_manager.loadSprite(quit_sprite_path);
-  sprite_manager.loadSprite(arrow_sprite_path);
-  sprite_manager.loadSprite(board_sprite_path);
+  texture_manager.loadTexture(snake_logo_sprite_path);
+  texture_manager.loadTexture(start_sprite_path);
+  texture_manager.loadTexture(quit_sprite_path);
+  texture_manager.loadTexture(arrow_sprite_path);
+  texture_manager.loadTexture(board_sprite_path);
 
   //create background board
   board_id = ecs.createEntity(
     Transform{ .scale = {31.25, 31.25}
     },
-    SpriteView{ .sprite_path = board_sprite_path,
-                .sprite_id = sprite_manager.getSpriteid(board_sprite_path),
-                .src_rect = { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h },
+    Sprite{ .sprite_path = board_sprite_path,
+                .sprite_id = texture_manager.getTextureid(board_sprite_path),
+                .src_rect = { 0, 0, texture_manager.getTexture(board_sprite_path).w, texture_manager.getTexture(board_sprite_path).h },
                 .zindex = 9
     }
   );
@@ -30,9 +30,9 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
     Transform{ .pos {.x = 0, .y = 100},
                .scale = {8, 8}
     },
-    SpriteView{ .sprite_path = snake_logo_sprite_path,
-                .sprite_id = sprite_manager.getSpriteid(snake_logo_sprite_path),
-                .src_rect = { 0, 0, sprite_manager.getSprite(snake_logo_sprite_path).w, sprite_manager.getSprite(snake_logo_sprite_path).h },
+    Sprite{ .sprite_path = snake_logo_sprite_path,
+                .sprite_id = texture_manager.getTextureid(snake_logo_sprite_path),
+                .src_rect = { 0, 0, texture_manager.getTexture(snake_logo_sprite_path).w, texture_manager.getTexture(snake_logo_sprite_path).h },
                 .zindex = 10
     }
   );
@@ -41,9 +41,9 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
     Transform{  .pos = {.x = 0, .y = -150},
                 .scale = {3, 3}
     },
-    SpriteView{ .sprite_path = start_sprite_path,
-                .sprite_id = sprite_manager.getSpriteid(start_sprite_path),
-                .src_rect = { 0, 0, sprite_manager.getSprite(start_sprite_path).w, sprite_manager.getSprite(start_sprite_path).h },
+    Sprite{ .sprite_path = start_sprite_path,
+                .sprite_id = texture_manager.getTextureid(start_sprite_path),
+                .src_rect = { 0, 0, texture_manager.getTexture(start_sprite_path).w, texture_manager.getTexture(start_sprite_path).h },
                 .zindex = 10
     }
   );
@@ -52,9 +52,9 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
     Transform{  .pos = {.x = 0, .y = -300},
                 .scale = {3, 3}
     },
-    SpriteView{ .sprite_path = quit_sprite_path,
-                .sprite_id = sprite_manager.getSpriteid(quit_sprite_path),
-                .src_rect = { 0, 0, sprite_manager.getSprite(quit_sprite_path).w, sprite_manager.getSprite(quit_sprite_path).h },
+    Sprite{ .sprite_path = quit_sprite_path,
+                .sprite_id = texture_manager.getTextureid(quit_sprite_path),
+                .src_rect = { 0, 0, texture_manager.getTexture(quit_sprite_path).w, texture_manager.getTexture(quit_sprite_path).h },
                 .zindex = 10
     }
   );
@@ -63,9 +63,9 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
     Transform{  .pos = {.x = -200, .y = -150},
                 .scale = {2, 2}
     },
-    SpriteView{ .sprite_path = arrow_sprite_path,
-                .sprite_id = sprite_manager.getSpriteid(arrow_sprite_path),
-                .src_rect = { 0, 0, sprite_manager.getSprite(arrow_sprite_path).w, sprite_manager.getSprite(arrow_sprite_path).h },
+    Sprite{ .sprite_path = arrow_sprite_path,
+                .sprite_id = texture_manager.getTextureid(arrow_sprite_path),
+                .src_rect = { 0, 0, texture_manager.getTexture(arrow_sprite_path).w, texture_manager.getTexture(arrow_sprite_path).h },
                 .zindex = 10
     }
   );
@@ -80,12 +80,12 @@ void TitleScreenScene::initialise(World& world, SpriteManager& sprite_manager) {
   InputSystem::instance().addToCurrentContext(menu_controller);
 }
 
-void TitleScreenScene::deinitialise(World& world, SpriteManager& sprite_manager) {
-  sprite_manager.unloadSprite(snake_logo_sprite_path);
-  sprite_manager.unloadSprite(start_sprite_path);
-  sprite_manager.unloadSprite(quit_sprite_path);
-  sprite_manager.unloadSprite(arrow_sprite_path);
-  sprite_manager.unloadSprite(board_sprite_path);
+void TitleScreenScene::deinitialise(World& world, TextureManager& texture_manager) {
+  texture_manager.unloadTexture(snake_logo_sprite_path);
+  texture_manager.unloadTexture(start_sprite_path);
+  texture_manager.unloadTexture(quit_sprite_path);
+  texture_manager.unloadTexture(arrow_sprite_path);
+  texture_manager.unloadTexture(board_sprite_path);
   world.ecs.destroyEntity(snake_logo_id);
   world.ecs.destroyEntity(start_option_id);
   world.ecs.destroyEntity(quit_option_id);

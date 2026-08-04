@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EntityComponentSystem.hpp"
-#include "SpriteManager.hpp"
+#include "TextureManager.hpp"
 #include "TimelineManager.hpp"
 #include "IScene.hpp"
 #include "Camera.hpp"
@@ -18,7 +18,7 @@ public:
       unloadScene();
     }
     current_scene = new T;
-    current_scene->initialise(*this, this->sprite_manager);
+    current_scene->initialise(*this, this->texture_manager);
   };
   void unloadScene();
 
@@ -29,7 +29,7 @@ public:
   EntityComponentSystem ecs;
   IScene* current_scene = nullptr;
   Camera camera;
-  SpriteManager sprite_manager;
+  TextureManager texture_manager;
   TimelineManager timeline_manager;
   bool paused = false;
 

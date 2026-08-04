@@ -3,7 +3,7 @@
 #include <random>
 
 #include "common.hpp"
-#include "SpriteView.hpp"
+#include "Sprite.hpp"
 #include "SpriteAnim.hpp"
 #include "LinearVelocity.hpp"
 #include "AngularVelocity.hpp"
@@ -14,23 +14,23 @@
 #include "PauseController.hpp"
 #include "RetryMenuController.hpp"
 
-void SnakeGameScene::initialise(World& world, SpriteManager& sprite_manager) {
+void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	this->world = &(world);
 	this->ecs = &(world.ecs);
-	this->sprite_manager = &(world.sprite_manager);
+	this->texture_manager = &(world.texture_manager);
 	// sprites init
-	sprite_manager.loadSprite(snake_sprite_path);
-	sprite_manager.loadSprite(apple_sprite_path);
-	sprite_manager.loadSprite(board_sprite_path);
-	sprite_manager.loadSprite(pause_sprite_path);
+	texture_manager.loadTexture(snake_sprite_path);
+	texture_manager.loadTexture(apple_sprite_path);
+	texture_manager.loadTexture(board_sprite_path);
+	texture_manager.loadTexture(pause_sprite_path);
 
 	// board init
 	ecs->createEntity(
 		Transform{ .scale = {31.25, 31.25}
 		},
-		SpriteView{ .sprite_path = board_sprite_path,
-								.sprite_id = sprite_manager.getSpriteid(board_sprite_path),
-								.src_rect = { 0, 0, sprite_manager.getSprite(board_sprite_path).w, sprite_manager.getSprite(board_sprite_path).h },
+		Sprite{ .sprite_path = board_sprite_path,
+								.sprite_id = texture_manager.getTextureid(board_sprite_path),
+								.src_rect = { 0, 0, texture_manager.getTexture(board_sprite_path).w, texture_manager.getTexture(board_sprite_path).h },
 								.zindex = 9
 		}
 	);
@@ -46,7 +46,7 @@ void SnakeGameScene::initialise(World& world, SpriteManager& sprite_manager) {
 	SpriteAnim& ss1_anim = ecs->getc<SpriteAnim>(ss1_id);
 	ss1_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
 	ss1_anim.current_frame = 15;
-	ecs->getc<SpriteView>(ss1_id).src_rect = {
+	ecs->getc<Sprite>(ss1_id).src_rect = {
 		.x = ss1_anim.current_frame % ss1_anim.cols * ss1_anim.cellw,
 		.y = ss1_anim.current_frame / ss1_anim.cols * ss1_anim.cellh,
 		.w = ss1_anim.cellw,
@@ -57,8 +57,8 @@ void SnakeGameScene::initialise(World& world, SpriteManager& sprite_manager) {
 	// apple init
 	apple_id = ecs->createEntity(
 		Transform{ },
-		SpriteView{ .sprite_path = apple_sprite_path,
-								.sprite_id = sprite_manager.getSpriteid(apple_sprite_path),
+		Sprite{ .sprite_path = apple_sprite_path,
+								.sprite_id = texture_manager.getTextureid(apple_sprite_path),
 								.src_rect = { 0, 0, 64, 64 },
 								.zindex = 11
 		}
@@ -72,11 +72,11 @@ void SnakeGameScene::initialise(World& world, SpriteManager& sprite_manager) {
 	InputSystem::instance().addToCurrentContext(pause_controller);
 };
 
-void SnakeGameScene::deinitialise(World& world, SpriteManager& sprite_manager) {
-	sprite_manager.unloadSprite(snake_sprite_path);
-	sprite_manager.unloadSprite(apple_sprite_path);
-	sprite_manager.unloadSprite(board_sprite_path);
-	sprite_manager.unloadSprite(pause_sprite_path);
+void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager) {
+	texture_manager.unloadTexture(snake_sprite_path);
+	texture_manager.unloadTexture(apple_sprite_path);
+	texture_manager.unloadTexture(board_sprite_path);
+	texture_manager.unloadTexture(pause_sprite_path);
 	for (u32 ss : snake) {
 		ecs->destroyEntity(ss);
 	}
@@ -109,7 +109,7 @@ void SnakeGameScene::updateSnake() {
 	if (static_cast<i32>(head.out_dir) + static_cast<i32>(head.in_dir) == 0) {
 		// Straight
 		if (head.curr_type != SnakeSpriteType::STRAIGHT) {
-			ecs->getc<SpriteView>(head.id).flip_flags = SDL_FLIP_NONE;
+			ecs->getc<Sprite>(head.id).flip_flags = SDL_FLIP_NONE;
 			ecs->getc<SpriteAnim>(head.id).current_frame += 8;
 			head.curr_type = SnakeSpriteType::STRAIGHT;
 		}
@@ -117,7 +117,7 @@ void SnakeGameScene::updateSnake() {
 	else {
 		//curved
 		// Set flipping for curved sprites (it runs left-to-up, clockwise)
-		SpriteView& hv = ecs->getc<SpriteView>(head.id);
+		Sprite& hv = ecs->getc<Sprite>(head.id);
 		switch (head.in_dir) {
 		case SnakeDir::LEFT:
 			hv.flip_flags = head.out_dir == SnakeDir::DOWN ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
@@ -187,7 +187,7 @@ void SnakeGameScene::updateSnake() {
 			new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
 			Transform& new_tail_transform = ecs->getc<Transform>(new_tail_id);
 			Transform& new_tail_next = ecs->getNextc(new_tail_id);
-			SpriteView& new_tail_view = ecs->getc<SpriteView>(new_tail_id);
+			Sprite& new_tail_view = ecs->getc<Sprite>(new_tail_id);
 			if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
 				new_tail_transform.rot += 180;
 				new_tail_next.rot += 180;
@@ -240,8 +240,8 @@ u32 SnakeGameScene::createSnakeSegment(SnakeSegment ss) {
 		Transform{ .pos = {t_x, t_y},
 								.scale = {2, 2}
 		},
-		SpriteView{ .sprite_path = snake_sprite_path,
-								.sprite_id = sprite_manager->getSpriteid(snake_sprite_path),
+		Sprite{ .sprite_path = snake_sprite_path,
+								.sprite_id = texture_manager->getTextureid(snake_sprite_path),
 								.src_rect = {0, 0, 32, 32},
 								.zindex = 11
 		},
@@ -307,8 +307,8 @@ void SnakeGameScene::generateAppleParticles() {
 									.pos = {apple_transform.pos.x, apple_transform.pos.y},
 									.scale = {scale_range(mt), scale_range(mt)}
 			},
-			SpriteView{ .sprite_path = apple_sprite_path,
-									.sprite_id = sprite_manager->getSpriteid(apple_sprite_path),
+			Sprite{ .sprite_path = apple_sprite_path,
+									.sprite_id = texture_manager->getTextureid(apple_sprite_path),
 									.src_rect = {view_range(mt), view_range(mt), 8, 8}
 			},
 			LinearVelocity{
@@ -338,19 +338,19 @@ void SnakeGameScene::onDeath() {
 }
 
 void SnakeGameScene::createRetryScreen() {
-	sprite_manager->loadSprite(game_over_sprite_path);
-	sprite_manager->loadSprite(retry_sprite_path);
-	sprite_manager->loadSprite(menu_sprite_path);
-	sprite_manager->loadSprite(quit_sprite_path);
-	sprite_manager->loadSprite(arrow_sprite_path);
+	texture_manager->loadTexture(game_over_sprite_path);
+	texture_manager->loadTexture(retry_sprite_path);
+	texture_manager->loadTexture(menu_sprite_path);
+	texture_manager->loadTexture(quit_sprite_path);
+	texture_manager->loadTexture(arrow_sprite_path);
 	// retry logo
 	u32 retry_logo_id = ecs->createEntity(
 		Transform{	.pos {.x = 0, .y = 100}, 
 								.scale = {.x = 4, .y = 4}
 		},
-		SpriteView{ .sprite_path = game_over_sprite_path,
-								.sprite_id = sprite_manager->getSpriteid(game_over_sprite_path),
-								.src_rect = {0, 0, sprite_manager->getSprite(game_over_sprite_path).w, sprite_manager->getSprite(game_over_sprite_path).h },
+		Sprite{ .sprite_path = game_over_sprite_path,
+								.sprite_id = texture_manager->getTextureid(game_over_sprite_path),
+								.src_rect = {0, 0, texture_manager->getTexture(game_over_sprite_path).w, texture_manager->getTexture(game_over_sprite_path).h },
 								.zindex = 12
 		}
 	);
@@ -359,9 +359,9 @@ void SnakeGameScene::createRetryScreen() {
 		Transform{	.pos {.x = -300, .y = -150},
 								.scale = {.x = 2, .y = 2}
 		},
-		SpriteView{ .sprite_path = retry_sprite_path,
-								.sprite_id = sprite_manager->getSpriteid(retry_sprite_path),
-								.src_rect = {0, 0, sprite_manager->getSprite(retry_sprite_path).w, sprite_manager->getSprite(retry_sprite_path).h },
+		Sprite{ .sprite_path = retry_sprite_path,
+								.sprite_id = texture_manager->getTextureid(retry_sprite_path),
+								.src_rect = {0, 0, texture_manager->getTexture(retry_sprite_path).w, texture_manager->getTexture(retry_sprite_path).h },
 								.zindex = 12
 		}
 	);
@@ -371,9 +371,9 @@ void SnakeGameScene::createRetryScreen() {
 								.scale = {.x = 2, .y = 2}
 
 		},
-		SpriteView{ .sprite_path = menu_sprite_path,
-								.sprite_id = sprite_manager->getSpriteid(menu_sprite_path),
-								.src_rect = {0, 0, sprite_manager->getSprite(menu_sprite_path).w, sprite_manager->getSprite(menu_sprite_path).h },
+		Sprite{ .sprite_path = menu_sprite_path,
+								.sprite_id = texture_manager->getTextureid(menu_sprite_path),
+								.src_rect = {0, 0, texture_manager->getTexture(menu_sprite_path).w, texture_manager->getTexture(menu_sprite_path).h },
 								.zindex = 12
 		}
 	);
@@ -382,9 +382,9 @@ void SnakeGameScene::createRetryScreen() {
 		Transform{	.pos {.x = 300, .y = -150}, 
 								.scale = {.x = 2, .y = 2}
 		},
-		SpriteView{ .sprite_path = quit_sprite_path,
-								.sprite_id = sprite_manager->getSpriteid(quit_sprite_path),
-								.src_rect = {0, 0, sprite_manager->getSprite(quit_sprite_path).w, sprite_manager->getSprite(quit_sprite_path).h },
+		Sprite{ .sprite_path = quit_sprite_path,
+								.sprite_id = texture_manager->getTextureid(quit_sprite_path),
+								.src_rect = {0, 0, texture_manager->getTexture(quit_sprite_path).w, texture_manager->getTexture(quit_sprite_path).h },
 								.zindex = 12
 		}
 	);
@@ -393,9 +393,9 @@ void SnakeGameScene::createRetryScreen() {
 		Transform{ .pos {.x = -450, .y = -150},
 								.scale = {.x = 2, .y = 2}
 		},
-		SpriteView{ .sprite_path = arrow_sprite_path,
-								.sprite_id = sprite_manager->getSpriteid(arrow_sprite_path),
-								.src_rect = {0, 0, sprite_manager->getSprite(arrow_sprite_path).w, sprite_manager->getSprite(arrow_sprite_path).h },
+		Sprite{ .sprite_path = arrow_sprite_path,
+								.sprite_id = texture_manager->getTextureid(arrow_sprite_path),
+								.src_rect = {0, 0, texture_manager->getTexture(arrow_sprite_path).w, texture_manager->getTexture(arrow_sprite_path).h },
 								.zindex = 12
 		}
 	);

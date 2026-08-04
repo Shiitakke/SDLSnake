@@ -61,11 +61,11 @@ void RetryMenuController::handleEvent(const SDL_Event& e) {
 }
 
 RetryMenuController::~RetryMenuController() {
-  world.sprite_manager.unloadSprite(game_over_sprite_path);
-  world.sprite_manager.unloadSprite(retry_sprite_path);
-  world.sprite_manager.unloadSprite(menu_sprite_path);
-  world.sprite_manager.unloadSprite(quit_sprite_path);
-  world.sprite_manager.unloadSprite(arrow_sprite_path);
+  world.texture_manager.unloadTexture(game_over_sprite_path);
+  world.texture_manager.unloadTexture(retry_sprite_path);
+  world.texture_manager.unloadTexture(menu_sprite_path);
+  world.texture_manager.unloadTexture(quit_sprite_path);
+  world.texture_manager.unloadTexture(arrow_sprite_path);
 
   world.timeline_manager.destroyTimelineChecked(timeline_id);
   

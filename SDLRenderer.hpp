@@ -2,24 +2,27 @@
 
 #include <SDL.h>
 
+#include "IRenderer.hpp"
+
 #include "common.hpp"
 #include "Transform.hpp"
-#include "SpriteView.hpp"
+#include "Sprite.hpp"
 #include "Camera.hpp"
 #include "ComponentManager.hpp"
-#include "SpriteManager.hpp"
+#include "TextureManager.hpp"
+#include "SDLTextureFactory.hpp"
 
-class RenderingSystem {
+class SDLRenderer : public IRenderer {
 public:
-  RenderingSystem(
+  SDLRenderer(
     ComponentManager<Transform>& _transforms,
-    ComponentManager<SpriteView>& _views,
-    SpriteManager& _sprite_manager,
+    ComponentManager<Sprite>& _views,
+    TextureManager& _texture_manager,
     Camera& _camera
   ) :
     transforms(_transforms),
     views(_views),
-    sprite_manager(_sprite_manager),
+    texture_manager(_texture_manager),
     camera(_camera)
   {
     window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, INTERNAL_WINDOW_WIDTH, INTERNAL_WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
@@ -30,16 +33,16 @@ public:
     if (renderer == nullptr) {
       printf("Failed to create renderer. %s", SDL_GetError());
     }
-    sprite_manager.setRenderer(renderer);
+    texture_manager.setTextureFactory(new SDLTextureFactory(renderer));
   };
-  ~RenderingSystem();
+  ~SDLRenderer();
 
-  void render(float delta);
+  void render(const float& delta) override;
   void handleWindowResize();
 private:
   ComponentManager<Transform>& transforms;
-  ComponentManager<SpriteView>& views;
-  SpriteManager& sprite_manager;
+  ComponentManager<Sprite>& views;
+  TextureManager& texture_manager;
   Camera& camera;
   SDL_Window* window = nullptr;
   SDL_Renderer* renderer = nullptr;

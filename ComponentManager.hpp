@@ -6,7 +6,7 @@
 
 #include "common.hpp"
 #include "Transform.hpp"
-#include "SpriteView.hpp"
+#include "Sprite.hpp"
 
 class ComponentManagerInterface {
 public:
@@ -138,15 +138,15 @@ public:
 
 
 template <>
-class ComponentManager<SpriteView> : public ComponentManagerInterface {
+class ComponentManager<Sprite> : public ComponentManagerInterface {
 public:
-  ComponentManager<SpriteView>() {
+  ComponentManager<Sprite>() {
     id_map.fill(-1);
     entity_map.fill(-1);
   };
-  ~ComponentManager<SpriteView>() = default;
+  ~ComponentManager<Sprite>() = default;
 
-  void createComponent(const u32& id, const SpriteView& component) {
+  void createComponent(const u32& id, const Sprite& component) {
     u32 i = n_components;
     while (i > 0) {
       if (components[i - 1].zindex <= component.zindex) {
@@ -165,7 +165,7 @@ public:
     ++n_components;
   }
 
-  SpriteView& getComponent(const u32& id) {
+  Sprite& getComponent(const u32& id) {
     return components[id_map[id]];
   }
 
@@ -201,7 +201,7 @@ public:
   }
 
   u32 n_components = 0;
-  std::array<SpriteView, 5000> components; // TODO: Swap over to using a heap (faster for sorted)
+  std::array<Sprite, 5000> components; // TODO: Swap over to using a heap (faster for sorted)
   std::array<i32, 5000> id_map; // maps entity ids to index
   std::array<i32, 5000> entity_map; // maps index to entity id
 };

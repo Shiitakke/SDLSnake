@@ -7,7 +7,7 @@
 #include "EntityComponentSystem.hpp"
 #include "InputSystem.hpp"
 
-#include "SpriteManager.hpp"
+#include "TextureManager.hpp"
 
 #include "IUserController.hpp"
 #include "TitleMenuController.hpp"
@@ -17,8 +17,8 @@ public:
   TitleScreenScene() = default;
   
   void update() override;
-  void initialise(World& world, SpriteManager& sprite_manager) override;
-  void deinitialise(World& world, SpriteManager& sprite_manager) override;
+  void initialise(World& world, TextureManager& texture_manager) override;
+  void deinitialise(World& world, TextureManager& texture_manager) override;
 private:
   u32 snake_logo_id;
   u32 start_option_id;

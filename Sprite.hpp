@@ -1,11 +1,15 @@
 #pragma once
-#include <string>
+
 #include <SDL.h>
+#include <String>
 
 #include "common.hpp"
 
 struct Sprite {
-  SDL_Texture* t = nullptr;
-  i32 w = 0;
-  i32 h = 0;
+  std::string sprite_path;
+  u32 sprite_id;
+  SDL_Rect src_rect;
+  u32 zindex = 10;
+  SDL_RendererFlip flip_flags = SDL_FLIP_NONE;
+  float parallax_factor = 1.0f;
 };
