@@ -23,27 +23,27 @@ public:
   };
   ~ComponentManager<T>() = default;
 
-  void createComponent(const u32& id, const T& component) {
+  void createComponent(u32 id, const T& component) {
     components[n_components] = component;
     id_map[id] = n_components;
     entity_map[n_components] = id;
     ++n_components;
   }
 
-  T& getComponent(const u32& id) {
+  T& getComponent(u32 id) {
     return components[id_map[id]];
   }
 
-  bool exists(const u32& id) {
+  bool exists(u32 id) {
     return id_map[id] != -1;
   }
 
   // Given an index into the components array, returns the id of the component at the index
-  u32 idFromIndex(const u32& index) {
+  u32 idFromIndex(u32 index) {
     return entity_map[index];
   }
 
-  void destroyComponent(const u32& entity_to_remove) {
+  void destroyComponent(u32 entity_to_remove) {
     u32 index_to_remove = id_map[entity_to_remove];
     u32 last_index = n_components - 1;
     components[index_to_remove] = components[last_index];
@@ -58,7 +58,7 @@ public:
     destroyComponentChecked(id);
   }
 
-  void destroyComponentChecked(const u32& id) {
+  void destroyComponentChecked(u32 id) {
     if (exists(id)) {
       destroyComponent(id);
     }
@@ -79,7 +79,7 @@ public:
   };
   ~ComponentManager<Transform>() = default;
 
-  void createComponent(const u32& id, const Transform& component) {
+  void createComponent(u32 id, const Transform& component) {
     components[n_components] = component;
     next_transforms[n_components] = component;
     id_map[id] = n_components;
@@ -87,19 +87,19 @@ public:
     ++n_components;
   }
 
-  Transform& getComponent(const u32& id) {
+  Transform& getComponent(u32 id) {
     return components[id_map[id]];
   }
-  Transform& getNextComponent(const u32& id) {
+  Transform& getNextComponent(u32 id) {
     return next_transforms[id_map[id]];
   }
 
   // Given an index into the components array, returns the id of the component at the index
-  u32 idFromIndex(const u32& index) {
+  u32 idFromIndex(u32 index) {
     return entity_map[index];
   }
 
-  void destroyComponent(const u32& entity_to_remove) {
+  void destroyComponent(u32 entity_to_remove) {
     u32 index_to_remove = id_map[entity_to_remove];
     u32 last_index = n_components - 1;
     components[index_to_remove] = components[last_index];
@@ -111,7 +111,7 @@ public:
     id_map[entity_to_remove] = -1;
   }
   
-  bool exists(const u32& id) {
+  bool exists(u32 id) {
     return id_map[id] != -1;
   }
 
@@ -119,7 +119,7 @@ public:
     destroyComponentChecked(id);
   }
 
-  void destroyComponentChecked(const u32& id) {
+  void destroyComponentChecked(u32 id) {
     if (exists(id)) {
       destroyComponent(id);
     }
@@ -146,7 +146,7 @@ public:
   };
   ~ComponentManager<Sprite>() = default;
 
-  void createComponent(const u32& id, const Sprite& component) {
+  void createComponent(u32 id, const Sprite& component) {
     u32 i = n_components;
     while (i > 0) {
       if (components[i - 1].zindex <= component.zindex) {
@@ -165,16 +165,16 @@ public:
     ++n_components;
   }
 
-  Sprite& getComponent(const u32& id) {
+  Sprite& getComponent(u32 id) {
     return components[id_map[id]];
   }
 
   // Given an index into the components array, returns the id of the component at the index
-  u32 idFromIndex(const u32& index) {
+  u32 idFromIndex(u32 index) {
     return entity_map[index];
   }
 
-  void destroyComponent(const u32& entity_to_remove) {
+  void destroyComponent(u32 entity_to_remove) {
     u32 index_to_remove = id_map[entity_to_remove];
     id_map[entity_to_remove] = -1;
     n_components--;
@@ -186,7 +186,7 @@ public:
     }
   }
 
-  bool exists(const u32& id) {
+  bool exists(u32 id) {
     return id_map[id] != -1;
   }
 
@@ -194,7 +194,7 @@ public:
     destroyComponentChecked(id);
   }
 
-  void destroyComponentChecked(const u32& id) {
+  void destroyComponentChecked(u32 id) {
     if (exists(id)) {
       destroyComponent(id);
     }

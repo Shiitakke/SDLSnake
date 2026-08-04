@@ -28,7 +28,7 @@ Texture& TextureManager::getTexture(const std::string& path) {
   return textures[texture_map[path]];
 }
 
-Texture& TextureManager::getTexture(const u32& id) {
+Texture& TextureManager::getTexture(u32 id) {
   return textures[id];
 }
 

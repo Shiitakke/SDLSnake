@@ -96,9 +96,6 @@
     <ClCompile Include="RetryMenuController.cpp">
       <Filter>Source Files\UserControllers</Filter>
     </ClCompile>
-    <ClCompile Include="ITextureFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SDLTextureFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

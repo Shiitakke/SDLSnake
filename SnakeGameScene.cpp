@@ -109,7 +109,7 @@ void SnakeGameScene::updateSnake() {
 	if (static_cast<i32>(head.out_dir) + static_cast<i32>(head.in_dir) == 0) {
 		// Straight
 		if (head.curr_type != SnakeSpriteType::STRAIGHT) {
-			ecs->getc<Sprite>(head.id).flip_flags = SDL_FLIP_NONE;
+			ecs->getc<Sprite>(head.id).flip_flags = SpriteFlip::NONE;
 			ecs->getc<SpriteAnim>(head.id).current_frame += 8;
 			head.curr_type = SnakeSpriteType::STRAIGHT;
 		}
@@ -120,16 +120,16 @@ void SnakeGameScene::updateSnake() {
 		Sprite& hv = ecs->getc<Sprite>(head.id);
 		switch (head.in_dir) {
 		case SnakeDir::LEFT:
-			hv.flip_flags = head.out_dir == SnakeDir::DOWN ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+			hv.flip_flags = head.out_dir == SnakeDir::DOWN ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
 			break;
 		case SnakeDir::RIGHT:
-			hv.flip_flags = head.out_dir == SnakeDir::UP ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+			hv.flip_flags = head.out_dir == SnakeDir::UP ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
 			break;
 		case SnakeDir::UP:
-			hv.flip_flags = head.out_dir == SnakeDir::LEFT ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+			hv.flip_flags = head.out_dir == SnakeDir::LEFT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
 			break;
 		case SnakeDir::DOWN:
-			hv.flip_flags = head.out_dir == SnakeDir::RIGHT ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+			hv.flip_flags = head.out_dir == SnakeDir::RIGHT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
 			break;
 		}
 		if (head.curr_type != SnakeSpriteType::CURVED) {
@@ -197,11 +197,11 @@ void SnakeGameScene::updateSnake() {
 				new_tail_transform.rot += 90;
 				new_tail_next.rot += 90;
 				new_tail_anim.current_frame = 7;
-				if (new_tail_view.flip_flags == SDL_FLIP_VERTICAL) {
-					new_tail_view.flip_flags = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
+				if (new_tail_view.flip_flags == SpriteFlip::VERTICAL) {
+					new_tail_view.flip_flags = static_cast<SpriteFlip::SpriteFlip>(SpriteFlip::HORIZONTAL | SpriteFlip::VERTICAL);
 				}
 				else {
-					new_tail_view.flip_flags = SDL_FLIP_VERTICAL;
+					new_tail_view.flip_flags = SpriteFlip::VERTICAL;
 				}
 			}
 		}

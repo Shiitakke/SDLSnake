@@ -6,6 +6,5 @@
 
 struct Camera {
   u32 id;
-  SDL_Rect viewport;
-  float zoom = 1.f;
+  float zoom = 1.0f;
 };

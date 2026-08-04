@@ -37,7 +37,7 @@ public:
   };
   ~SDLRenderer();
 
-  void render(const float& delta) override;
+  void render(float delta) override;
   void handleWindowResize();
 private:
   ComponentManager<Transform>& transforms;

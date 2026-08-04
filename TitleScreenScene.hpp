@@ -15,10 +15,9 @@
 class TitleScreenScene : public IScene {
 public:
   TitleScreenScene() = default;
-  
-  void update() override;
   void initialise(World& world, TextureManager& texture_manager) override;
   void deinitialise(World& world, TextureManager& texture_manager) override;
+  void update() override;
 private:
   u32 snake_logo_id;
   u32 start_option_id;

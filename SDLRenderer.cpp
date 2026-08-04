@@ -8,7 +8,7 @@ SDLRenderer::~SDLRenderer() {
 	SDL_DestroyWindow(window);
 }
 
-void SDLRenderer::render(const float& delta) {
+void SDLRenderer::render(float delta) {
 	SDL_RenderClear(renderer);
 
 	const Transform camera_transform = lerp(
@@ -47,7 +47,7 @@ void SDLRenderer::render(const float& delta) {
 			&dst_rect,
 			view_transform.rot,
 			NULL,
-			view.flip_flags
+			static_cast<SDL_RendererFlip>(view.flip_flags)
 		);
 	}
 

@@ -17,7 +17,7 @@ public:
   bool loadTexture(const std::string& path);
   void unloadTexture(const std::string& path);
   Texture& getTexture(const std::string& path);
-  Texture& getTexture(const u32& id);
+  Texture& getTexture(u32 id);
   u32 getTextureid(const std::string& path);
   void unloadAll();
   void setTextureFactory(ITextureFactory* _texture_factory) { texture_factory = _texture_factory; }

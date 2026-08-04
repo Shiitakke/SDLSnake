@@ -5,7 +5,7 @@
 #include "vec.hpp"
 
 struct Transform {
-  vec2 pos = {0, 0};
-  vec2 scale = {1, 1};
-  float rot = 0.f;
+  vec2 pos = {0.0f, 0.0f};
+  vec2 scale = {1.0f, 1.0f};
+  float rot = 0.0f;
 };

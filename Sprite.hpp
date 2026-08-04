@@ -5,11 +5,19 @@
 
 #include "common.hpp"
 
+namespace SpriteFlip { // using namespace enum over enum class for easier bitwise OR
+  enum SpriteFlip {
+    NONE = 0,
+    HORIZONTAL = 1 << 0,
+    VERTICAL = 1 << 1,
+  };
+}
+
 struct Sprite {
   std::string sprite_path;
   u32 sprite_id;
   SDL_Rect src_rect;
   u32 zindex = 10;
-  SDL_RendererFlip flip_flags = SDL_FLIP_NONE;
+  SpriteFlip::SpriteFlip  flip_flags = SpriteFlip::NONE;
   float parallax_factor = 1.0f;
 };

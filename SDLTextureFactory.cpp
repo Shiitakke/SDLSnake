@@ -28,4 +28,5 @@ Texture SDLTextureFactory::loadTexture(const std::string& path) {
 
 void SDLTextureFactory::unloadTexture(Texture& texture) {
   SDL_DestroyTexture(static_cast<SDL_Texture*>(texture.t));
+  texture.t = nullptr;
 }

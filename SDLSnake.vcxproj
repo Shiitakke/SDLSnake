@@ -158,7 +158,6 @@
     <ClCompile Include="IdManager.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="IScene.cpp" />
-    <ClCompile Include="ITextureFactory.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PauseController.cpp" />
     <ClCompile Include="SDLRenderer.cpp" />

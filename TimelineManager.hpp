@@ -8,7 +8,6 @@
 
 class TimelineManager {
 public:
-
   u32 createTimeline(Timeline timeline) {
     u32 id = id_manager.getNextId();
     timeline.id = id;
