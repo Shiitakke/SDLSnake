@@ -21,6 +21,7 @@
 
 #include "ComponentManager.hpp"
 #include "TimelineManager.hpp"
+#include "TimerManager.hpp"
 
 #include "Transform.hpp"
 #include "Sprite.hpp"
@@ -34,6 +35,9 @@ bool initSdl();
 void initGame();
 void close();
 
+void updateTimers(
+	TimerManager& timer_manager
+);
 void updateTimelines(
 	TimelineManager& timeline_manager
 );
@@ -91,6 +95,8 @@ int main(int argc, char* args[]) {
 			if (!world.paused) {
 				world.updateScene();
 			
+				updateTimers(world.timer_manager);
+
 				updateTimelines(world.timeline_manager);
 
 				updateAnims(
@@ -120,6 +126,26 @@ int main(int argc, char* args[]) {
 	}
 	close();
 	return 0;
+}
+
+void updateTimers(
+	TimerManager& timer_manager
+) {
+	for (i32 i = 0; i < timer_manager.timers.n_components; ++i) {
+		Timer& timer = timer_manager.timers.components[i];
+		if (timer.paused) {
+			continue;
+		}
+		timer.since_last_update += TIME_STEP;
+		while (timer.since_last_update >= timer.interval) {
+			timer.callback();
+			timer.since_last_update -= timer.interval;
+			if (!timer.repeats) {
+				timer_manager.destroyTimer(timer.id);
+				--i;
+			}
+		}
+	}
 }
 
 void updateTimelines(

@@ -9,9 +9,13 @@ IdManager::IdManager() {
 u32 IdManager::getNextId() {
   u32 front = ids.front();
   ids.pop_front();
+  used_ids.emplace(front);
   return front;
 }
 
 void IdManager::returnId(u32 id) {
-  ids.emplace_front(id);
+  if (used_ids.contains(id)) {
+    ids.emplace_front(id);
+    used_ids.erase(id);
+  }
 }

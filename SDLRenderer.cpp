@@ -51,6 +51,7 @@ void SDLRenderer::render(float delta) {
 		);
 	}
 
+	// Collision box rendering
 	for (u32 i = 0; i < collisions.n_components; ++i) {
 		const CollisionBox& box = collisions.components[i];
 		const Transform box_transform = lerp(
@@ -82,20 +83,6 @@ void SDLRenderer::render(float delta) {
 		}
 		SDL_RenderDrawRect(renderer, &dst_rect);
 	}
-
-	// Collisionbox rendering
-
-	//for (i32 i = 0; i < collision_boxes._n_components; ++i) {
-	//	CollisionBox& b = collision_boxes._components[i];
-	//	Transform& t = transforms.getComponent(b._id);
-	//	SDL_Rect dst_rect = {
-	//		(vp.w / 2) - cam_transform._pos._x + (t._pos._x * out_res_scale - (b._extent._x * out_res_scale) / 2),
-	//		(vp.h / 2) - cam_transform._pos._y + (-(t._pos._y) * out_res_scale - (b._extent._y * out_res_scale) / 2),
-	//		b._extent._x * out_res_scale,
-	//		b._extent._y * out_res_scale
-	//	};
-
-	//}
 
 	SDL_RenderPresent(renderer);
 }

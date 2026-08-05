@@ -14,6 +14,7 @@
 #include "SnakeController.hpp"
 #include "PauseController.hpp"
 #include "RetryMenuController.hpp"
+#include "Timer.hpp"
 
 void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	this->world = &(world);
@@ -216,6 +217,8 @@ void SnakeGameScene::updateSnake() {
 			onDeath();
 			break;
 		}
+		// remove collision from old head
+		world->ecs.destroyComponent<CollisionBox>(snake.back());
 		u32 new_segment_id = createSnakeSegment({ 0, new_pos, in_dir, next_dir, SnakeSpriteType::STRAIGHT });
 		Transform& t = ecs->getc<Transform>(new_segment_id);
 		Transform& t_next = ecs->getNextc(new_segment_id);
@@ -254,9 +257,13 @@ u32 SnakeGameScene::createSnakeSegment(SnakeSegment ss) {
 								.current_frame = 8
 		},
 		CollisionBox{ .extent = {.x = 50, .y = 50},
-									.on_begin_collision = [this](u32 otherid)->void {this->world->ecs.destroyEntity(otherid);}
+									.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
+									.on_begin_collision = [this](u32 otherid)->void {
+										if (this->world->ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel) {
+											this->world->ecs.destroyEntity(otherid);
+										}
+									}
 		}
-
 	);
 	ss.id = new_segment_id;
 	snake_segments.createComponent(new_segment_id, ss);
@@ -306,24 +313,36 @@ void SnakeGameScene::generateAppleParticles() {
 	std::uniform_real_distribution<float> vel_range{ -10., 10. };
 	std::uniform_real_distribution<float> scale_range{ 1., 3. };
 	std::uniform_real_distribution<float> rot_range{ 0, 30 };
+	std::vector<u32> apple_ids = {};
 	for (i32 i = 0; i < 10; ++i) {
 		particles.push_back(ecs->createEntity(
-			Transform{	.pos = {apple_transform.pos.x, apple_transform.pos.y},
+			Transform{ .pos = {apple_transform.pos.x, apple_transform.pos.y},
 									.scale = {scale_range(mt), scale_range(mt)}
 			},
 			Sprite{ .sprite_path = apple_sprite_path,
 							.sprite_id = texture_manager->getTextureid(apple_sprite_path),
 							.src_rect = {view_range(mt), view_range(mt), 8, 8}
 			},
-			LinearVelocity{	.velocity = {vel_range(mt), vel_range(mt)},
+			LinearVelocity{ .velocity = {vel_range(mt), vel_range(mt)},
 											.friction = 0.1f
 			},
-			AngularVelocity{.velocity = rot_range(mt)
-			},
-			CollisionBox{ .extent = {.x = 15, .y = 15},
+			AngularVelocity{ .velocity = rot_range(mt)
 			}
+			//CollisionBox{ .extent = {.x = 15, .y = 15},
+			//							.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::apple_particle_collision_channel)
+			//}
 		));
+		apple_ids.push_back(particles.back());
 	}
+	world->timer_manager.createTimer(
+		Timer{	.interval = 500,
+						.callback = [this, apple_ids]()->void {
+							for (u32 id : apple_ids) {
+								this->world->ecs.createComponent(id, CollisionBox{ .extent = {.x = 15, .y = 15}, .channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::apple_particle_collision_channel) });
+							}
+						},
+		}
+	);
 }
 
 std::tuple<float, float> SnakeGameScene::boardPosToWorldPos(BoardPos pos) {

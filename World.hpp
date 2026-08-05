@@ -5,6 +5,7 @@
 #include "TimelineManager.hpp"
 #include "IScene.hpp"
 #include "Camera.hpp"
+#include "TimerManager.hpp"
 
 class World {
 public:
@@ -31,6 +32,7 @@ public:
   Camera camera;
   TextureManager texture_manager;
   TimelineManager timeline_manager;
+  TimerManager timer_manager;
   bool paused = false;
 
 private:

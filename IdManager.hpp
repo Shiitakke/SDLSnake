@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <unordered_set>
 
 #include "common.hpp"
 
@@ -11,6 +12,7 @@ public:
   u32 getNextId();
   void returnId(u32 id);
 private:
+  std::unordered_set<u32> used_ids;
   std::deque<u32> ids;
 };
 

@@ -167,6 +167,7 @@
     <ClCompile Include="SnakeController.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TimelineManager.cpp" />
+    <ClCompile Include="TimerManager.cpp" />
     <ClCompile Include="TitleMenuController.cpp" />
     <ClCompile Include="TitleScreenScene.cpp" />
     <ClCompile Include="UnpauseController.cpp" />
@@ -199,6 +200,8 @@
     <ClInclude Include="Sprite.hpp" />
     <ClInclude Include="Timeline.hpp" />
     <ClInclude Include="TimelineManager.hpp" />
+    <ClInclude Include="Timer.hpp" />
+    <ClInclude Include="TimerManager.hpp" />
     <ClInclude Include="TitleMenuController.hpp" />
     <ClInclude Include="TitleScreenScene.hpp" />
     <ClInclude Include="Transform.hpp" />
