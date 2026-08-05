@@ -2,7 +2,7 @@
 
 #include <string>
 
-class Texture;
+struct Texture;
 
 class ITextureFactory {
 public:

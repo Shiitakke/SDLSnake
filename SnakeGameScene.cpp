@@ -7,6 +7,7 @@
 #include "SpriteAnim.hpp"
 #include "LinearVelocity.hpp"
 #include "AngularVelocity.hpp"
+#include "CollisionBox.hpp"
 #include "World.hpp"
 #include "InputSystem.hpp"
 #include "IUserController.hpp"
@@ -185,6 +186,7 @@ void SnakeGameScene::updateSnake() {
 			SnakeSegment& new_tail = snake_segments.getComponent(new_tail_id);
 			SpriteAnim& new_tail_anim = ecs->getc<SpriteAnim>(new_tail_id);
 			new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
+			new_tail_anim.since_last_update = 0;
 			Transform& new_tail_transform = ecs->getc<Transform>(new_tail_id);
 			Transform& new_tail_next = ecs->getNextc(new_tail_id);
 			Sprite& new_tail_view = ecs->getc<Sprite>(new_tail_id);
@@ -247,9 +249,12 @@ u32 SnakeGameScene::createSnakeSegment(SnakeSegment ss) {
 		},
 		SpriteAnim{ .rows = 4, .cols = 4,
 								.cellw = 32, .cellh = 32,
-								.framerate = 56,
+								.framerate = 60,
 								.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 },
 								.current_frame = 8
+		},
+		CollisionBox{ .extent = {.x = 50, .y = 50},
+									.on_begin_collision = [this](u32 otherid)->void {this->world->ecs.destroyEntity(otherid);}
 		}
 
 	);
@@ -303,20 +308,19 @@ void SnakeGameScene::generateAppleParticles() {
 	std::uniform_real_distribution<float> rot_range{ 0, 30 };
 	for (i32 i = 0; i < 10; ++i) {
 		particles.push_back(ecs->createEntity(
-			Transform{
-									.pos = {apple_transform.pos.x, apple_transform.pos.y},
+			Transform{	.pos = {apple_transform.pos.x, apple_transform.pos.y},
 									.scale = {scale_range(mt), scale_range(mt)}
 			},
 			Sprite{ .sprite_path = apple_sprite_path,
-									.sprite_id = texture_manager->getTextureid(apple_sprite_path),
-									.src_rect = {view_range(mt), view_range(mt), 8, 8}
+							.sprite_id = texture_manager->getTextureid(apple_sprite_path),
+							.src_rect = {view_range(mt), view_range(mt), 8, 8}
 			},
-			LinearVelocity{
-											.velocity = {vel_range(mt), vel_range(mt)},
+			LinearVelocity{	.velocity = {vel_range(mt), vel_range(mt)},
 											.friction = 0.1f
 			},
-			AngularVelocity{
-												.velocity = rot_range(mt)
+			AngularVelocity{.velocity = rot_range(mt)
+			},
+			CollisionBox{ .extent = {.x = 15, .y = 15},
 			}
 		));
 	}

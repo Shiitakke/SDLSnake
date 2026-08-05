@@ -10,6 +10,7 @@
 #include "TextureManager.hpp"
 #include "SpriteAnim.hpp"
 #include "assets.hpp"
+#include "CollisionBox.hpp"
 
 class SnakeGameScene : public IScene {
 public:
@@ -52,6 +53,8 @@ public:
 	SnakeDir next_dir = SnakeDir::RIGHT;
 
 private:
+	const static CollisionChannel::Channel snake_segment_collision_channel = CollisionChannel::c2;
+	const static  CollisionChannel::Channel apple_particle_collision_channel = CollisionChannel::c3;
 	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;
 	TextureManager* texture_manager = nullptr;

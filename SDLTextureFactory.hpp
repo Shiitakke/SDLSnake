@@ -2,8 +2,8 @@
 
 #include "ITextureFactory.hpp"
 
-class Texture;
-class SDL_Renderer;
+struct Texture;
+struct SDL_Renderer;
 
 class SDLTextureFactory : public ITextureFactory {
 public:  

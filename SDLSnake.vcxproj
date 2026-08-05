@@ -178,6 +178,7 @@
     <ClInclude Include="AngularVelocity.hpp" />
     <ClInclude Include="assets.hpp" />
     <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="CollisionBox.hpp" />
     <ClInclude Include="common.hpp" />
     <ClInclude Include="ComponentManager.hpp" />
     <ClInclude Include="EntityComponentSystem.hpp" />

@@ -197,5 +197,8 @@
     <ClInclude Include="SDLTextureFactory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionBox.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

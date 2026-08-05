@@ -11,6 +11,7 @@
 #include "ComponentManager.hpp"
 #include "TextureManager.hpp"
 #include "SDLTextureFactory.hpp"
+#include "CollisionBox.hpp"
 
 class SDLRenderer : public IRenderer {
 public:
@@ -18,12 +19,14 @@ public:
     ComponentManager<Transform>& _transforms,
     ComponentManager<Sprite>& _views,
     TextureManager& _texture_manager,
-    Camera& _camera
+    Camera& _camera,
+    ComponentManager<CollisionBox>& _collisions
   ) :
     transforms(_transforms),
     views(_views),
     texture_manager(_texture_manager),
-    camera(_camera)
+    camera(_camera),
+    collisions(_collisions)
   {
     window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, INTERNAL_WINDOW_WIDTH, INTERNAL_WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (window == nullptr) {
@@ -42,6 +45,7 @@ public:
 private:
   ComponentManager<Transform>& transforms;
   ComponentManager<Sprite>& views;
+  ComponentManager<CollisionBox>& collisions;
   TextureManager& texture_manager;
   Camera& camera;
   SDL_Window* window = nullptr;

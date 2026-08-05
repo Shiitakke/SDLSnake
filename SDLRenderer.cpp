@@ -51,6 +51,52 @@ void SDLRenderer::render(float delta) {
 		);
 	}
 
+	for (u32 i = 0; i < collisions.n_components; ++i) {
+		const CollisionBox& box = collisions.components[i];
+		const Transform box_transform = lerp(
+			transforms.getComponent(collisions.idFromIndex(i)),
+			transforms.getNextComponent(collisions.idFromIndex(i)),
+			delta
+		);
+		// Start at middle of viewport, translate by camera, then translate by position, center based on scale, multiply to scale from internal to actual size
+		const SDL_Rect dst_rect = {
+			(internal_screen_width / 2 -
+			(camera_transform.pos.x) + box_transform.pos.x -
+			(box.extent.x / 2.f))
+				* out_res_scale,
+
+			(internal_screen_height / 2 +
+			(camera_transform.pos.y) - box_transform.pos.y -
+			(box.extent.y / 2.f))
+				* out_res_scale,
+
+			box.extent.x * out_res_scale,
+			box.extent.y * out_res_scale
+		};
+
+		if (box.colliding) {
+			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+		}
+		else {
+			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+		}
+		SDL_RenderDrawRect(renderer, &dst_rect);
+	}
+
+	// Collisionbox rendering
+
+	//for (i32 i = 0; i < collision_boxes._n_components; ++i) {
+	//	CollisionBox& b = collision_boxes._components[i];
+	//	Transform& t = transforms.getComponent(b._id);
+	//	SDL_Rect dst_rect = {
+	//		(vp.w / 2) - cam_transform._pos._x + (t._pos._x * out_res_scale - (b._extent._x * out_res_scale) / 2),
+	//		(vp.h / 2) - cam_transform._pos._y + (-(t._pos._y) * out_res_scale - (b._extent._y * out_res_scale) / 2),
+	//		b._extent._x * out_res_scale,
+	//		b._extent._y * out_res_scale
+	//	};
+
+	//}
+
 	SDL_RenderPresent(renderer);
 }
 

@@ -20,6 +20,12 @@ struct vec<2> {
       y + other.y
     };
   };
+  vec2 operator-(const vec2& other) {
+    return {
+      x - other.x,
+      y - other.y
+    };
+  }
   vec2 operator*(float scalar) {
     return {
       x * scalar,
