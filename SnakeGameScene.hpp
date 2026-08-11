@@ -27,25 +27,31 @@ public:
 	void update() override;
 
 	//publics for SnakeObject
-	enum class BoardTile {
+	enum class BoardTileType {
 		EMPTY,
 		APPLE,
+	};
+
+	struct BoardTile {
+		BoardTileType type = BoardTileType::EMPTY;
+		u32 id = 0; // id of potential apple on tile
 	};
 
 	const static CollisionChannel::Channel snake_segment_collision_channel = CollisionChannel::c2;
 	const static  CollisionChannel::Channel apple_particle_collision_channel = CollisionChannel::c3;
 	std::tuple<float, float> boardPosToWorldPos(BoardPos pos);
 
-	void collectApple();
+	void collectAppleAt(BoardPos pos);
 	void createRetryScreen();
+	bool appleAt(BoardPos pos);
 	void onDeath();
 
 
 	std::unordered_set<u32> particles = {};
-	BoardTile board[16][16] = { BoardTile::EMPTY };
+	BoardTile board[16][16] = { };
 private:
-	void generateAppleParticles();
-	void generateApplePos();
+	void generateAppleParticles(u32 apple_id);
+	void createNewApple();
 	void updateSnakes();
 
 	World* world = nullptr;
@@ -54,8 +60,7 @@ private:
 	u32 BOARD_WIDTH = 16;
 	u32 BOARD_HEIGHT = 16;
 	std::vector<SnakeObject*> snakes;
-	u32 apple_id = 0;
-	BoardPos apple_pos = {0, 0};
+	std::unordered_set<u32> apple_ids;
 	bool paused = false;
 };
 

@@ -126,11 +126,11 @@ void SnakeObject::updateSnake() {
 		bool collected_apple = false;
 		// Since an animation plays of the tail shrinking, it feels better
 		// to remove the tail first
-		if (scene.board[new_pos.x][new_pos.y] != SnakeGameScene::BoardTile::APPLE) {
-			destroySnakeSegment();
-		} else {
+		if (scene.appleAt(new_pos)) {
 			collected_apple = true;
-			scene.collectApple();
+			scene.collectAppleAt(new_pos);
+		} else {
+			destroySnakeSegment();
 		}
 		switch (board[new_pos.x][new_pos.y]) {
 		case SnakeBoardTile::EMPTY: 

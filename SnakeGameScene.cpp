@@ -46,16 +46,7 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 		)
 	);
 
-	// apple init
-	apple_id = ecs->createEntity(
-		Transform{ },
-		Sprite{ .sprite_path = apple_sprite_path,
-								.sprite_id = texture_manager.getTextureid(apple_sprite_path),
-								.src_rect = { 0, 0, 64, 64 },
-								.zindex = 11
-		}
-	);
-	generateApplePos();
+	createNewApple();
 	IUserController* snake_controller = new SnakeController(*snakes.back());
 
 	IUserController* pause_controller = new PauseController(*this, world);
@@ -77,7 +68,9 @@ void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager)
 	for (u32 particle : particles) {
 		ecs->destroyEntity(particle);
 	}
-	ecs->destroyEntity(apple_id);
+	for (u32 apple_id : apple_ids) {
+		ecs->destroyEntity(apple_id);
+	}
 	InputSystem::instance().clearContexts();
 	world.timer_manager.clearTimers();
 	world.timeline_manager.clearTimelines();
@@ -95,13 +88,20 @@ void SnakeGameScene::updateSnakes() {
 	}
 }
 
-void SnakeGameScene::collectApple() {
-	board[apple_pos.x][apple_pos.y] = BoardTile::EMPTY;
-	generateAppleParticles();
-	generateApplePos();
+bool SnakeGameScene::appleAt(BoardPos pos) {
+	return board[pos.x][pos.y].type == BoardTileType::APPLE;
 }
 
-void SnakeGameScene::generateApplePos() {
+void SnakeGameScene::collectAppleAt(BoardPos pos) {
+	board[pos.x][pos.y].type = BoardTileType::EMPTY;
+	u32 apple_id = board[pos.x][pos.y].id;
+	generateAppleParticles(apple_id);
+	world->ecs.destroyEntity(board[pos.x][pos.y].id);
+	apple_ids.erase(apple_ids.find(board[pos.x][pos.y].id));
+	createNewApple();
+}
+
+void SnakeGameScene::createNewApple() {
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<u32> x_range{ 0, BOARD_WIDTH - 1 };
@@ -111,8 +111,8 @@ void SnakeGameScene::generateApplePos() {
 	while (!placed) {
 		x = x_range(mt);
 		y = y_range(mt);
-		if (board[x][y] == BoardTile::EMPTY) {
-			board[x][y] = BoardTile::APPLE;
+		if (board[x][y].type == BoardTileType::EMPTY) {
+			board[x][y].type = BoardTileType::APPLE;
 			placed = true;
 		}
 		else {
@@ -121,13 +121,19 @@ void SnakeGameScene::generateApplePos() {
 	}
 
 	const auto& [new_x, new_y] = boardPosToWorldPos({ x, y });
-	ecs->getc<Transform>(apple_id).pos = { new_x, new_y };
-	ecs->getNextc(apple_id).pos = { new_x, new_y };
-	apple_pos.x = x;
-	apple_pos.y = y;
+	u32 new_apple_id = ecs->createEntity(
+		Transform{ .pos = { new_x, new_y } },
+		Sprite{ .sprite_path = apple_sprite_path,
+								.sprite_id = world->texture_manager.getTextureid(apple_sprite_path),
+								.src_rect = { 0, 0, 64, 64 },
+								.zindex = 11
+		}
+	);
+	apple_ids.emplace(new_apple_id);
+	board[x][y].id = new_apple_id;
 }
 
-void SnakeGameScene::generateAppleParticles() {
+void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 	const Transform apple_transform = ecs->getc<Transform>(apple_id);
 	std::random_device rd;
 	std::mt19937 mt(rd());
