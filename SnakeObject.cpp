@@ -40,12 +40,15 @@ SnakeObject::SnakeObject(
 };
 
 SnakeObject::~SnakeObject() {
-
+	for (SnakeSegment& ss : segments) {
+		world.ecs.destroyEntity(ss.id);
+	}
 }
 
 void SnakeObject::updateSnake() {
 	since_last_update += TIME_STEP;
 
+	// Clean head dir, dont go backwards
 	SnakeSegment& head = segments.back();
 	if (next_dir == head.in_dir) {
 		next_dir = head.out_dir;
@@ -116,7 +119,7 @@ void SnakeObject::updateSnake() {
 		if (new_pos.x < 0 || new_pos.x >= 16 ||
 			new_pos.y < 0 || new_pos.y >= 16)
 		{
-			//onDeath();
+			scene.onDeath();
 			return;
 		}
 
@@ -130,36 +133,38 @@ void SnakeObject::updateSnake() {
 			scene.collectApple();
 		}
 		switch (board[new_pos.x][new_pos.y]) {
-		case SnakeBoardTile::EMPTY: if (!collected_apple) {
-			// Set the new tail to play a reverse animation of the segment shrinking
-			SnakeSegment& new_tail = segments.front();
-			u32 new_tail_id = new_tail.id;
-			SpriteAnim& new_tail_anim = world.ecs.getc<SpriteAnim>(new_tail_id);
-			new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
-			new_tail_anim.since_last_update = 0;
-			Transform& new_tail_transform = world.ecs.getc<Transform>(new_tail_id);
-			Transform& new_tail_next = world.ecs.getNextc(new_tail_id);
-			Sprite& new_tail_view = world.ecs.getc<Sprite>(new_tail_id);
-			if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
-				new_tail_transform.rot += 180;
-				new_tail_next.rot += 180;
-				new_tail_anim.current_frame = 15;
-			}
-			else {
-				new_tail_transform.rot += 90;
-				new_tail_next.rot += 90;
-				new_tail_anim.current_frame = 7;
-				if (new_tail_view.flip_flags == SpriteFlip::VERTICAL) {
-					new_tail_view.flip_flags = static_cast<SpriteFlip::SpriteFlip>(SpriteFlip::HORIZONTAL | SpriteFlip::VERTICAL);
+		case SnakeBoardTile::EMPTY: 
+			if (!collected_apple) {
+				// Set the new tail to play a reverse animation of the segment shrinking
+				SnakeSegment& new_tail = segments.front();
+				u32 new_tail_id = new_tail.id;
+				SpriteAnim& new_tail_anim = world.ecs.getc<SpriteAnim>(new_tail_id);
+				new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
+				new_tail_anim.since_last_update = 0;
+				Transform& new_tail_transform = world.ecs.getc<Transform>(new_tail_id);
+				Transform& new_tail_next = world.ecs.getNextc(new_tail_id);
+				Sprite& new_tail_view = world.ecs.getc<Sprite>(new_tail_id);
+				if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
+					new_tail_transform.rot += 180;
+					new_tail_next.rot += 180;
+					new_tail_anim.current_frame = 15;
 				}
 				else {
-					new_tail_view.flip_flags = SpriteFlip::VERTICAL;
+					new_tail_transform.rot += 90;
+					new_tail_next.rot += 90;
+					new_tail_anim.current_frame = 7;
+					if (new_tail_view.flip_flags == SpriteFlip::VERTICAL) {
+						new_tail_view.flip_flags = static_cast<SpriteFlip::SpriteFlip>(SpriteFlip::HORIZONTAL | SpriteFlip::VERTICAL);
+					}
+					else {
+						new_tail_view.flip_flags = SpriteFlip::VERTICAL;
+					}
 				}
 			}
 			break;
-		}
 		case SnakeBoardTile::SNAKE:
 			// kill this snake
+			scene.onDeath();
 			break;
 		}
 		// remove collision from old head
@@ -197,7 +202,7 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 		},
 		SpriteAnim{ .rows = 4, .cols = 4,
 								.cellw = 32, .cellh = 32,
-								.framerate = 60,
+								.framerate = 1000 / static_cast<i32>(time_per_move / 8),
 								.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 },
 								.current_frame = 8
 		},

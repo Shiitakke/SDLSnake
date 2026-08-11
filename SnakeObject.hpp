@@ -15,15 +15,16 @@ public:
 		float _speed
 	);
   ~SnakeObject();
-
-	void updateSnake();
-
+	
 	enum class SnakeDir {
 		UP = 1,
 		DOWN = -1,
 		LEFT = 2,
 		RIGHT = -2,
 	}; //public for snakecontroller
+
+	void updateSnake();
+
 	SnakeDir next_dir = SnakeDir::RIGHT; //public for snakecontroller
 
 private:

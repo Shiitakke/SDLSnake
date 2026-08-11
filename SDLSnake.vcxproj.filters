@@ -40,15 +40,33 @@
     <Filter Include="Source Files\Scenes">
       <UniqueIdentifier>{018986b4-755d-4027-8688-5bfdc7147b11}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Gameplay Objects">
+      <UniqueIdentifier>{18482fcb-f4b0-4f06-a411-e45faaa29216}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderers">
+      <UniqueIdentifier>{f224a990-cdb5-49e5-930f-ec37c6068595}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Texture Factories">
+      <UniqueIdentifier>{bfa7f134-8b10-4283-bb12-67337a2fb305}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{88b6c18f-a610-4076-8ac3-8cadec774014}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderers">
+      <UniqueIdentifier>{ad3d394e-9ecd-4e0b-8fae-7bae1f9c5314}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Texture Factories">
+      <UniqueIdentifier>{62b2482b-9b5f-4172-91b6-6462740c363c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{0b82c824-34ab-4ccc-862b-e72cac33c211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Gameplay Objects">
+      <UniqueIdentifier>{5a3404f4-b520-44ab-813d-acd410e18ba0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vec.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IdManager.cpp">
@@ -58,9 +76,6 @@
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="EntityComponentSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="SDLRenderer.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
     <ClCompile Include="InputSystem.cpp">
@@ -96,29 +111,26 @@
     <ClCompile Include="RetryMenuController.cpp">
       <Filter>Source Files\UserControllers</Filter>
     </ClCompile>
+    <ClCompile Include="SnakeObject.cpp">
+      <Filter>Source Files\Gameplay Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SDLRenderer.cpp">
+      <Filter>Source Files\Renderers</Filter>
+    </ClCompile>
     <ClCompile Include="SDLTextureFactory.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Texture Factories</Filter>
     </ClCompile>
     <ClCompile Include="TimerManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="SnakeObject.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="util.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="vec.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vec.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AngularVelocity.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -167,9 +179,6 @@
     <ClInclude Include="TitleScreenScene.hpp">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="assets.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TitleMenuController.hpp">
       <Filter>Header Files\UserControllers</Filter>
     </ClInclude>
@@ -191,29 +200,44 @@
     <ClInclude Include="RetryMenuController.hpp">
       <Filter>Header Files\UserControllers</Filter>
     </ClInclude>
-    <ClInclude Include="IRenderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDLRenderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ITextureFactory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDLTextureFactory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionBox.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="Timer.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="TimerManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SnakeObject.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Gameplay Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLRenderer.hpp">
+      <Filter>Header Files\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderer.hpp">
+      <Filter>Header Files\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLTextureFactory.hpp">
+      <Filter>Header Files\Texture Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="ITextureFactory.hpp">
+      <Filter>Header Files\Texture Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerManager.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="util.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="vec.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="assets.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="common.hpp">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

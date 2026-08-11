@@ -17,35 +17,36 @@
 
 
 class SnakeGameScene : public IScene {
+private:
+
 public:
 	SnakeGameScene() = default;
+	~SnakeGameScene() = default;
 	void initialise(World& world, TextureManager& texture_manager) override;
 	void deinitialise(World& world, TextureManager& texture_manager) override;
 	void update() override;
 
+	//publics for SnakeObject
 	enum class BoardTile {
 		EMPTY,
 		APPLE,
 	};
 
-
-
-	// Public for SnakeObject (may not need this)
 	const static CollisionChannel::Channel snake_segment_collision_channel = CollisionChannel::c2;
 	const static  CollisionChannel::Channel apple_particle_collision_channel = CollisionChannel::c3;
 	std::tuple<float, float> boardPosToWorldPos(BoardPos pos);
 
 	void collectApple();
-	void updateSnakes();
-
-
-	void onDeath();
 	void createRetryScreen();
+	void onDeath();
+
+
 	std::unordered_set<u32> particles = {};
 	BoardTile board[16][16] = { BoardTile::EMPTY };
 private:
 	void generateAppleParticles();
 	void generateApplePos();
+	void updateSnakes();
 
 	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;

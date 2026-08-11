@@ -35,10 +35,8 @@ private:
   u32 retry_menu_id;
   u32 retry_quit_id;
   u32 arrow_id;
-  Transform& arrow_transform;
   Transform start_transform;
   Transform end_transform;
-  Transform curr_transform;
 
   RetryMenuSelection selections[3] = {
     RetryMenuSelection::RETRY,

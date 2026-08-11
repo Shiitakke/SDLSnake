@@ -17,20 +17,17 @@ RetryMenuController::RetryMenuController(
   retry_option_id(_retry_option_id),
   retry_menu_id(_retry_menu_id),
   retry_quit_id(_retry_quit_id),
-  arrow_id(_arrow_id),
-  arrow_transform(world.ecs.getNextc(arrow_id))
+  arrow_id(_arrow_id)
 {
+  Transform arrow_transform = world.ecs.getNextc(arrow_id);
   selection_transforms[0] = world.ecs.getc<Transform>(retry_option_id);
   selection_transforms[1] = world.ecs.getc<Transform>(retry_menu_id);
   selection_transforms[2] = world.ecs.getc<Transform>(retry_quit_id);
   start_transform = arrow_transform;
   end_transform = arrow_transform;
-  curr_transform = arrow_transform;
-  timeline_id = world.timeline_manager.createTimeline({ .length = 0 });
 }
 
 void RetryMenuController::handleEvent(const SDL_Event& e) {
-
   if (e.type == SDL_KEYDOWN) {
     switch (e.key.keysym.sym) {
     case SDLK_LEFT:
@@ -77,12 +74,11 @@ RetryMenuController::~RetryMenuController() {
 }
 
 void RetryMenuController::changeSelection() {
-  start_transform = arrow_transform;
+  start_transform = world.ecs.getNextc(arrow_id);
   end_transform = selection_transforms[curr_selection];
   end_transform.pos.x -= 150;
-  curr_transform = arrow_transform;
   world.timeline_manager.destroyTimelineChecked(timeline_id);
-  world.timeline_manager.createTimeline({
+  timeline_id = world.timeline_manager.createTimeline({
     .length = 100,
     .on_update = [this](float delta)->void {moveArrow(delta);},
     .delta_curve = [](float delta)->float {return 4 * delta * std::pow(1.f / (1.f + delta), 2);}
@@ -91,5 +87,6 @@ void RetryMenuController::changeSelection() {
 
 void RetryMenuController::moveArrow(float delta) {
   Transform curr_pos = lerp(start_transform, end_transform, delta);
+  Transform& arrow_transform = world.ecs.getNextc(arrow_id);
   arrow_transform.pos = curr_pos.pos;
 }
