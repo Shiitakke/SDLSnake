@@ -12,6 +12,7 @@
 #include "InputSystem.hpp"
 #include "IUserController.hpp"
 #include "SnakeController.hpp"
+#include "SnakeObject.hpp"
 #include "PauseController.hpp"
 #include "RetryMenuController.hpp"
 #include "Timer.hpp"
@@ -37,24 +38,13 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 		}
 	);
 
-	// snake init
-	BoardPos ss1_pos = { 3, BOARD_HEIGHT / 2 };
-	BoardPos ss2_pos = { 4, BOARD_HEIGHT / 2 };
-	u32 ss1_id = createSnakeSegment({ 0, ss1_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
-	createSnakeSegment({ 0, ss2_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
-	ecs->getc<Transform>(ss1_id).rot = 180;
-	ecs->getNextc(ss1_id).rot = 180;
-
-	SpriteAnim& ss1_anim = ecs->getc<SpriteAnim>(ss1_id);
-	ss1_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
-	ss1_anim.current_frame = 15;
-	ecs->getc<Sprite>(ss1_id).src_rect = {
-		.x = ss1_anim.current_frame % ss1_anim.cols * ss1_anim.cellw,
-		.y = ss1_anim.current_frame / ss1_anim.cols * ss1_anim.cellh,
-		.w = ss1_anim.cellw,
-		.h = ss1_anim.cellh
-	};
-	SnakeDir next_dir = SnakeDir::RIGHT;
+	snakes.push_back(
+		new SnakeObject(
+			world,
+			(*this),
+			8
+		)
+	);
 
 	// apple init
 	apple_id = ecs->createEntity(
@@ -66,7 +56,8 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 		}
 	);
 	generateApplePos();
-	IUserController* snake_controller = new SnakeController(*this);
+	IUserController* snake_controller = new SnakeController(*snakes.back());
+
 	IUserController* pause_controller = new PauseController(*this, world);
 
 	InputSystem::instance().pushContext();
@@ -79,9 +70,10 @@ void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager)
 	texture_manager.unloadTexture(apple_sprite_path);
 	texture_manager.unloadTexture(board_sprite_path);
 	texture_manager.unloadTexture(pause_sprite_path);
-	for (u32 ss : snake) {
-		ecs->destroyEntity(ss);
+	for (SnakeObject* s : snakes) {
+		delete s;
 	}
+	snakes.clear();
 	for (u32 particle : particles) {
 		ecs->destroyEntity(particle);
 	}
@@ -91,194 +83,207 @@ void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager)
 
 void SnakeGameScene::update() {
 	if (!paused) {
-		updateSnake();
+		updateSnakes();
 	}
 }
 
-void SnakeGameScene::updateSnake() {
-	constexpr float snake_speed = 8;
-	constexpr float time_per_move = 1000. / snake_speed;
-	static float since_last_update = 0.;
-	since_last_update += TIME_STEP;
-
-	SnakeSegment& head = snake_segments.getComponent(snake.back());
-	if (next_dir == head.in_dir) {
-		next_dir = head.out_dir;
-	}
-	head.out_dir = next_dir;
-
-	// Look at direction enum explicit values for why this works
-	if (static_cast<i32>(head.out_dir) + static_cast<i32>(head.in_dir) == 0) {
-		// Straight
-		if (head.curr_type != SnakeSpriteType::STRAIGHT) {
-			ecs->getc<Sprite>(head.id).flip_flags = SpriteFlip::NONE;
-			ecs->getc<SpriteAnim>(head.id).current_frame += 8;
-			head.curr_type = SnakeSpriteType::STRAIGHT;
-		}
-	}
-	else {
-		//curved
-		// Set flipping for curved sprites (it runs left-to-up, clockwise)
-		Sprite& hv = ecs->getc<Sprite>(head.id);
-		switch (head.in_dir) {
-		case SnakeDir::LEFT:
-			hv.flip_flags = head.out_dir == SnakeDir::DOWN ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
-			break;
-		case SnakeDir::RIGHT:
-			hv.flip_flags = head.out_dir == SnakeDir::UP ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
-			break;
-		case SnakeDir::UP:
-			hv.flip_flags = head.out_dir == SnakeDir::LEFT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
-			break;
-		case SnakeDir::DOWN:
-			hv.flip_flags = head.out_dir == SnakeDir::RIGHT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
-			break;
-		}
-		if (head.curr_type != SnakeSpriteType::CURVED) {
-			ecs->getc<SpriteAnim>(head.id).current_frame -= 8;
-			head.curr_type = SnakeSpriteType::CURVED;
-		}
-	}
-	while (since_last_update > time_per_move) {
-		// Get tail, get head, place new head, remove tail if head moved into an empty space
-		SnakeSegment& head = snake_segments.getComponent(snake.back());
-		SnakeSegment& tail = snake_segments.getComponent(snake.front());
-		BoardPos new_pos = head.pos;
-		SnakeDir in_dir;
-		switch (next_dir) {
-		case SnakeDir::UP:
-			new_pos.y--;
-			in_dir = SnakeDir::DOWN;
-			break;
-		case SnakeDir::DOWN:
-			new_pos.y++;
-			in_dir = SnakeDir::UP;
-			break;
-		case SnakeDir::LEFT:
-			new_pos.x--;
-			in_dir = SnakeDir::RIGHT;
-			break;
-		case SnakeDir::RIGHT:
-			new_pos.x++;
-			in_dir = SnakeDir::LEFT;
-			break;
-		default:
-			new_pos.y--;
-			in_dir = SnakeDir::DOWN;
-			break;
-		}
-		// Bounds checking
-		if (new_pos.x < 0 || new_pos.x >= BOARD_WIDTH ||
-			new_pos.y < 0 || new_pos.y >= BOARD_HEIGHT)
-		{
-			onDeath();
-			return;
-		}
-
-		
-		if (board[new_pos.x][new_pos.y] != BoardTile::APPLE) {
-			destroySnakeSegment();
-		}
-		switch (board[new_pos.x][new_pos.y]) {
-		case BoardTile::EMPTY:
-		{	
-			// Set the new tail to play a reverse animation of the segment shrinking
-			u32 new_tail_id = snake.front();
-			SnakeSegment& new_tail = snake_segments.getComponent(new_tail_id);
-			SpriteAnim& new_tail_anim = ecs->getc<SpriteAnim>(new_tail_id);
-			new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
-			new_tail_anim.since_last_update = 0;
-			Transform& new_tail_transform = ecs->getc<Transform>(new_tail_id);
-			Transform& new_tail_next = ecs->getNextc(new_tail_id);
-			Sprite& new_tail_view = ecs->getc<Sprite>(new_tail_id);
-			if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
-				new_tail_transform.rot += 180;
-				new_tail_next.rot += 180;
-				new_tail_anim.current_frame = 15;
-			}
-			else {
-				new_tail_transform.rot += 90;
-				new_tail_next.rot += 90;
-				new_tail_anim.current_frame = 7;
-				if (new_tail_view.flip_flags == SpriteFlip::VERTICAL) {
-					new_tail_view.flip_flags = static_cast<SpriteFlip::SpriteFlip>(SpriteFlip::HORIZONTAL | SpriteFlip::VERTICAL);
-				}
-				else {
-					new_tail_view.flip_flags = SpriteFlip::VERTICAL;
-				}
-			}
-		}
-		break;
-		case BoardTile::APPLE:
-			generateAppleParticles();
-			generateApplePos();
-			break;
-		case BoardTile::SNAKE:
-			onDeath();
-			break;
-		}
-		// remove collision from old head
-		world->ecs.destroyComponent<CollisionBox>(snake.back());
-		u32 new_segment_id = createSnakeSegment({ 0, new_pos, in_dir, next_dir, SnakeSpriteType::STRAIGHT });
-		Transform& t = ecs->getc<Transform>(new_segment_id);
-		Transform& t_next = ecs->getNextc(new_segment_id);
-		switch (in_dir) {
-		case SnakeDir::DOWN:
-			t.rot += 90;
-			t_next.rot += 90;
-			[[fallthrough]];
-		case SnakeDir::RIGHT:
-			t.rot += 90;
-			t_next.rot += 90;
-			[[fallthrough]];
-		case SnakeDir::UP:
-			t.rot += 90;
-			t_next.rot += 90;
-		}
-		since_last_update -= time_per_move;
+void SnakeGameScene::updateSnakes() {
+	for (SnakeObject* snake : snakes) {
+		snake->updateSnake();
 	}
 }
 
-u32 SnakeGameScene::createSnakeSegment(SnakeSegment ss) {
-	const auto& [t_x, t_y] = boardPosToWorldPos(ss.pos);
-	u32 new_segment_id = ecs->createEntity(
-		Transform{ .pos = {t_x, t_y},
-								.scale = {2, 2}
-		},
-		Sprite{ .sprite_path = snake_sprite_path,
-								.sprite_id = texture_manager->getTextureid(snake_sprite_path),
-								.src_rect = {0, 0, 32, 32},
-								.zindex = 11
-		},
-		SpriteAnim{ .rows = 4, .cols = 4,
-								.cellw = 32, .cellh = 32,
-								.framerate = 60,
-								.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 },
-								.current_frame = 8
-		},
-		CollisionBox{ .extent = {.x = 50, .y = 50},
-									.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
-									.on_begin_collision = [this](u32 otherid)->void {
-										if (this->world->ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel) {
-											this->world->ecs.destroyEntity(otherid);
-										}
-									}
-		}
-	);
-	ss.id = new_segment_id;
-	snake_segments.createComponent(new_segment_id, ss);
-	snake.emplace_back(new_segment_id);
-	board[ss.pos.x][ss.pos.y] = BoardTile::SNAKE;
-	return new_segment_id;
-}
+//void SnakeGameScene::updateSnake() {
+//	constexpr float snake_speed = 8;
+//	constexpr float time_per_move = 1000. / snake_speed;
+//	static float since_last_update = 0.;
+//	since_last_update += TIME_STEP;
+//
+//	SnakeSegment& head = snake_segments.getComponent(snake.back());
+//	if (next_dir == head.in_dir) {
+//		next_dir = head.out_dir;
+//	}
+//	head.out_dir = next_dir;
+//
+//	// Look at direction enum explicit values for why this works
+//	if (static_cast<i32>(head.out_dir) + static_cast<i32>(head.in_dir) == 0) {
+//		// Straight
+//		if (head.curr_type != SnakeSpriteType::STRAIGHT) {
+//			ecs->getc<Sprite>(head.id).flip_flags = SpriteFlip::NONE;
+//			ecs->getc<SpriteAnim>(head.id).current_frame += 8;
+//			head.curr_type = SnakeSpriteType::STRAIGHT;
+//		}
+//	}
+//	else {
+//		//curved
+//		// Set flipping for curved sprites (it runs left-to-up, clockwise)
+//		Sprite& hv = ecs->getc<Sprite>(head.id);
+//		switch (head.in_dir) {
+//		case SnakeDir::LEFT:
+//			hv.flip_flags = head.out_dir == SnakeDir::DOWN ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
+//			break;
+//		case SnakeDir::RIGHT:
+//			hv.flip_flags = head.out_dir == SnakeDir::UP ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
+//			break;
+//		case SnakeDir::UP:
+//			hv.flip_flags = head.out_dir == SnakeDir::LEFT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
+//			break;
+//		case SnakeDir::DOWN:
+//			hv.flip_flags = head.out_dir == SnakeDir::RIGHT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
+//			break;
+//		}
+//		if (head.curr_type != SnakeSpriteType::CURVED) {
+//			ecs->getc<SpriteAnim>(head.id).current_frame -= 8;
+//			head.curr_type = SnakeSpriteType::CURVED;
+//		}
+//	}
+//	while (since_last_update > time_per_move) {
+//		// Get tail, get head, place new head, remove tail if head moved into an empty space
+//		SnakeSegment& head = snake_segments.getComponent(snake.back());
+//		SnakeSegment& tail = snake_segments.getComponent(snake.front());
+//		BoardPos new_pos = head.pos;
+//		SnakeDir in_dir;
+//		switch (next_dir) {
+//		case SnakeDir::UP:
+//			new_pos.y--;
+//			in_dir = SnakeDir::DOWN;
+//			break;
+//		case SnakeDir::DOWN:
+//			new_pos.y++;
+//			in_dir = SnakeDir::UP;
+//			break;
+//		case SnakeDir::LEFT:
+//			new_pos.x--;
+//			in_dir = SnakeDir::RIGHT;
+//			break;
+//		case SnakeDir::RIGHT:
+//			new_pos.x++;
+//			in_dir = SnakeDir::LEFT;
+//			break;
+//		default:
+//			new_pos.y--;
+//			in_dir = SnakeDir::DOWN;
+//			break;
+//		}
+//		// Bounds checking
+//		if (new_pos.x < 0 || new_pos.x >= BOARD_WIDTH ||
+//			new_pos.y < 0 || new_pos.y >= BOARD_HEIGHT)
+//		{
+//			onDeath();
+//			return;
+//		}
+//
+//		
+//		if (board[new_pos.x][new_pos.y] != BoardTile::APPLE) {
+//			destroySnakeSegment();
+//		}
+//		switch (board[new_pos.x][new_pos.y]) {
+//		case BoardTile::EMPTY:
+//		{	
+//			// Set the new tail to play a reverse animation of the segment shrinking
+//			u32 new_tail_id = snake.front();
+//			SnakeSegment& new_tail = snake_segments.getComponent(new_tail_id);
+//			SpriteAnim& new_tail_anim = ecs->getc<SpriteAnim>(new_tail_id);
+//			new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
+//			new_tail_anim.since_last_update = 0;
+//			Transform& new_tail_transform = ecs->getc<Transform>(new_tail_id);
+//			Transform& new_tail_next = ecs->getNextc(new_tail_id);
+//			Sprite& new_tail_view = ecs->getc<Sprite>(new_tail_id);
+//			if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
+//				new_tail_transform.rot += 180;
+//				new_tail_next.rot += 180;
+//				new_tail_anim.current_frame = 15;
+//			}
+//			else {
+//				new_tail_transform.rot += 90;
+//				new_tail_next.rot += 90;
+//				new_tail_anim.current_frame = 7;
+//				if (new_tail_view.flip_flags == SpriteFlip::VERTICAL) {
+//					new_tail_view.flip_flags = static_cast<SpriteFlip::SpriteFlip>(SpriteFlip::HORIZONTAL | SpriteFlip::VERTICAL);
+//				}
+//				else {
+//					new_tail_view.flip_flags = SpriteFlip::VERTICAL;
+//				}
+//			}
+//		}
+//		break;
+//		case BoardTile::APPLE:
+//			generateAppleParticles();
+//			generateApplePos();
+//			break;
+//		case BoardTile::SNAKE:
+//			onDeath();
+//			break;
+//		}
+//		// remove collision from old head
+//		world->ecs.destroyComponent<CollisionBox>(snake.back());
+//		u32 new_segment_id = createSnakeSegment({ 0, new_pos, in_dir, next_dir, SnakeSpriteType::STRAIGHT });
+//		Transform& t = ecs->getc<Transform>(new_segment_id);
+//		Transform& t_next = ecs->getNextc(new_segment_id);
+//		switch (in_dir) {
+//		case SnakeDir::DOWN:
+//			t.rot += 90;
+//			t_next.rot += 90;
+//			[[fallthrough]];
+//		case SnakeDir::RIGHT:
+//			t.rot += 90;
+//			t_next.rot += 90;
+//			[[fallthrough]];
+//		case SnakeDir::UP:
+//			t.rot += 90;
+//			t_next.rot += 90;
+//		}
+//		since_last_update -= time_per_move;
+//	}
+//}
+//
+//u32 SnakeGameScene::createSnakeSegment(SnakeSegment ss) {
+//	const auto& [t_x, t_y] = boardPosToWorldPos(ss.pos);
+//	u32 new_segment_id = ecs->createEntity(
+//		Transform{ .pos = {t_x, t_y},
+//								.scale = {2, 2}
+//		},
+//		Sprite{ .sprite_path = snake_sprite_path,
+//								.sprite_id = texture_manager->getTextureid(snake_sprite_path),
+//								.src_rect = {0, 0, 32, 32},
+//								.zindex = 11
+//		},
+//		SpriteAnim{ .rows = 4, .cols = 4,
+//								.cellw = 32, .cellh = 32,
+//								.framerate = 60,
+//								.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 },
+//								.current_frame = 8
+//		},
+//		CollisionBox{ .extent = {.x = 50, .y = 50},
+//									.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
+//									.on_begin_collision = [this](u32 otherid)->void {
+//										if (this->world->ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel) {
+//											this->world->ecs.destroyEntity(otherid);
+//											this->particles.erase(particles.find(otherid));
+//										}
+//									}
+//		}
+//	);
+//	ss.id = new_segment_id;
+//	snake_segments.createComponent(new_segment_id, ss);
+//	snake.emplace_back(new_segment_id);
+//	board[ss.pos.x][ss.pos.y] = BoardTile::SNAKE;
+//	return new_segment_id;
+//}
+//
+//void SnakeGameScene::destroySnakeSegment() {
+//	u32 id = snake.front();
+//	ecs->destroyEntity(id);
+//	BoardPos pos = snake_segments.getComponent(id).pos;
+//	board[pos.x][pos.y] = BoardTile::EMPTY;
+//	snake_segments.destroyComponent(id);
+//	snake.pop_front();
+//}
 
-void SnakeGameScene::destroySnakeSegment() {
-	u32 id = snake.front();
-	ecs->destroyEntity(id);
-	BoardPos pos = snake_segments.getComponent(id).pos;
-	board[pos.x][pos.y] = BoardTile::EMPTY;
-	snake_segments.destroyComponent(id);
-	snake.pop_front();
+void SnakeGameScene::collectApple() {
+	board[apple_pos.x][apple_pos.y] = BoardTile::EMPTY;
+	generateAppleParticles();
+	generateApplePos();
 }
 
 void SnakeGameScene::generateApplePos() {
@@ -303,6 +308,8 @@ void SnakeGameScene::generateApplePos() {
 	const auto& [new_x, new_y] = boardPosToWorldPos({ x, y });
 	ecs->getc<Transform>(apple_id).pos = { new_x, new_y };
 	ecs->getNextc(apple_id).pos = { new_x, new_y };
+	apple_pos.x = x;
+	apple_pos.y = y;
 }
 
 void SnakeGameScene::generateAppleParticles() {
@@ -315,7 +322,7 @@ void SnakeGameScene::generateAppleParticles() {
 	std::uniform_real_distribution<float> rot_range{ 0, 30 };
 	std::vector<u32> apple_ids = {};
 	for (i32 i = 0; i < 10; ++i) {
-		particles.push_back(ecs->createEntity(
+		u32 new_particle_id = ecs->createEntity(
 			Transform{ .pos = {apple_transform.pos.x, apple_transform.pos.y},
 									.scale = {scale_range(mt), scale_range(mt)}
 			},
@@ -328,11 +335,9 @@ void SnakeGameScene::generateAppleParticles() {
 			},
 			AngularVelocity{ .velocity = rot_range(mt)
 			}
-			//CollisionBox{ .extent = {.x = 15, .y = 15},
-			//							.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::apple_particle_collision_channel)
-			//}
-		));
-		apple_ids.push_back(particles.back());
+		);
+		particles.emplace(new_particle_id);
+		apple_ids.push_back(new_particle_id);
 	}
 	world->timer_manager.createTimer(
 		Timer{	.interval = 500,

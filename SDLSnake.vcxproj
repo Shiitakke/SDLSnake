@@ -165,6 +165,7 @@
     <ClCompile Include="SDLTextureFactory.cpp" />
     <ClCompile Include="SnakeGameScene.cpp" />
     <ClCompile Include="SnakeController.cpp" />
+    <ClCompile Include="SnakeObject.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TimelineManager.cpp" />
     <ClCompile Include="TimerManager.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="SDLTextureFactory.hpp" />
     <ClInclude Include="SnakeGameScene.hpp" />
     <ClInclude Include="SnakeController.hpp" />
+    <ClInclude Include="SnakeObject.hpp" />
     <ClInclude Include="SpriteAnim.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="TextureManager.hpp" />

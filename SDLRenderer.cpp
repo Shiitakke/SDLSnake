@@ -50,7 +50,7 @@ void SDLRenderer::render(float delta) {
 			static_cast<SDL_RendererFlip>(view.flip_flags)
 		);
 	}
-
+#ifdef _DEBUG
 	// Collision box rendering
 	for (u32 i = 0; i < collisions.n_components; ++i) {
 		const CollisionBox& box = collisions.components[i];
@@ -83,6 +83,7 @@ void SDLRenderer::render(float delta) {
 		}
 		SDL_RenderDrawRect(renderer, &dst_rect);
 	}
+#endif
 
 	SDL_RenderPresent(renderer);
 }

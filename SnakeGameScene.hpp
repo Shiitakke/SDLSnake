@@ -2,15 +2,19 @@
 
 #include "common.hpp"
 #include <deque>
+#include <unordered_set>
+#include <vector>
 
 #include "IScene.hpp"
 
 #include "EntityComponentSystem.hpp"
 #include "ComponentManager.hpp"
 #include "TextureManager.hpp"
+#include "SnakeObject.hpp"
 #include "SpriteAnim.hpp"
 #include "assets.hpp"
 #include "CollisionBox.hpp"
+
 
 class SnakeGameScene : public IScene {
 public:
@@ -19,63 +23,38 @@ public:
 	void deinitialise(World& world, TextureManager& texture_manager) override;
 	void update() override;
 
-	enum class SnakeDir {
-		UP = 1,
-		DOWN = -1,
-		LEFT = 2,
-		RIGHT = -2,
-	};
-
 	enum class BoardTile {
 		EMPTY,
 		APPLE,
-		SNAKE
 	};
 
-	struct BoardPos {
-		i32 x;
-		i32 y;
-	};
 
-	enum class SnakeSpriteType {
-		STRAIGHT,
-		CURVED
-	};
 
-	struct SnakeSegment {
-		u32 id;
-		BoardPos pos;
-		SnakeDir in_dir;
-		SnakeDir out_dir;
-		SnakeSpriteType curr_type;
-	};
-
-	SnakeDir next_dir = SnakeDir::RIGHT;
-
-private:
+	// Public for SnakeObject (may not need this)
 	const static CollisionChannel::Channel snake_segment_collision_channel = CollisionChannel::c2;
 	const static  CollisionChannel::Channel apple_particle_collision_channel = CollisionChannel::c3;
+	std::tuple<float, float> boardPosToWorldPos(BoardPos pos);
+
+	void collectApple();
+	void updateSnakes();
+
+
+	void onDeath();
+	void createRetryScreen();
+	std::unordered_set<u32> particles = {};
+	BoardTile board[16][16] = { BoardTile::EMPTY };
+private:
+	void generateAppleParticles();
+	void generateApplePos();
+
 	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;
 	TextureManager* texture_manager = nullptr;
-
-	void updateSnake();
-	u32 createSnakeSegment(SnakeSegment ss);
-	void destroySnakeSegment();
-	void generateApplePos();
-	void generateAppleParticles();
-	void onDeath();
-	void createRetryScreen();
-	std::tuple<float, float> boardPosToWorldPos(BoardPos pos);
-	
 	u32 BOARD_WIDTH = 16;
 	u32 BOARD_HEIGHT = 16;
-
-	ComponentManager<SnakeSegment> snake_segments;
-	BoardTile board[16][16] = { BoardTile::EMPTY };
-	std::deque<u32> snake;
+	std::vector<SnakeObject*> snakes;
 	u32 apple_id = 0;
-	std::vector<u32> particles = {};
+	BoardPos apple_pos = {0, 0};
 	bool paused = false;
 };
 
