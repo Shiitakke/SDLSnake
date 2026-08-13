@@ -40,15 +40,24 @@ public:
 	const static CollisionChannel::Channel snake_segment_collision_channel = CollisionChannel::c2;
 	const static  CollisionChannel::Channel apple_particle_collision_channel = CollisionChannel::c3;
 	std::tuple<float, float> boardPosToWorldPos(BoardPos pos);
-
-	void collectAppleAt(BoardPos pos);
-	void createRetryScreen();
+	
 	bool appleAt(BoardPos pos);
+	void collectAppleAt(BoardPos pos);
+	void collectParticle(u32 id);
+	void createRetryScreen();
 	void onDeath();
-
+	void setSnakeSpeeds(float new_speed);
 
 	std::unordered_set<u32> particles = {};
 	BoardTile board[16][16] = { };
+	bool paused = false; // public for buy menu controller
+	// publics for shop to set when upgrading (probably move to functions instead later)
+	u32 apple_count = 1;
+	u32 apple_particle_count = 0;
+	u32 apple_particle_value = 1;
+	u32 apple_value = 1;
+	u32 current_score = 0;
+	
 private:
 	void generateAppleParticles(u32 apple_id);
 	void createNewApple();
@@ -59,8 +68,8 @@ private:
 	TextureManager* texture_manager = nullptr;
 	u32 BOARD_WIDTH = 16;
 	u32 BOARD_HEIGHT = 16;
+	u32 new_snake_speed = 4;
 	std::vector<SnakeObject*> snakes;
 	std::unordered_set<u32> apple_ids;
-	bool paused = false;
 };
 

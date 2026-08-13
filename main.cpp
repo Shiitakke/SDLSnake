@@ -216,6 +216,8 @@ void updateCollisions(
 	ComponentManager<Transform>& transforms,
 	ComponentManager<CollisionBox>& collision_boxes
 ) {
+	// If we delete something on collision start, then this map becomes invalid
+	// Need some way to inform the physics system that entities have been destroyed
 	static std::unordered_map<u32, std::unordered_set<u32>> collisions; // TODO: move to class instead of a static var
 	for (i32 i = 0; i < collision_boxes.n_components; ++i) {
 		CollisionBox& box1 = collision_boxes.components[i];

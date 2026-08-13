@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BuyController.cpp" />
     <ClCompile Include="EntityComponentSystem.cpp" />
     <ClCompile Include="IdManager.cpp" />
     <ClCompile Include="InputSystem.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="SDLRenderer.cpp" />
     <ClCompile Include="RetryMenuController.cpp" />
     <ClCompile Include="SDLTextureFactory.cpp" />
+    <ClCompile Include="ShopMenuController.cpp" />
     <ClCompile Include="SnakeGameScene.cpp" />
     <ClCompile Include="SnakeController.cpp" />
     <ClCompile Include="SnakeObject.cpp" />
@@ -179,6 +181,7 @@
   <ItemGroup>
     <ClInclude Include="AngularVelocity.hpp" />
     <ClInclude Include="assets.hpp" />
+    <ClInclude Include="BuyController.hpp" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="CollisionBox.hpp" />
     <ClInclude Include="common.hpp" />
@@ -193,6 +196,7 @@
     <ClInclude Include="SDLRenderer.hpp" />
     <ClInclude Include="RetryMenuController.hpp" />
     <ClInclude Include="SDLTextureFactory.hpp" />
+    <ClInclude Include="ShopMenuController.hpp" />
     <ClInclude Include="SnakeGameScene.hpp" />
     <ClInclude Include="SnakeController.hpp" />
     <ClInclude Include="SnakeObject.hpp" />

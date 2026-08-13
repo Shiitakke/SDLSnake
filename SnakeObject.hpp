@@ -2,7 +2,6 @@
 
 #include <deque>
 #include "common.hpp"
-//#include "SnakeGameScene.hpp"
 
 class World;
 class SnakeGameScene;
@@ -23,6 +22,7 @@ public:
 		RIGHT = -2,
 	}; //public for snakecontroller
 
+	void setSpeed(float new_speed);
 	void updateSnake();
 
 	SnakeDir next_dir = SnakeDir::RIGHT; //public for snakecontroller
@@ -58,6 +58,7 @@ private:
 	float since_last_update = 0.0f;
 	float speed;
 	float time_per_move;
+	float anim_framerate;
 
 };
 

@@ -129,6 +129,12 @@
     <ClCompile Include="vec.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="ShopMenuController.cpp">
+      <Filter>Source Files\UserControllers</Filter>
+    </ClCompile>
+    <ClCompile Include="BuyController.cpp">
+      <Filter>Source Files\UserControllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AngularVelocity.hpp">
@@ -238,6 +244,12 @@
     </ClInclude>
     <ClInclude Include="common.hpp">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="BuyController.hpp">
+      <Filter>Header Files\UserControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="ShopMenuController.hpp">
+      <Filter>Header Files\UserControllers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

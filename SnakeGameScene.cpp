@@ -3,6 +3,7 @@
 #include <random>
 
 #include "common.hpp"
+#include "BuyController.hpp"
 #include "Sprite.hpp"
 #include "SpriteAnim.hpp"
 #include "LinearVelocity.hpp"
@@ -42,18 +43,18 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 		new SnakeObject(
 			world,
 			(*this),
-			16
+			new_snake_speed
 		)
 	);
 
 	createNewApple();
 	IUserController* snake_controller = new SnakeController(*snakes.back());
-
 	IUserController* pause_controller = new PauseController(*this, world);
-
+	IUserController* buy_controller = new BuyController(*this, world);
 	InputSystem::instance().pushContext();
 	InputSystem::instance().addToCurrentContext(snake_controller);
 	InputSystem::instance().addToCurrentContext(pause_controller);
+	InputSystem::instance().addToCurrentContext(buy_controller);
 };
 
 void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager) {
@@ -82,15 +83,17 @@ void SnakeGameScene::update() {
 	}
 }
 
-void SnakeGameScene::updateSnakes() {
-	for (SnakeObject* snake : snakes) {
-		snake->updateSnake();
-	}
-}
-
 bool SnakeGameScene::appleAt(BoardPos pos) {
 	return board[pos.x][pos.y].type == BoardTileType::APPLE;
 }
+
+std::tuple<float, float> SnakeGameScene::boardPosToWorldPos(BoardPos pos) {
+	static float tile_width = INTERNAL_WINDOW_WIDTH / static_cast<float>(BOARD_WIDTH);
+	static float tile_height = INTERNAL_WINDOW_HEIGHT / static_cast<float>(BOARD_HEIGHT);
+	float x = static_cast<float>(pos.x) * tile_width - INTERNAL_WINDOW_WIDTH / 2.f + (tile_width / 2.f);
+	float y = static_cast<float>(pos.y) * tile_width - INTERNAL_WINDOW_HEIGHT / 2.f + (tile_height / 2.f);
+	return { x, -y };
+};
 
 void SnakeGameScene::collectAppleAt(BoardPos pos) {
 	board[pos.x][pos.y].type = BoardTileType::EMPTY;
@@ -99,6 +102,13 @@ void SnakeGameScene::collectAppleAt(BoardPos pos) {
 	world->ecs.destroyEntity(board[pos.x][pos.y].id);
 	apple_ids.erase(apple_ids.find(board[pos.x][pos.y].id));
 	createNewApple();
+	current_score += apple_value;
+}
+
+void SnakeGameScene::collectParticle(u32 id) {
+	ecs->destroyEntity(id);
+	particles.erase(id);
+	current_score += apple_particle_value;
 }
 
 void SnakeGameScene::createNewApple() {
@@ -131,59 +141,6 @@ void SnakeGameScene::createNewApple() {
 	);
 	apple_ids.emplace(new_apple_id);
 	board[x][y].id = new_apple_id;
-}
-
-void SnakeGameScene::generateAppleParticles(u32 apple_id) {
-	const Transform apple_transform = ecs->getc<Transform>(apple_id);
-	std::random_device rd;
-	std::mt19937 mt(rd());
-	std::uniform_int_distribution<i32> view_range{ 0, 56 };
-	std::uniform_real_distribution<float> vel_range{ -10., 10. };
-	std::uniform_real_distribution<float> scale_range{ 1., 3. };
-	std::uniform_real_distribution<float> rot_range{ 0, 30 };
-	std::vector<u32> apple_ids = {};
-	for (i32 i = 0; i < 10; ++i) {
-		u32 new_particle_id = ecs->createEntity(
-			Transform{ .pos = {apple_transform.pos.x, apple_transform.pos.y},
-									.scale = {scale_range(mt), scale_range(mt)}
-			},
-			Sprite{ .sprite_path = apple_sprite_path,
-							.sprite_id = texture_manager->getTextureid(apple_sprite_path),
-							.src_rect = {view_range(mt), view_range(mt), 8, 8}
-			},
-			LinearVelocity{ .velocity = {vel_range(mt), vel_range(mt)},
-											.friction = 0.1f
-			},
-			AngularVelocity{ .velocity = rot_range(mt)
-			}
-		);
-		particles.emplace(new_particle_id);
-		apple_ids.push_back(new_particle_id);
-	}
-	world->timer_manager.createTimer(
-		Timer{	.interval = 500,
-						.callback = [this, apple_ids]()->void {
-							for (u32 id : apple_ids) {
-								this->world->ecs.createComponent(id, CollisionBox{ .extent = {.x = 15, .y = 15}, .channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::apple_particle_collision_channel) });
-							}
-						},
-		}
-	);
-}
-
-std::tuple<float, float> SnakeGameScene::boardPosToWorldPos(BoardPos pos) {
-	static float tile_width = INTERNAL_WINDOW_WIDTH / static_cast<float>(BOARD_WIDTH);
-	static float tile_height = INTERNAL_WINDOW_HEIGHT / static_cast<float>(BOARD_HEIGHT);
-	float x = static_cast<float>(pos.x) * tile_width - INTERNAL_WINDOW_WIDTH / 2.f + (tile_width / 2.f);
-	float y = static_cast<float>(pos.y) * tile_width - INTERNAL_WINDOW_HEIGHT / 2.f + (tile_height / 2.f);
-	return { x, -y };
-};
-
-void SnakeGameScene::onDeath() {
-	paused = true;
-	// play death animation
-	// show retry screen
-	createRetryScreen();
 }
 
 void SnakeGameScene::createRetryScreen() {
@@ -260,4 +217,61 @@ void SnakeGameScene::createRetryScreen() {
 	);
 	InputSystem::instance().pushContext();
 	InputSystem::instance().addToCurrentContext(retry_controller);
+}
+
+void SnakeGameScene::generateAppleParticles(u32 apple_id) {
+	const Transform apple_transform = ecs->getc<Transform>(apple_id);
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<i32> view_range{ 0, 56 };
+	std::uniform_real_distribution<float> vel_range{ -10., 10. };
+	std::uniform_real_distribution<float> scale_range{ 1., 3. };
+	std::uniform_real_distribution<float> rot_range{ 0, 30 };
+	std::vector<u32> apple_ids = {};
+	for (i32 i = 0; i < apple_particle_count; ++i) {
+		u32 new_particle_id = ecs->createEntity(
+			Transform{ .pos = {apple_transform.pos.x, apple_transform.pos.y},
+									.scale = {scale_range(mt), scale_range(mt)}
+			},
+			Sprite{ .sprite_path = apple_sprite_path,
+							.sprite_id = texture_manager->getTextureid(apple_sprite_path),
+							.src_rect = {view_range(mt), view_range(mt), 8, 8}
+			},
+			LinearVelocity{ .velocity = {vel_range(mt), vel_range(mt)},
+											.friction = 0.1f
+			},
+			AngularVelocity{ .velocity = rot_range(mt)
+			}
+		);
+		particles.emplace(new_particle_id);
+		apple_ids.push_back(new_particle_id);
+	}
+	world->timer_manager.createTimer(
+		Timer{	.interval = 500,
+						.callback = [this, apple_ids]()->void {
+							for (u32 id : apple_ids) {
+								this->world->ecs.createComponent(id, CollisionBox{ .extent = {.x = 15, .y = 15}, .channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::apple_particle_collision_channel) });
+							}
+						},
+		}
+	);
+}
+
+void SnakeGameScene::onDeath() {
+	paused = true;
+	// play death animation
+	// show retry screen
+	createRetryScreen();
+}
+
+void SnakeGameScene::setSnakeSpeeds(float new_speed) {
+	for (SnakeObject* snake : snakes) {
+		snake->setSpeed(new_speed);
+	}
+}
+
+void SnakeGameScene::updateSnakes() {
+	for (SnakeObject* snake : snakes) {
+		snake->updateSnake();
+	}
 }

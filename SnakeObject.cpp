@@ -14,10 +14,9 @@ SnakeObject::SnakeObject(
 	float _speed
 ) :
 	world(_world),
-	scene(_scene),
-	speed(_speed),
-	time_per_move(1000. / _speed)
+	scene(_scene)
 {
+	setSpeed(_speed);
 	// snake init
 	BoardPos ss1_pos = { 3, 8 };
 	BoardPos ss2_pos = { 4, 8 };
@@ -210,8 +209,7 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 									.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
 									.on_begin_collision = [this](u32 otherid)->void {
 										if (world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel) {
-											world.ecs.destroyEntity(otherid);
-											scene.particles.erase(scene.particles.find(otherid));
+											scene.collectParticle(otherid);
 										}
 									}
 		}
@@ -228,4 +226,14 @@ void SnakeObject::destroySnakeSegment() {
 	BoardPos pos = segments.front().pos;
 	board[pos.x][pos.y] = SnakeBoardTile::EMPTY;
 	segments.pop_front();
+}
+
+void SnakeObject::setSpeed(float new_speed) {
+	// need to change speed, time per move, and anim speeds
+	speed = new_speed;
+	time_per_move = 1000. / speed;
+	anim_framerate = 1000 / static_cast<i32>(time_per_move / 8);
+	for (SnakeSegment& segment : segments) {
+		world.ecs.getc<SpriteAnim>(segment.id).framerate = anim_framerate;
+	}
 }
