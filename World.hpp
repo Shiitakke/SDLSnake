@@ -7,6 +7,8 @@
 #include "Camera.hpp"
 #include "TimerManager.hpp"
 
+class IAIController;
+
 class World {
 public:
   World() = default;
@@ -33,6 +35,7 @@ public:
   TextureManager texture_manager;
   TimelineManager timeline_manager;
   TimerManager timer_manager;
+  std::vector<IAIController*> ai_controllers;
   bool paused = false;
 
 private:

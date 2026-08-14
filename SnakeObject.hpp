@@ -2,6 +2,7 @@
 
 #include <deque>
 #include "common.hpp"
+#include "Sprite.hpp"
 
 class World;
 class SnakeGameScene;
@@ -11,7 +12,8 @@ public:
   SnakeObject(
 		World& _world,
 		SnakeGameScene& _scene,
-		float _speed
+		float _speed,
+		SpriteColorMod _snake_color
 	);
   ~SnakeObject();
 	
@@ -55,6 +57,7 @@ private:
 	// Snakes check in with the appleboard to see if theres an apple wherever they are moving
 	SnakeBoardTile board[16][16] = { SnakeBoardTile::EMPTY };
 	std::deque<SnakeSegment> segments = {};
+	SpriteColorMod snake_color;
 	float since_last_update = 0.0f;
 	float speed;
 	float time_per_move;

@@ -64,6 +64,9 @@
     <Filter Include="Source Files\Gameplay Objects">
       <UniqueIdentifier>{5a3404f4-b520-44ab-813d-acd410e18ba0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AIControllers">
+      <UniqueIdentifier>{efc62ac7-3ce4-491a-a278-b6875a92df98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -134,6 +137,9 @@
     </ClCompile>
     <ClCompile Include="BuyController.cpp">
       <Filter>Source Files\UserControllers</Filter>
+    </ClCompile>
+    <ClCompile Include="AISnakeController.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -250,6 +256,12 @@
     </ClInclude>
     <ClInclude Include="ShopMenuController.hpp">
       <Filter>Header Files\UserControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="IAIController.hpp">
+      <Filter>Header Files\AIControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="AISnakeController.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

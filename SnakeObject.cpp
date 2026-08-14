@@ -11,10 +11,12 @@
 SnakeObject::SnakeObject(
 	World& _world,
 	SnakeGameScene& _scene,
-	float _speed
+	float _speed,
+	SpriteColorMod _snake_color
 ) :
 	world(_world),
-	scene(_scene)
+	scene(_scene),
+	snake_color(_snake_color)
 {
 	setSpeed(_speed);
 	// snake init
@@ -197,7 +199,8 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 		Sprite{ .sprite_path = snake_sprite_path,
 						.sprite_id = world.texture_manager.getTextureid(snake_sprite_path),
 						.src_rect = {0, 0, 32, 32},
-						.zindex = 11
+						.zindex = 11,
+						.color_mod = snake_color
 		},
 		SpriteAnim{ .rows = 4, .cols = 4,
 								.cellw = 32, .cellh = 32,

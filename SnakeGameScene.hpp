@@ -15,7 +15,6 @@
 #include "assets.hpp"
 #include "CollisionBox.hpp"
 
-
 class SnakeGameScene : public IScene {
 private:
 
@@ -45,24 +44,25 @@ public:
 	void collectAppleAt(BoardPos pos);
 	void collectParticle(u32 id);
 	void createRetryScreen();
+	void createNewAutoSnake();
 	void onDeath();
 	void setSnakeSpeeds(float new_speed);
-
-	std::unordered_set<u32> particles = {};
+	
 	BoardTile board[16][16] = { };
 	bool paused = false; // public for buy menu controller
 	// publics for shop to set when upgrading (probably move to functions instead later)
 	u32 apple_count = 1;
-	u32 apple_particle_count = 0;
+	u32 apple_particle_count = 20;
 	u32 apple_particle_value = 1;
 	u32 apple_value = 1;
 	u32 current_score = 0;
 	
 private:
 	void generateAppleParticles(u32 apple_id);
+	SpriteColorMod getNewSnakeColor();
 	void createNewApple();
 	void updateSnakes();
-
+	std::unordered_set<u32> particles = {};
 	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;
 	TextureManager* texture_manager = nullptr;

@@ -18,6 +18,7 @@
 #include "SDLRenderer.hpp"
 #include "EntityComponentSystem.hpp"
 #include "InputSystem.hpp"
+#include "IAIController.hpp"
 
 #include "ComponentManager.hpp"
 #include "TimelineManager.hpp"
@@ -89,6 +90,10 @@ int main(int argc, char* args[]) {
 		while (period > TIME_STEP) {
 			InputSystem::instance().processEvents();
 			
+			for (IAIController* ai_controller : world.ai_controllers) {
+				ai_controller->update();
+			}
+
 			ComponentManager<Transform>& transforms = world.ecs.getComponentManager<Transform>();
 			transforms.components = transforms.next_transforms;
 

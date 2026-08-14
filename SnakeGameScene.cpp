@@ -2,6 +2,7 @@
 
 #include <random>
 
+#include "AISnakeController.hpp"
 #include "common.hpp"
 #include "BuyController.hpp"
 #include "Sprite.hpp"
@@ -38,12 +39,13 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 								.zindex = 9
 		}
 	);
-
+	// Player snake
 	snakes.push_back(
 		new SnakeObject(
 			world,
 			(*this),
-			new_snake_speed
+			new_snake_speed,
+			SpriteColorMod{.r = 255, .g = 255, .b = 255}
 		)
 	);
 
@@ -55,6 +57,16 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	InputSystem::instance().addToCurrentContext(snake_controller);
 	InputSystem::instance().addToCurrentContext(pause_controller);
 	InputSystem::instance().addToCurrentContext(buy_controller);
+
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
 };
 
 void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager) {
@@ -75,6 +87,10 @@ void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager)
 	InputSystem::instance().clearContexts();
 	world.timer_manager.clearTimers();
 	world.timeline_manager.clearTimelines();
+	for (IAIController* ai_controller : world.ai_controllers) {
+		delete ai_controller;
+	}
+	world.ai_controllers.clear();
 }
 
 void SnakeGameScene::update() {
@@ -141,6 +157,17 @@ void SnakeGameScene::createNewApple() {
 	);
 	apple_ids.emplace(new_apple_id);
 	board[x][y].id = new_apple_id;
+}
+
+void SnakeGameScene::createNewAutoSnake() {
+	SnakeObject* new_snake = new SnakeObject(
+		(*world),
+		(*this),
+		new_snake_speed + 8,
+		getNewSnakeColor()
+	);
+	snakes.push_back(new_snake);
+	world->ai_controllers.push_back(new AISnakeController((*new_snake)));
 }
 
 void SnakeGameScene::createRetryScreen() {
@@ -255,6 +282,15 @@ void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 						},
 		}
 	);
+}
+
+SpriteColorMod SnakeGameScene::getNewSnakeColor() {
+	// TODO: Swap over to using hsv, then convert to rgb
+	// Have max saturation and value, and just rando the hue
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<i16> color_range{ 150, 255 };
+	return SpriteColorMod{ .r = u8(color_range(mt)), .g = u8(color_range(mt)), .b = u8(color_range(mt)) };
 }
 
 void SnakeGameScene::onDeath() {

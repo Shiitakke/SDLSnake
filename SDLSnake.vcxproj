@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AISnakeController.cpp" />
     <ClCompile Include="BuyController.cpp" />
     <ClCompile Include="EntityComponentSystem.cpp" />
     <ClCompile Include="IdManager.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AISnakeController.hpp" />
     <ClInclude Include="AngularVelocity.hpp" />
     <ClInclude Include="assets.hpp" />
     <ClInclude Include="BuyController.hpp" />
@@ -187,6 +189,7 @@
     <ClInclude Include="common.hpp" />
     <ClInclude Include="ComponentManager.hpp" />
     <ClInclude Include="EntityComponentSystem.hpp" />
+    <ClInclude Include="IAIController.hpp" />
     <ClInclude Include="IdManager.hpp" />
     <ClInclude Include="InputSystem.hpp" />
     <ClInclude Include="IRenderer.hpp" />
