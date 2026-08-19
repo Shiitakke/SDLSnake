@@ -1,6 +1,7 @@
 #include "SnakeObject.hpp"
 
 #include "assets.hpp"
+#include "BoardObject.hpp"
 #include "CollisionBox.hpp"
 #include "SnakeGameScene.hpp"
 #include "Sprite.hpp"
@@ -20,8 +21,8 @@ SnakeObject::SnakeObject(
 {
 	setSpeed(_speed);
 	// snake init
-	BoardPos ss1_pos = { 3, 8 };
-	BoardPos ss2_pos = { 4, 8 };
+	BoardObject::BoardPos ss1_pos = { 3, 8 };
+	BoardObject::BoardPos ss2_pos = { 4, 8 };
 	u32 ss1_id = createSnakeSegment({ 0, ss1_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
 	createSnakeSegment({ 0, ss2_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
 	world.ecs.getc<Transform>(ss1_id).rot = 180;
@@ -92,7 +93,7 @@ void SnakeObject::updateSnake() {
 		// Get tail, get head, place new head, remove tail if head moved into an empty space
 		SnakeSegment& head = segments.back();
 		SnakeSegment& tail = segments.front();
-		BoardPos new_pos = head.pos;
+		BoardObject::BoardPos new_pos = head.pos;
 		SnakeDir in_dir;
 		switch (next_dir) {
 		case SnakeDir::UP:
@@ -133,8 +134,8 @@ void SnakeObject::updateSnake() {
 		} else {
 			destroySnakeSegment();
 		}
-		switch (board[new_pos.x][new_pos.y]) {
-		case SnakeBoardTile::EMPTY: 
+		switch (board.board[new_pos.x][new_pos.y]) {
+		case BoardObject::BoardTile::EMPTY:
 			if (!collected_apple) {
 				// Set the new tail to play a reverse animation of the segment shrinking
 				SnakeSegment& new_tail = segments.front();
@@ -163,7 +164,7 @@ void SnakeObject::updateSnake() {
 				}
 			}
 			break;
-		case SnakeBoardTile::SNAKE:
+		case BoardObject::BoardTile::SNAKE:
 			// kill this snake
 			scene.onDeath();
 			break;
@@ -191,7 +192,7 @@ void SnakeObject::updateSnake() {
 }
 
 u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
-	const auto& [t_x, t_y] = scene.boardPosToWorldPos(ss.pos);
+	const auto& [t_x, t_y] = board.boardPosToWorldPos(ss.pos);
 	u32 new_segment_id = world.ecs.createEntity(
 		Transform{.pos = {t_x, t_y},
 							.scale = {2, 2}
@@ -219,15 +220,15 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 	);
 	ss.id = new_segment_id;
 	segments.emplace_back(ss);
-	board[ss.pos.x][ss.pos.y] = SnakeBoardTile::SNAKE;
+	board.board[ss.pos.x][ss.pos.y] = BoardObject::BoardTile::SNAKE;
 	return new_segment_id;
 }
 
 void SnakeObject::destroySnakeSegment() {
 	u32 id = segments.front().id;
 	world.ecs.destroyEntity(id);
-	BoardPos pos = segments.front().pos;
-	board[pos.x][pos.y] = SnakeBoardTile::EMPTY;
+	BoardObject::BoardPos pos = segments.front().pos;
+	board.board[pos.x][pos.y] = BoardObject::BoardTile::EMPTY;
 	segments.pop_front();
 }
 

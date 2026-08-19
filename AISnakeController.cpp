@@ -3,9 +3,14 @@
 #include <random>
 
 #include "SnakeObject.hpp"
+#include "SnakeGameScene.hpp"
 
-AISnakeController::AISnakeController(SnakeObject& _controlled_snake) :
-  controlled_snake(_controlled_snake)
+AISnakeController::AISnakeController(
+  SnakeObject& _controlled_snake,
+  SnakeGameScene& _scene
+) :
+  controlled_snake(_controlled_snake),
+  scene(_scene)
 {
 }
 
@@ -27,4 +32,7 @@ void AISnakeController::update() {
     controlled_snake.next_dir = SnakeObject::SnakeDir::RIGHT;
     break;
   }
+}
+
+void AISnakeController::generatePath() {
 }

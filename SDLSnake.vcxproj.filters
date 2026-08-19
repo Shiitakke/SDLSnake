@@ -67,6 +67,9 @@
     <Filter Include="Header Files\AIControllers">
       <UniqueIdentifier>{efc62ac7-3ce4-491a-a278-b6875a92df98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\AIControllers">
+      <UniqueIdentifier>{17b30b51-222a-4aba-96d1-c1c2b29343e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -139,7 +142,10 @@
       <Filter>Source Files\UserControllers</Filter>
     </ClCompile>
     <ClCompile Include="AISnakeController.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\AIControllers</Filter>
+    </ClCompile>
+    <ClCompile Include="BoardObject.cpp">
+      <Filter>Source Files\Gameplay Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -261,7 +267,10 @@
       <Filter>Header Files\AIControllers</Filter>
     </ClInclude>
     <ClInclude Include="AISnakeController.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\AIControllers</Filter>
+    </ClInclude>
+    <ClInclude Include="BoardObject.hpp">
+      <Filter>Header Files\Gameplay Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

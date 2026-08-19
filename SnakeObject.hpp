@@ -1,11 +1,13 @@
 #pragma once
 
 #include <deque>
+
+#include "BoardObject.hpp"
 #include "common.hpp"
 #include "Sprite.hpp"
 
-class World;
 class SnakeGameScene;
+class World;
 
 class SnakeObject {
 public:
@@ -28,21 +30,16 @@ public:
 	void updateSnake();
 
 	SnakeDir next_dir = SnakeDir::RIGHT; //public for snakecontroller
-
+	BoardObject board; // public for ai snake controller
 private:
 	enum class SnakeSpriteType {
 		STRAIGHT,
 		CURVED
 	};
 
-	enum class SnakeBoardTile {
-		EMPTY,
-		SNAKE
-	};
-
 	struct SnakeSegment {
 		u32 id;
-		BoardPos pos;
+		BoardObject::BoardPos pos;
 		SnakeDir in_dir;
 		SnakeDir out_dir;
 		SnakeSpriteType curr_type;
@@ -55,7 +52,6 @@ private:
 	SnakeGameScene& scene;
 	// Every snake has its own board to track itself, as they cant collide with each other
 	// Snakes check in with the appleboard to see if theres an apple wherever they are moving
-	SnakeBoardTile board[16][16] = { SnakeBoardTile::EMPTY };
 	std::deque<SnakeSegment> segments = {};
 	SpriteColorMod snake_color;
 	float since_last_update = 0.0f;

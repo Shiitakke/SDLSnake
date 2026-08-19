@@ -8,12 +8,14 @@
 #include "IScene.hpp"
 
 #include "EntityComponentSystem.hpp"
+#include "BoardObject.hpp"
 #include "ComponentManager.hpp"
 #include "TextureManager.hpp"
 #include "SnakeObject.hpp"
 #include "SpriteAnim.hpp"
 #include "assets.hpp"
 #include "CollisionBox.hpp"
+#include "vec.hpp"
 
 class SnakeGameScene : public IScene {
 private:
@@ -25,30 +27,18 @@ public:
 	void deinitialise(World& world, TextureManager& texture_manager) override;
 	void update() override;
 
-	//publics for SnakeObject
-	enum class BoardTileType {
-		EMPTY,
-		APPLE,
-	};
-
-	struct BoardTile {
-		BoardTileType type = BoardTileType::EMPTY;
-		u32 id = 0; // id of potential apple on tile
-	};
-
 	const static CollisionChannel::Channel snake_segment_collision_channel = CollisionChannel::c2;
 	const static  CollisionChannel::Channel apple_particle_collision_channel = CollisionChannel::c3;
-	std::tuple<float, float> boardPosToWorldPos(BoardPos pos);
 	
-	bool appleAt(BoardPos pos);
-	void collectAppleAt(BoardPos pos);
+	bool appleAt(BoardObject::BoardPos pos);
+	void collectAppleAt(BoardObject::BoardPos pos);
 	void collectParticle(u32 id);
 	void createRetryScreen();
 	void createNewAutoSnake();
 	void onDeath();
 	void setSnakeSpeeds(float new_speed);
 	
-	BoardTile board[16][16] = { };
+	BoardObject board;
 	bool paused = false; // public for buy menu controller
 	// publics for shop to set when upgrading (probably move to functions instead later)
 	u32 apple_count = 1;
@@ -70,6 +60,7 @@ private:
 	u32 BOARD_HEIGHT = 16;
 	u32 new_snake_speed = 4;
 	std::vector<SnakeObject*> snakes;
+	u32 apple_board[16][16];
 	std::unordered_set<u32> apple_ids;
 };
 
