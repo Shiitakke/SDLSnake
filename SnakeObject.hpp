@@ -28,6 +28,9 @@ public:
 
 	void setSpeed(float new_speed);
 	void updateSnake();
+	BoardObject::BoardPos get_head_pos();
+	void killSnake();
+	void init();
 
 	SnakeDir next_dir = SnakeDir::RIGHT; //public for snakecontroller
 	BoardObject board; // public for ai snake controller
@@ -58,6 +61,7 @@ private:
 	float speed;
 	float time_per_move;
 	float anim_framerate;
+	bool paused = false;
 
 };
 

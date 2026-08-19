@@ -12,8 +12,8 @@ public:
   };
   
   struct BoardPos {
-    u32 x;
-    u32 y;
+    u32 x = 0;
+    u32 y = 0;
   };
 
   BoardObject() = default;

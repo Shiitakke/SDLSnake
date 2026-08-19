@@ -20,24 +20,25 @@ SnakeObject::SnakeObject(
 	snake_color(_snake_color)
 {
 	setSpeed(_speed);
-	// snake init
-	BoardObject::BoardPos ss1_pos = { 3, 8 };
-	BoardObject::BoardPos ss2_pos = { 4, 8 };
-	u32 ss1_id = createSnakeSegment({ 0, ss1_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
-	createSnakeSegment({ 0, ss2_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
-	world.ecs.getc<Transform>(ss1_id).rot = 180;
-	world.ecs.getNextc(ss1_id).rot = 180;
+	init();
+	//// snake init
+	//BoardObject::BoardPos ss1_pos = { 3, 8 };
+	//BoardObject::BoardPos ss2_pos = { 4, 8 };
+	//u32 ss1_id = createSnakeSegment({ 0, ss1_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
+	//createSnakeSegment({ 0, ss2_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
+	//world.ecs.getc<Transform>(ss1_id).rot = 180;
+	//world.ecs.getNextc(ss1_id).rot = 180;
 
-	SpriteAnim& ss1_anim = world.ecs.getc<SpriteAnim>(ss1_id);
-	ss1_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
-	ss1_anim.current_frame = 15;
-	world.ecs.getc<Sprite>(ss1_id).src_rect = {
-		.x = ss1_anim.current_frame % ss1_anim.cols * ss1_anim.cellw,
-		.y = ss1_anim.current_frame / ss1_anim.cols * ss1_anim.cellh,
-		.w = ss1_anim.cellw,
-		.h = ss1_anim.cellh
-	};
-	SnakeDir next_dir = SnakeDir::RIGHT;
+	//SpriteAnim& ss1_anim = world.ecs.getc<SpriteAnim>(ss1_id);
+	//ss1_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
+	//ss1_anim.current_frame = 15;
+	//world.ecs.getc<Sprite>(ss1_id).src_rect = {
+	//	.x = ss1_anim.current_frame % ss1_anim.cols * ss1_anim.cellw,
+	//	.y = ss1_anim.current_frame / ss1_anim.cols * ss1_anim.cellh,
+	//	.w = ss1_anim.cellw,
+	//	.h = ss1_anim.cellh
+	//};
+	//SnakeDir next_dir = SnakeDir::RIGHT;
 
 };
 
@@ -48,6 +49,9 @@ SnakeObject::~SnakeObject() {
 }
 
 void SnakeObject::updateSnake() {
+	if (paused) {
+		return;
+	}	
 	since_last_update += TIME_STEP;
 
 	// Clean head dir, dont go backwards
@@ -121,7 +125,8 @@ void SnakeObject::updateSnake() {
 		if (new_pos.x < 0 || new_pos.x >= 16 ||
 			new_pos.y < 0 || new_pos.y >= 16)
 		{
-			scene.onDeath();
+			//scene.onDeath();
+			killSnake();
 			return;
 		}
 
@@ -166,7 +171,9 @@ void SnakeObject::updateSnake() {
 			break;
 		case BoardObject::BoardTile::SNAKE:
 			// kill this snake
-			scene.onDeath();
+			//scene.onDeath();
+			killSnake();
+			return;
 			break;
 		}
 		// remove collision from old head
@@ -211,8 +218,10 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 		},
 		CollisionBox{ .extent = {.x = 50, .y = 50},
 									.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
-									.on_begin_collision = [this](u32 otherid)->void {
-										if (world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel) {
+									.on_begin_collision = [=](u32 otherid)->void {
+										if (world.ecs.exists<CollisionBox>(otherid) && 
+												world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel
+											) {
 											scene.collectParticle(otherid);
 										}
 									}
@@ -230,6 +239,53 @@ void SnakeObject::destroySnakeSegment() {
 	BoardObject::BoardPos pos = segments.front().pos;
 	board.board[pos.x][pos.y] = BoardObject::BoardTile::EMPTY;
 	segments.pop_front();
+}
+
+BoardObject::BoardPos SnakeObject::get_head_pos() {
+	if (segments.size() < 1) {
+		return { 4, 8 };
+	}
+	return segments.back().pos;
+}
+
+void SnakeObject::killSnake() {
+	//for (i32 i = 0; i < segments.size(); ++i) {
+	//	destroySnakeSegment();
+	//};
+	//segments.clear();
+	for (SnakeSegment& ss : segments) {
+		world.ecs.destroyEntity(ss.id);
+		board.board[ss.pos.x][ss.pos.y] = BoardObject::BoardTile::EMPTY;
+	}
+	segments.clear();
+	paused = true;
+	// just set a timer and respawn
+	world.timer_manager.createTimer(
+		Timer	{ .interval = scene.respawn_timer,
+						.callback = [this]()->void {this->init(); this->paused = false; }
+					}
+	);
+}
+
+void SnakeObject::init() {
+	// snake init
+	BoardObject::BoardPos ss1_pos = { 3, 8 };
+	BoardObject::BoardPos ss2_pos = { 4, 8 };
+	u32 ss1_id = createSnakeSegment({ 0, ss1_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
+	createSnakeSegment({ 0, ss2_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
+	world.ecs.getc<Transform>(ss1_id).rot = 180;
+	world.ecs.getNextc(ss1_id).rot = 180;
+
+	SpriteAnim& ss1_anim = world.ecs.getc<SpriteAnim>(ss1_id);
+	ss1_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
+	ss1_anim.current_frame = 15;
+	world.ecs.getc<Sprite>(ss1_id).src_rect = {
+		.x = ss1_anim.current_frame % ss1_anim.cols * ss1_anim.cellw,
+		.y = ss1_anim.current_frame / ss1_anim.cols * ss1_anim.cellh,
+		.w = ss1_anim.cellw,
+		.h = ss1_anim.cellh
+	};
+	SnakeDir next_dir = SnakeDir::RIGHT;
 }
 
 void SnakeObject::setSpeed(float new_speed) {

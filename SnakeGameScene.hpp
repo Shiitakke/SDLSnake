@@ -18,8 +18,6 @@
 #include "vec.hpp"
 
 class SnakeGameScene : public IScene {
-private:
-
 public:
 	SnakeGameScene() = default;
 	~SnakeGameScene() = default;
@@ -42,10 +40,11 @@ public:
 	bool paused = false; // public for buy menu controller
 	// publics for shop to set when upgrading (probably move to functions instead later)
 	u32 apple_count = 1;
-	u32 apple_particle_count = 20;
+	u32 apple_particle_count = 10;
 	u32 apple_particle_value = 1;
 	u32 apple_value = 1;
 	u32 current_score = 0;
+	u32 respawn_timer = 1000;
 	
 private:
 	void generateAppleParticles(u32 apple_id);

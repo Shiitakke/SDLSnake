@@ -18,6 +18,7 @@
 #include "PauseController.hpp"
 #include "RetryMenuController.hpp"
 #include "Timer.hpp"
+#include "util.hpp"
 
 void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	this->world = &(world);
@@ -40,24 +41,48 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 		}
 	);
 	// Player snake
-	snakes.push_back(
-		new SnakeObject(
-			world,
-			(*this),
-			new_snake_speed,
-			SpriteColorMod{.r = 255, .g = 255, .b = 255}
-		)
-	);
+	//snakes.push_back(
+	//	new SnakeObject(
+	//		world,
+	//		(*this),
+	//		new_snake_speed,
+	//		SpriteColorMod{.r = 255, .g = 255, .b = 255}
+	//	)
+	//);
 
 	createNewApple();
-	IUserController* snake_controller = new SnakeController(*snakes.back());
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	createNewApple();
+	//IUserController* snake_controller = new SnakeController(*snakes.back());
 	IUserController* pause_controller = new PauseController(*this, world);
 	IUserController* buy_controller = new BuyController(*this, world);
 	InputSystem::instance().pushContext();
-	InputSystem::instance().addToCurrentContext(snake_controller);
+	//InputSystem::instance().addToCurrentContext(snake_controller);
 	InputSystem::instance().addToCurrentContext(pause_controller);
 	InputSystem::instance().addToCurrentContext(buy_controller);
 
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
+	createNewAutoSnake();
 	createNewAutoSnake();
 	createNewAutoSnake();
 	createNewAutoSnake();
@@ -146,7 +171,7 @@ void SnakeGameScene::createNewApple() {
 								.src_rect = { 0, 0, 64, 64 },
 								.zindex = 11
 		}
-	);
+	); 
 	apple_ids.emplace(new_apple_id);
 	apple_board[x][y] = new_apple_id;
 }
@@ -281,8 +306,10 @@ SpriteColorMod SnakeGameScene::getNewSnakeColor() {
 	// Have max saturation and value, and just rando the hue
 	std::random_device rd;
 	std::mt19937 mt(rd());
-	std::uniform_int_distribution<i16> color_range{ 150, 255 };
-	return SpriteColorMod{ .r = u8(color_range(mt)), .g = u8(color_range(mt)), .b = u8(color_range(mt)) };
+	std::uniform_int_distribution<i32> color_range{ 0, 360 };
+	const auto& [r, g, b] = hsvTorgb(color_range(mt), 0.9f, 0.9f);
+	return SpriteColorMod{ .r = r, .g = g, .b = b };
+	//return SpriteColorMod{ .r = u8(color_range(mt)), .g = u8(color_range(mt)), .b = u8(color_range(mt)) };
 }
 
 void SnakeGameScene::onDeath() {
