@@ -4,6 +4,19 @@
 #include <SDL_image.h>
 #include "Texture.hpp"
 
+SDLTextureFactory::SDLTextureFactory(SDL_Renderer* _renderer) :
+  renderer(_renderer)
+{
+  i32 img_flags = IMG_INIT_PNG;
+  if (!(IMG_Init(img_flags) & img_flags)) {
+    printf("Failed to initialize SDL image. %s\n", IMG_GetError());
+  };
+}
+
+SDLTextureFactory::~SDLTextureFactory() {
+  IMG_Quit();
+}
+
 Texture SDLTextureFactory::loadTexture(const std::string& path) {
   bool success = true;
   SDL_Surface* s = IMG_Load(path.c_str());

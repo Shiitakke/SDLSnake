@@ -16,6 +16,6 @@ const std::string pause_sprite_path = "./assets/pause.png";
 //Common assets
 const std::string board_sprite_path = "./assets/board.png";
 
-const std::string retry_sprite_path = "./assets/retry.png";
+const std::string resume_sprite_path = "./assets/retry.png";
 const std::string menu_sprite_path = "./assets/menu.png";
 const std::string game_over_sprite_path = "./assets/gameover.png";

@@ -1,7 +1,6 @@
 #pragma once
 #include <SDL.h>
 
-#include "common.hpp"
 #include "vec.hpp"
 
 struct Transform {

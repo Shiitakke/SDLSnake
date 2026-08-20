@@ -1,4 +1,5 @@
 #include <cmath>
+#include <tuple>
 
 #include "util.hpp"
 
@@ -24,7 +25,7 @@ std::tuple<u8, u8, u8> hsvTorgb(double h, double s, double v) {
   float g;
   float b;
   float c = v * s;
-  float x = c * (1 - fabs(fmod((h / 60), 2) - 1));
+  float x = c * (1 - fabs(fmod((fmod(h, 360) / 60), 2) - 1));
   float m = v - c;
 
   if (0 <= h && h < 60) {

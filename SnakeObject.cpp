@@ -21,25 +21,6 @@ SnakeObject::SnakeObject(
 {
 	setSpeed(_speed);
 	init();
-	//// snake init
-	//BoardObject::BoardPos ss1_pos = { 3, 8 };
-	//BoardObject::BoardPos ss2_pos = { 4, 8 };
-	//u32 ss1_id = createSnakeSegment({ 0, ss1_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
-	//createSnakeSegment({ 0, ss2_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
-	//world.ecs.getc<Transform>(ss1_id).rot = 180;
-	//world.ecs.getNextc(ss1_id).rot = 180;
-
-	//SpriteAnim& ss1_anim = world.ecs.getc<SpriteAnim>(ss1_id);
-	//ss1_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
-	//ss1_anim.current_frame = 15;
-	//world.ecs.getc<Sprite>(ss1_id).src_rect = {
-	//	.x = ss1_anim.current_frame % ss1_anim.cols * ss1_anim.cellw,
-	//	.y = ss1_anim.current_frame / ss1_anim.cols * ss1_anim.cellh,
-	//	.w = ss1_anim.cellw,
-	//	.h = ss1_anim.cellh
-	//};
-	//SnakeDir next_dir = SnakeDir::RIGHT;
-
 };
 
 SnakeObject::~SnakeObject() {
@@ -171,7 +152,6 @@ void SnakeObject::updateSnake() {
 			break;
 		case BoardObject::BoardTile::SNAKE:
 			// kill this snake
-			//scene.onDeath();
 			killSnake();
 			return;
 			break;
@@ -201,30 +181,34 @@ void SnakeObject::updateSnake() {
 u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 	const auto& [t_x, t_y] = board.boardPosToWorldPos(ss.pos);
 	u32 new_segment_id = world.ecs.createEntity(
-		Transform{.pos = {t_x, t_y},
-							.scale = {2, 2}
+		Transform{
+			.pos = {t_x, t_y},
+			.scale = {2, 2}
 		},
-		Sprite{ .sprite_path = snake_sprite_path,
-						.sprite_id = world.texture_manager.getTextureid(snake_sprite_path),
-						.src_rect = {0, 0, 32, 32},
-						.zindex = 11,
-						.color_mod = snake_color
+		Sprite{ 
+			.sprite_path = snake_sprite_path,
+			.sprite_id = world.texture_manager.getTextureid(snake_sprite_path),
+			.src_rect = {0, 0, 32, 32},
+			.zindex = 11,
+			.color_mod = snake_color
 		},
-		SpriteAnim{ .rows = 4, .cols = 4,
-								.cellw = 32, .cellh = 32,
-								.framerate = 1000 / static_cast<i32>(time_per_move / 8),
-								.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 },
-								.current_frame = 8
+		SpriteAnim{ 
+			.rows = 4, .cols = 4,
+			.cellw = 32, .cellh = 32,
+			.framerate = 1000 / static_cast<i32>(time_per_move / 8),
+			.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 },
+			.current_frame = 8
 		},
-		CollisionBox{ .extent = {.x = 50, .y = 50},
-									.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
-									.on_begin_collision = [=](u32 otherid)->void {
-										if (world.ecs.exists<CollisionBox>(otherid) && 
-												world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel
-											) {
-											scene.collectParticle(otherid);
-										}
-									}
+		CollisionBox{ 
+			.extent = {.x = 50, .y = 50},
+			.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
+			.on_begin_collision = [=](u32 otherid)->void {
+				if (world.ecs.exists<CollisionBox>(otherid) && 
+					world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel
+				) {
+					scene.collectParticle(otherid);
+				}
+			}
 		}
 	);
 	ss.id = new_segment_id;
@@ -249,10 +233,6 @@ BoardObject::BoardPos SnakeObject::get_head_pos() {
 }
 
 void SnakeObject::killSnake() {
-	//for (i32 i = 0; i < segments.size(); ++i) {
-	//	destroySnakeSegment();
-	//};
-	//segments.clear();
 	for (SnakeSegment& ss : segments) {
 		world.ecs.destroyEntity(ss.id);
 		board.board[ss.pos.x][ss.pos.y] = BoardObject::BoardTile::EMPTY;
@@ -261,8 +241,9 @@ void SnakeObject::killSnake() {
 	paused = true;
 	// just set a timer and respawn
 	world.timer_manager.createTimer(
-		Timer	{ .interval = scene.respawn_timer,
-						.callback = [this]()->void {this->init(); this->paused = false; }
+		Timer	{ 
+			.interval = scene.respawn_timer,
+			.callback = [this]()->void {this->init(); this->paused = false; }
 					}
 	);
 }
@@ -285,7 +266,8 @@ void SnakeObject::init() {
 		.w = ss1_anim.cellw,
 		.h = ss1_anim.cellh
 	};
-	SnakeDir next_dir = SnakeDir::RIGHT;
+	next_dir = SnakeDir::RIGHT;
+	since_last_update = 0.0f;
 }
 
 void SnakeObject::setSpeed(float new_speed) {

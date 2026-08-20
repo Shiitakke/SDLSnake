@@ -1,11 +1,41 @@
 #include "SDLRenderer.hpp"
+
 #include "util.hpp"
+
+SDLRenderer::SDLRenderer(
+	ComponentManager<Transform>& _transforms,
+	ComponentManager<Sprite>& _views,
+	TextureManager& _texture_manager,
+	Camera& _camera,
+	ComponentManager<CollisionBox>& _collisions,
+	u32 _internal_screen_width,
+	u32 _internal_screen_height
+) :
+	transforms(_transforms),
+	views(_views),
+	texture_manager(_texture_manager),
+	camera(_camera),
+	collisions(_collisions),
+	internal_screen_width(_internal_screen_width),
+	internal_screen_height(_internal_screen_height)
+{
+	window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, internal_screen_width, internal_screen_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	if (window == nullptr) {
+		printf("Failed to create window. %s", SDL_GetError());
+	}
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (renderer == nullptr) {
+		printf("Failed to create renderer. %s", SDL_GetError());
+	}
+	texture_manager.setTextureFactory(new SDLTextureFactory(renderer));
+};
 
 SDLRenderer::~SDLRenderer() {
 	texture_manager.setRenderer(nullptr);
 	texture_manager.unloadAll();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+	SDL_Quit();
 }
 
 void SDLRenderer::render(float delta) {

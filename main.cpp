@@ -1,41 +1,33 @@
 #include <SDL.h>
 #include <SDL_timer.h>
-#include <SDL_image.h>
 
 #include <stdio.h>
 #include <unordered_map>
 #include <unordered_set>
 
+#include "assets.hpp"
 #include "common.hpp"
 #include "util.hpp"
 
-#include "World.hpp"
-#include "assets.hpp"
-
-#include "SnakeGameScene.hpp"
-#include "TitleScreenScene.hpp"
-
-#include "SDLRenderer.hpp"
-#include "EntityComponentSystem.hpp"
-#include "InputSystem.hpp"
-#include "IAIController.hpp"
-
-#include "ComponentManager.hpp"
-#include "TimelineManager.hpp"
-#include "TimerManager.hpp"
-
-#include "Transform.hpp"
-#include "Sprite.hpp"
-#include "SpriteAnim.hpp"
-#include "LinearVelocity.hpp"
 #include "AngularVelocity.hpp"
 #include "CollisionBox.hpp"
+#include "ComponentManager.hpp"
+#include "EntityComponentSystem.hpp"
+#include "IAIController.hpp"
+#include "InputSystem.hpp"
+#include "LinearVelocity.hpp"
+#include "SDLRenderer.hpp"
+#include "SnakeGameScene.hpp"
+#include "Sprite.hpp"
+#include "SpriteAnim.hpp"
+#include "TimelineManager.hpp"
+#include "TimerManager.hpp"
+#include "Transform.hpp"
+#include "TitleScreenScene.hpp"
+#include "World.hpp"
 
-bool init();
-bool initSdl();
-void initGame();
-void close();
-
+void init();
+void deinit();
 void updateTimers(
 	TimerManager& timer_manager
 );
@@ -59,24 +51,20 @@ void updateCollisions(
 	ComponentManager<CollisionBox>& collision_boxes
 );
 
-// Engine stuff
 bool quit = false;
+constexpr float game_speed_scalar = 1.0f;
 World world;
 IRenderer* rendering_system;
 
 int main(int argc, char* args[]) {
-	if (!init()) {
-		return 1;
-	}
+	init();
 
-	//Sdl loop init
 	SDL_Event e;
 	u64 start = SDL_GetTicks64();
 	u64 end = start;
 	float period = 0;
 	
-	while (quit == false) {
-
+	while (!quit) {
 		while (SDL_PollEvent(&e)) {
 			InputSystem::instance().queueEvent(e);
 			if (e.type == SDL_QUIT) {
@@ -99,16 +87,12 @@ int main(int argc, char* args[]) {
 
 			if (!world.paused) {
 				world.updateScene();
-			
 				updateTimers(world.timer_manager);
-
 				updateTimelines(world.timeline_manager);
-
 				updateAnims(
 					world.ecs.getComponentManager<SpriteAnim>(),
 					world.ecs.getComponentManager<Sprite>()
 				);
-		
 				updateLinearVelocities(
 					world.ecs.getComponentManager<Transform>(),
 					world.ecs.getComponentManager<LinearVelocity>()
@@ -126,10 +110,10 @@ int main(int argc, char* args[]) {
 		}
 		rendering_system->render(period / TIME_STEP);
 		end = SDL_GetTicks64();
-		period += (end - start) * GAME_SPEED_SCALAR;
+		period += (end - start) * game_speed_scalar;
 		start = end;
 	}
-	close();
+	deinit();
 	return 0;
 }
 
@@ -138,10 +122,7 @@ void updateTimers(
 ) {
 	for (i32 i = 0; i < timer_manager.timers.n_components; ++i) {
 		Timer& timer = timer_manager.timers.components[i];
-		if (timer.paused) {
-			continue;
-		}
-		timer.since_last_update += TIME_STEP;
+		timer.since_last_update += TIME_STEP * !timer.paused;
 		while (timer.since_last_update >= timer.interval) {
 			timer.callback();
 			timer.since_last_update -= timer.interval;
@@ -268,28 +249,7 @@ void updateCollisions(
 	}
 }
 
-bool init() {
-	if (!initSdl()) {
-		return false;
-	}
-	initGame();
-	return true;
-}
-
-bool initSdl() {
-	if (SDL_Init(SDL_INIT_VIDEO)) {
-		printf("Failed to initiaze SDL. %s\n", SDL_GetError());
-		return false;
-	}
-	i32 img_flags = IMG_INIT_PNG;
-	if(!(IMG_Init(img_flags) & img_flags)) {
-		printf("Failed to initialize SDL image. %s\n", IMG_GetError());
-		return false;
-	};
-	return true;
-}
-
-void initGame() {
+void init() {
 	u32 cameraid = world.ecs.getNextId();
 	world.camera.id = cameraid;
 	world.ecs.createComponent<Transform>(cameraid, { });
@@ -298,12 +258,13 @@ void initGame() {
 		world.ecs.getComponentManager<Sprite>(),
 		world.texture_manager,
 		world.camera,
-		world.ecs.getComponentManager<CollisionBox>()
+		world.ecs.getComponentManager<CollisionBox>(),
+		1000,
+		1000
 	);
 	world.loadScene<TitleScreenScene>();
 }
 
-// Cleans up sdl
-void close() {
-	SDL_Quit();
+void deinit() {
+	delete rendering_system;
 }

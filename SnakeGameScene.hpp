@@ -31,25 +31,26 @@ public:
 	bool appleAt(BoardObject::BoardPos pos);
 	void collectAppleAt(BoardObject::BoardPos pos);
 	void collectParticle(u32 id);
-	void createRetryScreen();
+	//void createRetryScreen();
 	void createNewAutoSnake();
-	void onDeath();
 	void setSnakeSpeeds(float new_speed);
 	
 	BoardObject board;
 	bool paused = false; // public for buy menu controller
 	// publics for shop to set when upgrading (probably move to functions instead later)
-	u32 apple_count = 1;
-	u32 apple_particle_count = 10;
+	u32 apple_count = 10;
+	u32 apple_particle_count = 0;
 	u32 apple_particle_value = 1;
 	u32 apple_value = 1;
 	u32 current_score = 0;
 	u32 respawn_timer = 1000;
-	
+	u32 auto_snake_count = 4;
+	u32 new_snake_speed = 4;
+
 private:
+	void createNewApple();
 	void generateAppleParticles(u32 apple_id);
 	SpriteColorMod getNewSnakeColor();
-	void createNewApple();
 	void updateSnakes();
 	std::unordered_set<u32> particles = {};
 	World* world = nullptr;
@@ -57,7 +58,6 @@ private:
 	TextureManager* texture_manager = nullptr;
 	u32 BOARD_WIDTH = 16;
 	u32 BOARD_HEIGHT = 16;
-	u32 new_snake_speed = 4;
 	std::vector<SnakeObject*> snakes;
 	u32 apple_board[16][16];
 	std::unordered_set<u32> apple_ids;

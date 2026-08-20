@@ -108,13 +108,10 @@
     <ClCompile Include="SnakeGameScene.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="UnpauseController.cpp">
-      <Filter>Source Files\UserControllers</Filter>
-    </ClCompile>
     <ClCompile Include="TimelineManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="RetryMenuController.cpp">
+    <ClCompile Include="UnpauseController.cpp">
       <Filter>Source Files\UserControllers</Filter>
     </ClCompile>
     <ClCompile Include="SnakeObject.cpp">
@@ -206,16 +203,13 @@
     <ClInclude Include="SnakeGameScene.hpp">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="UnpauseController.hpp">
-      <Filter>Header Files\UserControllers</Filter>
-    </ClInclude>
     <ClInclude Include="Timeline.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="TimelineManager.hpp">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="RetryMenuController.hpp">
+    <ClInclude Include="UnpauseController.hpp">
       <Filter>Header Files\UserControllers</Filter>
     </ClInclude>
     <ClInclude Include="CollisionBox.hpp">

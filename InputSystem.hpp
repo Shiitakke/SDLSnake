@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <vector>
 
 #include "common.hpp"
 #include "IUserController.hpp"

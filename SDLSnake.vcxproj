@@ -164,7 +164,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PauseController.cpp" />
     <ClCompile Include="SDLRenderer.cpp" />
-    <ClCompile Include="RetryMenuController.cpp" />
+    <ClCompile Include="UnpauseController.cpp" />
     <ClCompile Include="SDLTextureFactory.cpp" />
     <ClCompile Include="ShopMenuController.cpp" />
     <ClCompile Include="SnakeGameScene.cpp" />
@@ -175,7 +175,6 @@
     <ClCompile Include="TimerManager.cpp" />
     <ClCompile Include="TitleMenuController.cpp" />
     <ClCompile Include="TitleScreenScene.cpp" />
-    <ClCompile Include="UnpauseController.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="vec.cpp" />
     <ClCompile Include="World.cpp" />
@@ -199,7 +198,7 @@
     <ClInclude Include="ITextureFactory.hpp" />
     <ClInclude Include="PauseController.hpp" />
     <ClInclude Include="SDLRenderer.hpp" />
-    <ClInclude Include="RetryMenuController.hpp" />
+    <ClInclude Include="UnpauseController.hpp" />
     <ClInclude Include="SDLTextureFactory.hpp" />
     <ClInclude Include="ShopMenuController.hpp" />
     <ClInclude Include="SnakeGameScene.hpp" />
@@ -217,7 +216,6 @@
     <ClInclude Include="TitleScreenScene.hpp" />
     <ClInclude Include="Transform.hpp" />
     <ClInclude Include="IUserController.hpp" />
-    <ClInclude Include="UnpauseController.hpp" />
     <ClInclude Include="util.hpp" />
     <ClInclude Include="vec.hpp" />
     <ClInclude Include="LinearVelocity.hpp" />

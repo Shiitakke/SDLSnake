@@ -1,28 +1,50 @@
 #pragma once
 
-#include "common.hpp"
-
 #include "IUserController.hpp"
-#include "SnakeGameScene.hpp"
+
 #include "World.hpp"
+#include "Transform.hpp"
 
 class UnpauseController : public IUserController {
 public:
   UnpauseController(
-    SnakeGameScene& _snake, 
-    World& _world, 
-    u32 _pauseid
-  ) : 
-    snake(_snake), 
-    world(_world), 
-    pauseid(_pauseid)
-  {
-  };
+    World& _world,
+    u32 _retry_logo_id,
+    u32 _retry_option_id,
+    u32 _retry_menu_id,
+    u32 _retry_quit_id,
+    u32 _arrow_id
+  );
+  ~UnpauseController();
   void handleEvent(const SDL_Event& e) override;
-  void changePause();
+
 private:
-  u32 pauseid;
-  SnakeGameScene& snake;
+  // There HAS to be a better way to make menu controllers...
+  enum class RetryMenuSelection {
+    RETRY,
+    MENU,
+    QUIT
+  };
+
+  void changeSelection();
+  void moveArrow(float delta);
+
   World& world;
+  u32 retry_logo_id;
+  u32 retry_option_id;
+  u32 retry_menu_id;
+  u32 retry_quit_id;
+  u32 arrow_id;
+  Transform start_transform;
+  Transform end_transform;
+
+  RetryMenuSelection selections[3] = {
+    RetryMenuSelection::RETRY,
+    RetryMenuSelection::MENU,
+    RetryMenuSelection::QUIT
+  };
+  Transform selection_transforms[3] = {};
+  i32 curr_selection = 0;
+  u32 timeline_id = 0;
 };
 

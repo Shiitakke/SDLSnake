@@ -101,21 +101,16 @@ void AISnakeController::generatePath() {
       }
     }
   }
-  //if (found) {
-    // Now go back along the path
-    BoardObject::BoardPos curr_pos = final_pos;
-    while (
-      curr_pos.x != initial_pos.x ||
-      curr_pos.y != initial_pos.y
-    ) {
-      apple_path.emplace_back(path[curr_pos.x][curr_pos.y].dir);
-      curr_pos = path[curr_pos.x][curr_pos.y].pos;
-    }
-    curr_head_pos = initial_pos;
-    controlled_snake.next_dir = apple_path.back();
-    apple_path.pop_back();  
-  //}
-  //else {
-  //  apple_path.emplace_back(SnakeObject::SnakeDir::LEFT);
-  //}
+  // Now go back along the path
+  BoardObject::BoardPos curr_pos = final_pos;
+  while (
+    curr_pos.x != initial_pos.x ||
+    curr_pos.y != initial_pos.y
+  ) {
+    apple_path.emplace_back(path[curr_pos.x][curr_pos.y].dir);
+    curr_pos = path[curr_pos.x][curr_pos.y].pos;
+  }
+  curr_head_pos = initial_pos;
+  controlled_snake.next_dir = apple_path.back();
+  apple_path.pop_back();  
 }

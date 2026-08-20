@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 
 #include "common.hpp"
 
@@ -14,6 +15,11 @@ struct vec<2> {
   float x = 0.f;
   float y = 0.f;
 
+  void normalise() {
+    float inv_mag = 1.0f / std::sqrt(std::pow(x, 2) + std::pow(y, 2));
+    x = x * inv_mag;
+    y = y * inv_mag;
+  }
   vec2 operator+(const vec2& other) {
     return {
       x + other.x,

@@ -16,7 +16,6 @@
 #include "SnakeController.hpp"
 #include "SnakeObject.hpp"
 #include "PauseController.hpp"
-#include "RetryMenuController.hpp"
 #include "Timer.hpp"
 #include "util.hpp"
 
@@ -32,66 +31,39 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 
 	// board init
 	ecs->createEntity(
-		Transform{ .scale = {31.25, 31.25}
-		},
-		Sprite{ .sprite_path = board_sprite_path,
-								.sprite_id = texture_manager.getTextureid(board_sprite_path),
-								.src_rect = { 0, 0, texture_manager.getTexture(board_sprite_path).w, texture_manager.getTexture(board_sprite_path).h },
-								.zindex = 9
+		Transform{ .scale = {31.25, 31.25} },
+		Sprite{ 
+			.sprite_path = board_sprite_path,
+			.sprite_id = texture_manager.getTextureid(board_sprite_path),
+			.src_rect = { 0, 0, texture_manager.getTexture(board_sprite_path).w, texture_manager.getTexture(board_sprite_path).h },
+			.zindex = 9
 		}
 	);
 	// Player snake
-	//snakes.push_back(
-	//	new SnakeObject(
-	//		world,
-	//		(*this),
-	//		new_snake_speed,
-	//		SpriteColorMod{.r = 255, .g = 255, .b = 255}
-	//	)
-	//);
+	snakes.push_back(
+		new SnakeObject(
+			world,
+			(*this),
+			new_snake_speed,
+			SpriteColorMod{.r = 255, .g = 255, .b = 255}
+		)
+	);
 
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	createNewApple();
-	//IUserController* snake_controller = new SnakeController(*snakes.back());
+	// Controllers setup
+	IUserController* snake_controller = new SnakeController(*snakes.back());
 	IUserController* pause_controller = new PauseController(*this, world);
 	IUserController* buy_controller = new BuyController(*this, world);
 	InputSystem::instance().pushContext();
-	//InputSystem::instance().addToCurrentContext(snake_controller);
+	InputSystem::instance().addToCurrentContext(snake_controller);
 	InputSystem::instance().addToCurrentContext(pause_controller);
 	InputSystem::instance().addToCurrentContext(buy_controller);
 
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
-	createNewAutoSnake();
+	for (i32 i = 0; i < apple_count; ++i) {
+		createNewApple();
+	}
+	for (i32 i = 0; i < auto_snake_count; ++i) {
+		createNewAutoSnake();
+	}
 };
 
 void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager) {
@@ -166,10 +138,11 @@ void SnakeGameScene::createNewApple() {
 	vec2 new_pos = board.boardPosToWorldPos({x, y});
 	u32 new_apple_id = ecs->createEntity(
 		Transform{ .pos = { new_pos.x, new_pos.y} },
-		Sprite{ .sprite_path = apple_sprite_path,
-								.sprite_id = world->texture_manager.getTextureid(apple_sprite_path),
-								.src_rect = { 0, 0, 64, 64 },
-								.zindex = 11
+		Sprite{ 
+			.sprite_path = apple_sprite_path,
+			.sprite_id = world->texture_manager.getTextureid(apple_sprite_path),
+			.src_rect = { 0, 0, 64, 64 },
+			.zindex = 11
 		}
 	); 
 	apple_ids.emplace(new_apple_id);
@@ -180,87 +153,11 @@ void SnakeGameScene::createNewAutoSnake() {
 	SnakeObject* new_snake = new SnakeObject(
 		(*world),
 		(*this),
-		new_snake_speed + 8,
+		new_snake_speed,
 		getNewSnakeColor()
 	);
 	snakes.push_back(new_snake);
 	world->ai_controllers.push_back(new AISnakeController((*new_snake), (*this)));
-}
-
-void SnakeGameScene::createRetryScreen() {
-	texture_manager->loadTexture(game_over_sprite_path);
-	texture_manager->loadTexture(retry_sprite_path);
-	texture_manager->loadTexture(menu_sprite_path);
-	texture_manager->loadTexture(quit_sprite_path);
-	texture_manager->loadTexture(arrow_sprite_path);
-	// retry logo
-	u32 retry_logo_id = ecs->createEntity(
-		Transform{	.pos {.x = 0, .y = 100}, 
-								.scale = {.x = 4, .y = 4}
-		},
-		Sprite{ .sprite_path = game_over_sprite_path,
-								.sprite_id = texture_manager->getTextureid(game_over_sprite_path),
-								.src_rect = {0, 0, texture_manager->getTexture(game_over_sprite_path).w, texture_manager->getTexture(game_over_sprite_path).h },
-								.zindex = 12
-		}
-	);
-	// retry option
-	u32 retry_option_id = ecs->createEntity(
-		Transform{	.pos {.x = -300, .y = -150},
-								.scale = {.x = 2, .y = 2}
-		},
-		Sprite{ .sprite_path = retry_sprite_path,
-								.sprite_id = texture_manager->getTextureid(retry_sprite_path),
-								.src_rect = {0, 0, texture_manager->getTexture(retry_sprite_path).w, texture_manager->getTexture(retry_sprite_path).h },
-								.zindex = 12
-		}
-	);
-	// main menu option
-	u32 retry_menu_id = ecs->createEntity(
-		Transform{	.pos {.x = 0, .y = -150},
-								.scale = {.x = 2, .y = 2}
-
-		},
-		Sprite{ .sprite_path = menu_sprite_path,
-								.sprite_id = texture_manager->getTextureid(menu_sprite_path),
-								.src_rect = {0, 0, texture_manager->getTexture(menu_sprite_path).w, texture_manager->getTexture(menu_sprite_path).h },
-								.zindex = 12
-		}
-	);
-	// quit option
-	u32 retry_quit_id = ecs->createEntity(
-		Transform{	.pos {.x = 300, .y = -150}, 
-								.scale = {.x = 2, .y = 2}
-		},
-		Sprite{ .sprite_path = quit_sprite_path,
-								.sprite_id = texture_manager->getTextureid(quit_sprite_path),
-								.src_rect = {0, 0, texture_manager->getTexture(quit_sprite_path).w, texture_manager->getTexture(quit_sprite_path).h },
-								.zindex = 12
-		}
-	);
-	// selection arrow
-	u32 arrow_id = ecs->createEntity(
-		Transform{ .pos {.x = -450, .y = -150},
-								.scale = {.x = 2, .y = 2}
-		},
-		Sprite{ .sprite_path = arrow_sprite_path,
-								.sprite_id = texture_manager->getTextureid(arrow_sprite_path),
-								.src_rect = {0, 0, texture_manager->getTexture(arrow_sprite_path).w, texture_manager->getTexture(arrow_sprite_path).h },
-								.zindex = 12
-		}
-	);
-
-	// retry screen controller
-	IUserController* retry_controller = new RetryMenuController(
-		*world,
-		retry_logo_id,
-		retry_option_id,
-		retry_menu_id,
-		retry_quit_id,
-		arrow_id
-	);
-	InputSystem::instance().pushContext();
-	InputSystem::instance().addToCurrentContext(retry_controller);
 }
 
 void SnakeGameScene::generateAppleParticles(u32 apple_id) {
@@ -269,54 +166,53 @@ void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<i32> view_range{ 0, 56 };
 	std::uniform_real_distribution<float> vel_range{ -10., 10. };
+	std::uniform_real_distribution<float> vel_mag_range{ 3.5, 8.5 };
 	std::uniform_real_distribution<float> scale_range{ 1., 3. };
 	std::uniform_real_distribution<float> rot_range{ 0, 30 };
 	std::vector<u32> apple_ids = {};
 	for (i32 i = 0; i < apple_particle_count; ++i) {
+		vec2 vel_vec = { vel_range(mt), vel_range(mt) };
+		vel_vec.normalise();
+		vel_vec = vel_vec * vel_mag_range(mt);
 		u32 new_particle_id = ecs->createEntity(
-			Transform{ .pos = {apple_transform.pos.x, apple_transform.pos.y},
-									.scale = {scale_range(mt), scale_range(mt)}
+			Transform{ 
+				.pos = {apple_transform.pos.x, apple_transform.pos.y},
+				.scale = {scale_range(mt), scale_range(mt)}
 			},
-			Sprite{ .sprite_path = apple_sprite_path,
-							.sprite_id = texture_manager->getTextureid(apple_sprite_path),
-							.src_rect = {view_range(mt), view_range(mt), 8, 8}
+			Sprite{ 
+				.sprite_path = apple_sprite_path,
+				.sprite_id = texture_manager->getTextureid(apple_sprite_path),
+				.src_rect = {view_range(mt), view_range(mt), 8, 8}
 			},
-			LinearVelocity{ .velocity = {vel_range(mt), vel_range(mt)},
-											.friction = 0.1f
+			LinearVelocity{ 
+				.velocity = vel_vec,
+				.friction = 0.1f
 			},
-			AngularVelocity{ .velocity = rot_range(mt)
+			AngularVelocity{ 
+				.velocity = rot_range(mt)
 			}
 		);
 		particles.emplace(new_particle_id);
 		apple_ids.push_back(new_particle_id);
 	}
 	world->timer_manager.createTimer(
-		Timer{	.interval = 500,
-						.callback = [this, apple_ids]()->void {
-							for (u32 id : apple_ids) {
-								this->world->ecs.createComponent(id, CollisionBox{ .extent = {.x = 15, .y = 15}, .channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::apple_particle_collision_channel) });
-							}
-						},
+		Timer{	
+			.interval = 500,
+			.callback = [this, apple_ids]()->void {
+				for (u32 id : apple_ids) {
+					this->world->ecs.createComponent(id, CollisionBox{ .extent = {.x = 15, .y = 15}, .channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::apple_particle_collision_channel) });
+				}
+			},
 		}
 	);
 }
 
 SpriteColorMod SnakeGameScene::getNewSnakeColor() {
-	// TODO: Swap over to using hsv, then convert to rgb
-	// Have max saturation and value, and just rando the hue
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<i32> color_range{ 0, 360 };
 	const auto& [r, g, b] = hsvTorgb(color_range(mt), 0.9f, 0.9f);
 	return SpriteColorMod{ .r = r, .g = g, .b = b };
-	//return SpriteColorMod{ .r = u8(color_range(mt)), .g = u8(color_range(mt)), .b = u8(color_range(mt)) };
-}
-
-void SnakeGameScene::onDeath() {
-	paused = true;
-	// play death animation
-	// show retry screen
-	createRetryScreen();
 }
 
 void SnakeGameScene::setSnakeSpeeds(float new_speed) {
