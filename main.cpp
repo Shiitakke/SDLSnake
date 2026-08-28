@@ -16,6 +16,7 @@
 #include "IAIController.hpp"
 #include "InputSystem.hpp"
 #include "LinearVelocity.hpp"
+#include "PhysicsSystem.hpp"
 #include "SDLRenderer.hpp"
 #include "SnakeGameScene.hpp"
 #include "Sprite.hpp"
@@ -52,9 +53,10 @@ void updateCollisions(
 );
 
 bool quit = false;
-constexpr float game_speed_scalar = 1.0f;
+constexpr float game_speed_scalar = 2.0f;
 World world;
 IRenderer* rendering_system;
+PhysicsSystem* physics_system;
 
 int main(int argc, char* args[]) {
 	init();
@@ -101,10 +103,11 @@ int main(int argc, char* args[]) {
 					world.ecs.getComponentManager<Transform>(),
 					world.ecs.getComponentManager<AngularVelocity>()
 				);
-				updateCollisions(
-					world.ecs.getComponentManager<Transform>(),
-					world.ecs.getComponentManager<CollisionBox>()
-				);
+				//updateCollisions(
+				//	world.ecs.getComponentManager<Transform>(),
+				//	world.ecs.getComponentManager<CollisionBox>()
+				//);
+				physics_system->update();
 			}
 			period -= TIME_STEP;			
 		}
@@ -144,6 +147,7 @@ void updateTimelines(
 		float timeline_delta = timeline.curr / timeline.length;
 		timeline.on_update(timeline.delta_curve(timeline_delta));
 		if (timeline_delta >= 1.0f) {
+			timeline.on_end();
 			timeline_manager.destroyTimeline(timeline.id);
 			i--;
 		}
@@ -261,6 +265,10 @@ void init() {
 		world.ecs.getComponentManager<CollisionBox>(),
 		1000,
 		1000
+	);
+	physics_system = new PhysicsSystem(
+		world.ecs.getComponentManager<Transform>(),
+		world.ecs.getComponentManager<CollisionBox>()
 	);
 	world.loadScene<TitleScreenScene>();
 }

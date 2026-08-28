@@ -17,6 +17,8 @@
 #include "CollisionBox.hpp"
 #include "vec.hpp"
 
+class BuyScreenObject;
+
 class SnakeGameScene : public IScene {
 public:
 	SnakeGameScene() = default;
@@ -30,7 +32,7 @@ public:
 	
 	bool appleAt(BoardObject::BoardPos pos);
 	void collectAppleAt(BoardObject::BoardPos pos);
-	void collectParticle(u32 id);
+	void collectParticle(u32 id, u32 snake_id);
 	//void createRetryScreen();
 	void createNewAutoSnake();
 	void setSnakeSpeeds(float new_speed);
@@ -39,23 +41,26 @@ public:
 	bool paused = false; // public for buy menu controller
 	// publics for shop to set when upgrading (probably move to functions instead later)
 	u32 apple_count = 10;
-	u32 apple_particle_count = 0;
+	u32 apple_particle_count = 10;
 	u32 apple_particle_value = 1;
 	u32 apple_value = 1;
 	u32 current_score = 0;
 	u32 respawn_timer = 1000;
-	u32 auto_snake_count = 4;
-	u32 new_snake_speed = 4;
+	u32 auto_snake_count = 16;
+	u32 new_snake_speed = 16;
 
 private:
 	void createNewApple();
 	void generateAppleParticles(u32 apple_id);
 	SpriteColorMod getNewSnakeColor();
 	void updateSnakes();
-	std::unordered_set<u32> particles = {};
+
+	//std::unordered_set<u32> particles = {};
+	std::unordered_map<u32, u32> particles = {};
 	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;
 	TextureManager* texture_manager = nullptr;
+	BuyScreenObject* buy_screen = nullptr;
 	u32 BOARD_WIDTH = 16;
 	u32 BOARD_HEIGHT = 16;
 	std::vector<SnakeObject*> snakes;

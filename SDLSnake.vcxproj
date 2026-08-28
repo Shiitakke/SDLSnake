@@ -157,12 +157,14 @@
     <ClCompile Include="AISnakeController.cpp" />
     <ClCompile Include="BoardObject.cpp" />
     <ClCompile Include="BuyController.cpp" />
+    <ClCompile Include="BuyScreenObject.cpp" />
     <ClCompile Include="EntityComponentSystem.cpp" />
     <ClCompile Include="IdManager.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="IScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PauseController.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="SDLRenderer.cpp" />
     <ClCompile Include="UnpauseController.cpp" />
     <ClCompile Include="SDLTextureFactory.cpp" />
@@ -185,6 +187,7 @@
     <ClInclude Include="assets.hpp" />
     <ClInclude Include="BoardObject.hpp" />
     <ClInclude Include="BuyController.hpp" />
+    <ClInclude Include="BuyScreenObject.hpp" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="CollisionBox.hpp" />
     <ClInclude Include="common.hpp" />
@@ -197,6 +200,7 @@
     <ClInclude Include="IScene.hpp" />
     <ClInclude Include="ITextureFactory.hpp" />
     <ClInclude Include="PauseController.hpp" />
+    <ClInclude Include="PhysicsSystem.hpp" />
     <ClInclude Include="SDLRenderer.hpp" />
     <ClInclude Include="UnpauseController.hpp" />
     <ClInclude Include="SDLTextureFactory.hpp" />

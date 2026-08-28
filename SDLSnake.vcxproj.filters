@@ -144,6 +144,12 @@
     <ClCompile Include="BoardObject.cpp">
       <Filter>Source Files\Gameplay Objects</Filter>
     </ClCompile>
+    <ClCompile Include="BuyScreenObject.cpp">
+      <Filter>Source Files\Gameplay Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AngularVelocity.hpp">
@@ -265,6 +271,12 @@
     </ClInclude>
     <ClInclude Include="BoardObject.hpp">
       <Filter>Header Files\Gameplay Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="BuyScreenObject.hpp">
+      <Filter>Header Files\Gameplay Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -198,15 +198,17 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 			.framerate = 1000 / static_cast<i32>(time_per_move / 8),
 			.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 },
 			.current_frame = 8
-		},
-		CollisionBox{ 
+		}
+	);
+	world.ecs.createComponent<CollisionBox>(new_segment_id,
+		CollisionBox{
 			.extent = {.x = 50, .y = 50},
 			.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
-			.on_begin_collision = [=](u32 otherid)->void {
-				if (world.ecs.exists<CollisionBox>(otherid) && 
-					world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel
+			.on_begin_collision = [=](u32 otherid)->void { // Collect apple particles
+				if (world.ecs.exists<CollisionBox>(otherid) &&
+						world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel
 				) {
-					scene.collectParticle(otherid);
+					scene.collectParticle(otherid, new_segment_id);
 				}
 			}
 		}

@@ -57,6 +57,7 @@ private:
 	// Snakes check in with the appleboard to see if theres an apple wherever they are moving
 	std::deque<SnakeSegment> segments = {};
 	SpriteColorMod snake_color;
+	u32 head_collision_id; // 
 	float since_last_update = 0.0f;
 	float speed;
 	float time_per_move;

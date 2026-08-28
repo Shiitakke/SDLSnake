@@ -1,5 +1,6 @@
 #include "BoardObject.hpp"
 
+// returns a vec2 to the middle of the tile in the board
 vec2 BoardObject::boardPosToWorldPos (BoardPos pos) {
   vec2 start = {
     .x = (origin.x - (width / 2)),

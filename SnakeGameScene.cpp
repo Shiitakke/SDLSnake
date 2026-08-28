@@ -5,6 +5,7 @@
 #include "AISnakeController.hpp"
 #include "common.hpp"
 #include "BuyController.hpp"
+#include "BuyScreenObject.hpp"
 #include "Sprite.hpp"
 #include "SpriteAnim.hpp"
 #include "LinearVelocity.hpp"
@@ -52,11 +53,9 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	// Controllers setup
 	IUserController* snake_controller = new SnakeController(*snakes.back());
 	IUserController* pause_controller = new PauseController(*this, world);
-	IUserController* buy_controller = new BuyController(*this, world);
 	InputSystem::instance().pushContext();
 	InputSystem::instance().addToCurrentContext(snake_controller);
 	InputSystem::instance().addToCurrentContext(pause_controller);
-	InputSystem::instance().addToCurrentContext(buy_controller);
 
 	for (i32 i = 0; i < apple_count; ++i) {
 		createNewApple();
@@ -64,6 +63,8 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	for (i32 i = 0; i < auto_snake_count; ++i) {
 		createNewAutoSnake();
 	}
+
+	buy_screen = new BuyScreenObject(*this, world, { .x = 0, .y = -1000 }, { .x = 0, .y = 0 });
 };
 
 void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager) {
@@ -75,8 +76,9 @@ void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager)
 		delete s;
 	}
 	snakes.clear();
-	for (u32 particle : particles) {
-		ecs->destroyEntity(particle);
+	for (auto particle : particles) {
+		ecs->destroyEntity(particle.first);
+		world.timer_manager.destroyTimer(particle.second);
 	}
 	for (u32 apple_id : apple_ids) {
 		ecs->destroyEntity(apple_id);
@@ -88,6 +90,10 @@ void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager)
 		delete ai_controller;
 	}
 	world.ai_controllers.clear();
+	delete buy_screen;
+	buy_screen = nullptr;
+	this->world = nullptr;
+	this->texture_manager = nullptr;
 }
 
 void SnakeGameScene::update() {
@@ -110,10 +116,26 @@ void SnakeGameScene::collectAppleAt(BoardObject::BoardPos pos) {
 	current_score += apple_value;
 }
 
-void SnakeGameScene::collectParticle(u32 id) {
-	ecs->destroyEntity(id);
-	particles.erase(id);
-	current_score += apple_particle_value;
+void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id) {
+	ecs->destroyComponent<CollisionBox>(particle_id);
+	Transform snake_head_t = world->ecs.getc<Transform>(snake_id);
+	Transform particle_start_t = world->ecs.getc<Transform>(particle_id);
+	world->timeline_manager.createTimeline(
+		Timeline{
+			.length = 1000,
+			.on_update = [=](float delta)->void {
+				Transform& particle_t = world->ecs.getNextc(particle_id);
+				Transform new_t = lerp(particle_start_t, snake_head_t, delta);
+				particle_t.pos = new_t.pos;
+			},
+			.on_end = [=]()->void {
+				ecs->destroyEntity(particle_id);
+				this->world->timer_manager.destroyTimer(this->particles[particle_id]);
+				this->particles.erase(particle_id);
+				this->current_score += apple_particle_value;					
+			}
+		}
+	);
 }
 
 void SnakeGameScene::createNewApple() {
@@ -192,7 +214,18 @@ void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 				.velocity = rot_range(mt)
 			}
 		);
-		particles.emplace(new_particle_id);
+	u32 particle_cleanup_timer_id = world->timer_manager.createTimer(
+		Timer{
+			.interval = 120000,
+			.callback = [=]()->void {
+				this->ecs->destroyEntity(new_particle_id);
+				//this->world->timer_manager.destroyTimer(this->particles[new_particle_id]);
+				this->particles.erase(new_particle_id);
+			},
+		}
+	);
+
+		particles.emplace(new_particle_id, particle_cleanup_timer_id);
 		apple_ids.push_back(new_particle_id);
 	}
 	world->timer_manager.createTimer(
@@ -205,6 +238,7 @@ void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 			},
 		}
 	);
+
 }
 
 SpriteColorMod SnakeGameScene::getNewSnakeColor() {

@@ -8,10 +8,12 @@
 
 ShopMenuController::ShopMenuController(
   SnakeGameScene& _game_scene,
-  World& _world
+  World& _world,
+	vec2 _game_scene_origin
 ) :
   game_scene(_game_scene),
-  world(_world)
+  world(_world),
+	game_scene_origin(_game_scene_origin)
 {
 
 };
@@ -19,6 +21,8 @@ ShopMenuController::ShopMenuController(
 void ShopMenuController::handleEvent(const SDL_Event& e) {
 	if (e.type == SDL_KEYDOWN) {
 		switch (e.key.keysym.sym) {
+		case SDLK_b:
+			[[fallthrough]];
 		case SDLK_ESCAPE:
 			moveToGameScreen();
 			break;
@@ -28,8 +32,8 @@ void ShopMenuController::handleEvent(const SDL_Event& e) {
 
 void ShopMenuController::moveToGameScreen() {
 	Transform& camera_transform = world.ecs.getNextc(world.camera.id);
-	Transform end_transform = camera_transform;
-	end_transform.pos.y += 1000;
+	Transform end_transform;
+	end_transform.pos = game_scene_origin;
 	// push to stop this from running twice, then we pop twice later on to return to the scene
 	InputSystem::instance().pushContext();
 	// Timeline moves, timer creates buymenucontroller only when move is finished
