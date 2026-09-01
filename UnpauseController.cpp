@@ -62,12 +62,6 @@ void UnpauseController::handleEvent(const SDL_Event& e) {
 
 UnpauseController::~UnpauseController() {
   world.paused = false;
-  world.texture_manager.unloadTexture(game_over_sprite_path);
-  world.texture_manager.unloadTexture(resume_sprite_path);
-  world.texture_manager.unloadTexture(menu_sprite_path);
-  world.texture_manager.unloadTexture(quit_sprite_path);
-  world.texture_manager.unloadTexture(arrow_sprite_path);
-
   world.timeline_manager.destroyTimelineChecked(timeline_id);
   
   world.ecs.destroyEntity(retry_logo_id);

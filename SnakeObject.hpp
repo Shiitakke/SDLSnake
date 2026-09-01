@@ -50,14 +50,18 @@ private:
 
 	u32 createSnakeSegment(SnakeSegment ss);
 	void destroySnakeSegment();
-	
+	void createHeadCollisionTimeline();
+
 	World& world;
 	SnakeGameScene& scene;
 	// Every snake has its own board to track itself, as they cant collide with each other
 	// Snakes check in with the appleboard to see if theres an apple wherever they are moving
 	std::deque<SnakeSegment> segments = {};
 	SpriteColorMod snake_color;
-	u32 head_collision_id; // 
+	u32 head_collision_id;
+	vec2 prev_head_collision_pos;
+	vec2 next_head_collision_pos;
+	u32 head_collision_timeline_id;
 	float since_last_update = 0.0f;
 	float speed;
 	float time_per_move;

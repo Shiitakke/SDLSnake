@@ -15,11 +15,6 @@ void PauseController::handleEvent(const SDL_Event& e) {
 
 void PauseController::changePause() {
 	world.paused = true;
-	world.texture_manager.loadTexture(pause_sprite_path);
-	world.texture_manager.loadTexture(resume_sprite_path);
-	world.texture_manager.loadTexture(menu_sprite_path);
-	world.texture_manager.loadTexture(quit_sprite_path);
-	world.texture_manager.loadTexture(arrow_sprite_path);
 	// pause logo
 	u32 retry_logo_id = world.ecs.createEntity(
 		Transform{ 

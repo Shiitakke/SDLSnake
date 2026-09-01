@@ -7,6 +7,7 @@
 #include "Sprite.hpp"
 #include "SpriteAnim.hpp"
 #include "Transform.hpp"
+#include "util.hpp"
 #include "World.hpp"
 
 SnakeObject::SnakeObject(
@@ -27,6 +28,7 @@ SnakeObject::~SnakeObject() {
 	for (SnakeSegment& ss : segments) {
 		world.ecs.destroyEntity(ss.id);
 	}
+	world.ecs.destroyEntity(head_collision_id);
 }
 
 void SnakeObject::updateSnake() {
@@ -74,6 +76,41 @@ void SnakeObject::updateSnake() {
 			head.curr_type = SnakeSpriteType::CURVED;
 		}
 	}
+
+	/*
+	//get next head position for the head collision box
+	BoardObject::BoardPos new_pos = head.pos;
+	switch (next_dir) {
+	case SnakeDir::UP:
+		new_pos.y--;
+		break;
+	case SnakeDir::DOWN:
+		new_pos.y++;
+		break;
+	case SnakeDir::LEFT:
+		new_pos.x--;
+		break;
+	case SnakeDir::RIGHT:
+		new_pos.x++;
+		break;
+	default:
+		new_pos.y--;
+		break;
+	}
+	// we cant put a negative value in boardpos to worldpos
+	if (new_pos.x < 0) {
+		new_pos.x = 0;
+	} else if (new_pos.x >= 16) {
+		new_pos.x = 15;
+	}
+	if (new_pos.y < 0) {
+		new_pos.y = 0;
+	} else if (new_pos.y >= 16) {
+		new_pos.y = 15;
+	}
+	next_head_collision_pos = board.boardPosToWorldPos(new_pos);
+	*/
+
 	while (since_last_update > time_per_move) {
 		// Get tail, get head, place new head, remove tail if head moved into an empty space
 		SnakeSegment& head = segments.back();
@@ -154,10 +191,9 @@ void SnakeObject::updateSnake() {
 			// kill this snake
 			killSnake();
 			return;
-			break;
 		}
 		// remove collision from old head
-		world.ecs.destroyComponent<CollisionBox>(segments.back().id);
+		//world.ecs.destroyComponent<CollisionBox>(segments.back().id);
 		u32 new_segment_id = createSnakeSegment({ 0, new_pos, in_dir, next_dir, SnakeSpriteType::STRAIGHT });
 		Transform& t = world.ecs.getc<Transform>(new_segment_id);
 		Transform& t_next = world.ecs.getNextc(new_segment_id);
@@ -174,6 +210,9 @@ void SnakeObject::updateSnake() {
 			t.rot += 90;
 			t_next.rot += 90;
 		}
+		prev_head_collision_pos = next_head_collision_pos;
+		next_head_collision_pos = board.boardPosToWorldPos(segments.back().pos);
+		createHeadCollisionTimeline();
 		since_last_update -= time_per_move;
 	}
 }
@@ -198,19 +237,6 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 			.framerate = 1000 / static_cast<i32>(time_per_move / 8),
 			.anim_graph = { 1, 2, 3, 4, 5, 6, 7, 7, 9, 10, 11, 12, 13, 14, 15, 15 },
 			.current_frame = 8
-		}
-	);
-	world.ecs.createComponent<CollisionBox>(new_segment_id,
-		CollisionBox{
-			.extent = {.x = 50, .y = 50},
-			.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
-			.on_begin_collision = [=](u32 otherid)->void { // Collect apple particles
-				if (world.ecs.exists<CollisionBox>(otherid) &&
-						world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel
-				) {
-					scene.collectParticle(otherid, new_segment_id);
-				}
-			}
 		}
 	);
 	ss.id = new_segment_id;
@@ -239,6 +265,16 @@ void SnakeObject::killSnake() {
 		world.ecs.destroyEntity(ss.id);
 		board.board[ss.pos.x][ss.pos.y] = BoardObject::BoardTile::EMPTY;
 	}
+	world.timeline_manager.destroyTimelineChecked(head_collision_timeline_id);
+	world.ecs.destroyComponent<CollisionBox>(head_collision_id);
+	World* world_ref = &world;
+	u32 head_collision_id_clone = head_collision_id;
+	world.timer_manager.createTimer(
+		Timer{
+			.interval = scene.respawn_timer + 1000,
+			.callback = [=]()->void {world_ref->ecs.destroyEntity(head_collision_id_clone);}
+		}
+	);
 	segments.clear();
 	paused = true;
 	// just set a timer and respawn
@@ -246,7 +282,7 @@ void SnakeObject::killSnake() {
 		Timer	{ 
 			.interval = scene.respawn_timer,
 			.callback = [this]()->void {this->init(); this->paused = false; }
-					}
+		}
 	);
 }
 
@@ -270,6 +306,40 @@ void SnakeObject::init() {
 	};
 	next_dir = SnakeDir::RIGHT;
 	since_last_update = 0.0f;
+	// head collision init
+	head_collision_id = world.ecs.createEntity(
+		Transform{
+			.pos = board.boardPosToWorldPos(ss2_pos)
+		}
+	);
+	world.ecs.createComponent<CollisionBox>( head_collision_id, 
+		CollisionBox{
+			.extent = {.x = 75, .y = 75},
+			.channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::snake_segment_collision_channel),
+			.on_begin_collision = [=](u32 otherid)->void { // Collect apple particles
+				if (world.ecs.exists<CollisionBox>(otherid) &&
+						world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel
+				) {
+					scene.collectParticle(otherid, head_collision_id);
+				}
+			}
+		}
+	);
+	prev_head_collision_pos = board.boardPosToWorldPos(ss1_pos);
+	next_head_collision_pos = board.boardPosToWorldPos(ss2_pos);
+	createHeadCollisionTimeline();
+}
+
+void SnakeObject::createHeadCollisionTimeline() {
+	head_collision_timeline_id = world.timeline_manager.createTimeline(
+		Timeline{
+			.length = time_per_move,
+			.on_update = [=](float delta)->void {
+				Transform& t = world.ecs.getNextc(head_collision_id);
+				t.pos = lerp(prev_head_collision_pos, next_head_collision_pos, delta);
+			},
+		}
+	);
 }
 
 void SnakeObject::setSpeed(float new_speed) {

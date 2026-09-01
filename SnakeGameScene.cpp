@@ -28,7 +28,12 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	texture_manager.loadTexture(snake_sprite_path);
 	texture_manager.loadTexture(apple_sprite_path);
 	texture_manager.loadTexture(board_sprite_path);
+	// for pause screen
 	texture_manager.loadTexture(pause_sprite_path);
+	texture_manager.loadTexture(resume_sprite_path);
+	texture_manager.loadTexture(menu_sprite_path);
+	texture_manager.loadTexture(quit_sprite_path);
+	texture_manager.loadTexture(arrow_sprite_path);
 
 	// board init
 	ecs->createEntity(
@@ -71,7 +76,14 @@ void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager)
 	texture_manager.unloadTexture(snake_sprite_path);
 	texture_manager.unloadTexture(apple_sprite_path);
 	texture_manager.unloadTexture(board_sprite_path);
-	texture_manager.unloadTexture(pause_sprite_path);
+	
+	//for pause elements
+	world.texture_manager.unloadTexture(game_over_sprite_path);
+	world.texture_manager.unloadTexture(resume_sprite_path);
+	world.texture_manager.unloadTexture(menu_sprite_path);
+	world.texture_manager.unloadTexture(quit_sprite_path);
+	world.texture_manager.unloadTexture(arrow_sprite_path);
+	
 	for (SnakeObject* s : snakes) {
 		delete s;
 	}
@@ -122,10 +134,13 @@ void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id) {
 	Transform particle_start_t = world->ecs.getc<Transform>(particle_id);
 	world->timeline_manager.createTimeline(
 		Timeline{
-			.length = 1000,
+			.length = 550,
 			.on_update = [=](float delta)->void {
 				Transform& particle_t = world->ecs.getNextc(particle_id);
-				Transform new_t = lerp(particle_start_t, snake_head_t, delta);
+				Transform new_t = particle_t;
+				if (world->ecs.exists<Transform>(snake_id)) {
+					new_t = lerp(particle_start_t, world->ecs.getNextc(snake_id), delta);
+				}
 				particle_t.pos = new_t.pos;
 			},
 			.on_end = [=]()->void {
@@ -133,7 +148,11 @@ void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id) {
 				this->world->timer_manager.destroyTimer(this->particles[particle_id]);
 				this->particles.erase(particle_id);
 				this->current_score += apple_particle_value;					
-			}
+			},
+			.delta_curve = [](float delta)->float {
+				return (-2 + std::pow((1 / (delta + 0.5) - 1), 2) + std::pow(2.9, delta));
+				return delta;
+			}		
 		}
 	);
 }
@@ -141,10 +160,10 @@ void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id) {
 void SnakeGameScene::createNewApple() {
 	std::random_device rd;
 	std::mt19937 mt(rd());
-	std::uniform_int_distribution<u32> x_range{ 0, BOARD_WIDTH - 1 };
-	std::uniform_int_distribution<u32> y_range{ 0, BOARD_HEIGHT - 1 };
+	std::uniform_int_distribution<i32> x_range{ 0, BOARD_WIDTH - 1 };
+	std::uniform_int_distribution<i32> y_range{ 0, BOARD_HEIGHT - 1 };
 	bool placed = false;
-	u32 x, y;
+	i32 x, y;
 	while (!placed) {
 		x = x_range(mt);
 		y = y_range(mt);

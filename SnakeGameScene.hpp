@@ -46,8 +46,8 @@ public:
 	u32 apple_value = 1;
 	u32 current_score = 0;
 	u32 respawn_timer = 1000;
-	u32 auto_snake_count = 16;
-	u32 new_snake_speed = 16;
+	u32 auto_snake_count = 4;
+	u32 new_snake_speed = 8;
 
 private:
 	void createNewApple();
@@ -61,8 +61,8 @@ private:
 	EntityComponentSystem* ecs = nullptr;
 	TextureManager* texture_manager = nullptr;
 	BuyScreenObject* buy_screen = nullptr;
-	u32 BOARD_WIDTH = 16;
-	u32 BOARD_HEIGHT = 16;
+	i32 BOARD_WIDTH = 16;
+	i32 BOARD_HEIGHT = 16;
 	std::vector<SnakeObject*> snakes;
 	u32 apple_board[16][16];
 	std::unordered_set<u32> apple_ids;

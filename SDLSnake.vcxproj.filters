@@ -148,7 +148,7 @@
       <Filter>Source Files\Gameplay Objects</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsSystem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -276,7 +276,7 @@
       <Filter>Header Files\Gameplay Objects</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsSystem.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Systems</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

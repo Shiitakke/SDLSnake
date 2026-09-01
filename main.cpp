@@ -53,7 +53,7 @@ void updateCollisions(
 );
 
 bool quit = false;
-constexpr float game_speed_scalar = 2.0f;
+constexpr float game_speed_scalar = 1.0f;
 World world;
 IRenderer* rendering_system;
 PhysicsSystem* physics_system;

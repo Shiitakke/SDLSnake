@@ -15,7 +15,7 @@ u32 IdManager::getNextId() {
 
 void IdManager::returnId(u32 id) {
   if (used_ids.contains(id)) {
-    ids.emplace_front(id);
+    ids.emplace_back(id);
     used_ids.erase(id);
   }
 }
