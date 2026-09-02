@@ -23,7 +23,7 @@ void PauseController::changePause() {
 		},
 		Sprite{ 
 			.sprite_path = pause_sprite_path,
-			.sprite_id = world.texture_manager.getTextureid(pause_sprite_path),
+			.texture_id = world.texture_manager.getTextureid(pause_sprite_path),
 			.src_rect = {0, 0, world.texture_manager.getTexture(pause_sprite_path).w, world.texture_manager.getTexture(pause_sprite_path).h },
 			.zindex = 12
 		}
@@ -36,7 +36,7 @@ void PauseController::changePause() {
 		},
 		Sprite{ 
 			.sprite_path = resume_sprite_path,
-			.sprite_id = world.texture_manager.getTextureid(resume_sprite_path),
+			.texture_id = world.texture_manager.getTextureid(resume_sprite_path),
 			.src_rect = {0, 0, world.texture_manager.getTexture(resume_sprite_path).w, world.texture_manager.getTexture(resume_sprite_path).h },
 			.zindex = 12
 		}
@@ -50,7 +50,7 @@ void PauseController::changePause() {
 		},
 		Sprite{ 
 			.sprite_path = menu_sprite_path,
-			.sprite_id = world.texture_manager.getTextureid(menu_sprite_path),
+			.texture_id = world.texture_manager.getTextureid(menu_sprite_path),
 			.src_rect = {0, 0, world.texture_manager.getTexture(menu_sprite_path).w, world.texture_manager.getTexture(menu_sprite_path).h },
 			.zindex = 12
 		}
@@ -63,7 +63,7 @@ void PauseController::changePause() {
 		},
 		Sprite{ 
 			.sprite_path = quit_sprite_path,
-			.sprite_id = world.texture_manager.getTextureid(quit_sprite_path),
+			.texture_id = world.texture_manager.getTextureid(quit_sprite_path),
 			.src_rect = {0, 0, world.texture_manager.getTexture(quit_sprite_path).w, world.texture_manager.getTexture(quit_sprite_path).h },
 			.zindex = 12
 		}
@@ -76,7 +76,7 @@ void PauseController::changePause() {
 		},
 		Sprite{ 
 			.sprite_path = arrow_sprite_path,
-			.sprite_id = world.texture_manager.getTextureid(arrow_sprite_path),
+			.texture_id = world.texture_manager.getTextureid(arrow_sprite_path),
 			.src_rect = {0, 0, world.texture_manager.getTexture(arrow_sprite_path).w, world.texture_manager.getTexture(arrow_sprite_path).h },
 			.zindex = 12
 		}

@@ -40,7 +40,7 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 		Transform{ .scale = {31.25, 31.25} },
 		Sprite{ 
 			.sprite_path = board_sprite_path,
-			.sprite_id = texture_manager.getTextureid(board_sprite_path),
+			.texture_id = texture_manager.getTextureid(board_sprite_path),
 			.src_rect = { 0, 0, texture_manager.getTexture(board_sprite_path).w, texture_manager.getTexture(board_sprite_path).h },
 			.zindex = 9
 		}
@@ -181,7 +181,7 @@ void SnakeGameScene::createNewApple() {
 		Transform{ .pos = { new_pos.x, new_pos.y} },
 		Sprite{ 
 			.sprite_path = apple_sprite_path,
-			.sprite_id = world->texture_manager.getTextureid(apple_sprite_path),
+			.texture_id = world->texture_manager.getTextureid(apple_sprite_path),
 			.src_rect = { 0, 0, 64, 64 },
 			.zindex = 11
 		}
@@ -222,7 +222,7 @@ void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 			},
 			Sprite{ 
 				.sprite_path = apple_sprite_path,
-				.sprite_id = texture_manager->getTextureid(apple_sprite_path),
+				.texture_id = texture_manager->getTextureid(apple_sprite_path),
 				.src_rect = {view_range(mt), view_range(mt), 8, 8}
 			},
 			LinearVelocity{ 

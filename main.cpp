@@ -47,10 +47,6 @@ void updateAngularVelocities(
 	ComponentManager<Transform>& transforms,
 	ComponentManager<AngularVelocity>& angular_velocities
 );
-void updateCollisions(
-	ComponentManager<Transform>& transforms,
-	ComponentManager<CollisionBox>& collision_boxes
-);
 
 bool quit = false;
 constexpr float game_speed_scalar = 1.0f;
@@ -103,10 +99,6 @@ int main(int argc, char* args[]) {
 					world.ecs.getComponentManager<Transform>(),
 					world.ecs.getComponentManager<AngularVelocity>()
 				);
-				//updateCollisions(
-				//	world.ecs.getComponentManager<Transform>(),
-				//	world.ecs.getComponentManager<CollisionBox>()
-				//);
 				physics_system->update();
 			}
 			period -= TIME_STEP;			
@@ -199,57 +191,6 @@ void updateAngularVelocities(
 		Transform& t = transforms.getNextComponent(angular_velocities.idFromIndex(i));
 		t.rot = t.rot + v.velocity;
 		v.velocity = v.acceleration + v.velocity * (1 - v.friction);
-	}
-}
-
-void updateCollisions(
-	ComponentManager<Transform>& transforms,
-	ComponentManager<CollisionBox>& collision_boxes
-) {
-	// If we delete something on collision start, then this map becomes invalid
-	// Need some way to inform the physics system that entities have been destroyed
-	static std::unordered_map<u32, std::unordered_set<u32>> collisions; // TODO: move to class instead of a static var
-	for (i32 i = 0; i < collision_boxes.n_components; ++i) {
-		CollisionBox& box1 = collision_boxes.components[i];
-		u32 box1_id = collision_boxes.idFromIndex(i);
-		Transform& t1 = transforms.getNextComponent(box1_id);
-		for (i32 j = i + 1; j < collision_boxes.n_components; ++j) {
-			CollisionBox& box2 = collision_boxes.components[j];
-			if (!(box1.channels & box2.channels)) {
-				continue;
-			}
-			u32 box2_id = collision_boxes.idFromIndex(j);
-			Transform& t2 = transforms.getNextComponent(collision_boxes.idFromIndex(j));
-
-			vec2 dist = t2.pos - t1.pos;
-			dist.x = std::abs(dist.x);
-			dist.y = std::abs(dist.y);
-			if (
-				((box1.extent.x + box2.extent.x) / 2.0f) > dist.x &&
-				((box1.extent.y + box2.extent.y) / 2.0f) > dist.y
-				) {
-				// Objects are colliding, fire onCollisionBegin events for next frame
-				// but only if they weren't colliding last frame
-				if	(	!collisions.contains(box1_id) ||
-							!collisions[box1_id].contains(box2_id)
-						) 
-				{
-					collisions[box1_id].emplace(box2_id);
-					box1.on_begin_collision(box2_id);
-					box2.on_begin_collision(box1_id);
-				}
-			}
-			else {
-				if (collisions.contains(box1_id) &&
-						collisions[box1_id].contains(box2_id)
-					) {
-					//Collision just ended
-					collisions[box1_id].erase(collisions[box1_id].find(box2_id));
-					box1.on_end_collision(box2_id);
-					box2.on_end_collision(box1_id);
-				}
-			}
-		}
 	}
 }
 

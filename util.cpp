@@ -1,5 +1,6 @@
 #include <cmath>
 #include <tuple>
+#include <vector>
 
 #include "util.hpp"
 
@@ -11,7 +12,6 @@ Transform lerp(const Transform& a, const Transform& b, float delta) {
 										.rot = std::lerp(a.rot, b.rot, delta)
 									};
 }
-
 
 vec2 lerp(const vec2& a, const vec2& b, float delta) {
 	return vec2	{	.x = std::lerp(a.x, b.x, delta),
@@ -68,5 +68,29 @@ std::tuple<u8, u8, u8> hsvTorgb(double h, double s, double v) {
     static_cast<u8>((r + m) * 255),
     static_cast<u8>((g + m) * 255),
     static_cast<u8>((b + m) * 255),
+  };
+}
+
+BitmapFontWord makeBitmapWord(BitmapFont font, World& world, std::string word, Transform origin) {
+  std::vector<u32> letter_ids;
+  Transform curr_letter_transform = origin;
+  u32 letter_width = font.cellw * origin.scale.x;
+  curr_letter_transform.pos.x -= (letter_width * word.size()) / 2;
+  for (char c : word) {
+    u32 sprite_sheet_index = font.glyph_map[c];
+    i32 row = static_cast<u8>(sprite_sheet_index) / font.cols;
+    i32 col = static_cast<u8>(sprite_sheet_index) % font.cols;
+    letter_ids.emplace_back(world.ecs.createEntity(
+      curr_letter_transform,
+      Sprite{
+      .sprite_path = font.font_path,
+      .texture_id = world.texture_manager.getTextureid(font.font_path),
+      .src_rect = {.x = col * font.cellw, .y = row * font.cellh, .w = font.cellw, .h = font.cellh},      
+      }
+    ));
+    curr_letter_transform.pos.x += letter_width;
+  }
+  return BitmapFontWord{
+    letter_ids
   };
 }

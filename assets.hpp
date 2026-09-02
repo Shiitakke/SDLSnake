@@ -19,3 +19,5 @@ const std::string board_sprite_path = "./assets/board.png";
 const std::string resume_sprite_path = "./assets/retry.png";
 const std::string menu_sprite_path = "./assets/menu.png";
 const std::string game_over_sprite_path = "./assets/gameover.png";
+
+const std::string font_test = "./assets/minogram_6x10.png";

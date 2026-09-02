@@ -17,7 +17,35 @@ BuyController::BuyController(
 	buy_screen_origin(_buy_screen_origin),
 	game_screen_origin(_game_screen_origin)
 {
+	world.texture_manager.loadTexture(font_test);
+	u32 font_id = world.texture_manager.getTextureid(font_test);
+	BitmapFont test = BitmapFont{
+		.texture_id = font_id,
+		.font_path = font_test,
+		.rows = 7,
+		.cols = 13,
+		.cellw = 6,
+		.cellh = 10,
+		.glyph_map = {0},
+	};
 
+	i32 i = 0;
+	for (char c = 'A'; c <= 'Z'; ++c) {
+		test.glyph_map[c] = i;
+		++i;
+	}
+	i = 26;
+	for (char c = 'a'; c <= 'z'; ++c) {
+		test.glyph_map[c] = i;
+		++i;
+	}
+	test.glyph_map[' '] = 88;
+
+	Transform word_transform = Transform{
+		.pos = buy_screen_origin,
+		.scale = {.x = 10, .y = 10}
+	};
+	makeBitmapWord(test, world, "Hello", word_transform);
 };
 
 void BuyController::handleEvent(const SDL_Event& e) {

@@ -37,113 +37,13 @@ void SnakeObject::updateSnake() {
 	}	
 	since_last_update += TIME_STEP;
 
-	// Clean head dir, dont go backwards
-	SnakeSegment& head = segments.back();
-	if (next_dir == head.in_dir) {
-		next_dir = head.out_dir;
-	}
-	head.out_dir = next_dir;
-
-	// Look at direction enum explicit values for why this works
-	if (static_cast<i32>(head.out_dir) + static_cast<i32>(head.in_dir) == 0) {
-		// Straight
-		if (head.curr_type != SnakeSpriteType::STRAIGHT) {
-			world.ecs.getc<Sprite>(head.id).flip_flags = SpriteFlip::NONE;
-			world.ecs.getc<SpriteAnim>(head.id).current_frame += 8;
-			head.curr_type = SnakeSpriteType::STRAIGHT;
-		}
-	}
-	else {
-		//curved
-		// Set flipping for curved sprites (it runs left-to-up, clockwise)
-		Sprite& hv = world.ecs.getc<Sprite>(head.id);
-		switch (head.in_dir) {
-		case SnakeDir::LEFT:
-			hv.flip_flags = head.out_dir == SnakeDir::DOWN ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
-			break;
-		case SnakeDir::RIGHT:
-			hv.flip_flags = head.out_dir == SnakeDir::UP ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
-			break;
-		case SnakeDir::UP:
-			hv.flip_flags = head.out_dir == SnakeDir::LEFT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
-			break;
-		case SnakeDir::DOWN:
-			hv.flip_flags = head.out_dir == SnakeDir::RIGHT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
-			break;
-		}
-		if (head.curr_type != SnakeSpriteType::CURVED) {
-			world.ecs.getc<SpriteAnim>(head.id).current_frame -= 8;
-			head.curr_type = SnakeSpriteType::CURVED;
-		}
-	}
-
-	/*
-	//get next head position for the head collision box
-	BoardObject::BoardPos new_pos = head.pos;
-	switch (next_dir) {
-	case SnakeDir::UP:
-		new_pos.y--;
-		break;
-	case SnakeDir::DOWN:
-		new_pos.y++;
-		break;
-	case SnakeDir::LEFT:
-		new_pos.x--;
-		break;
-	case SnakeDir::RIGHT:
-		new_pos.x++;
-		break;
-	default:
-		new_pos.y--;
-		break;
-	}
-	// we cant put a negative value in boardpos to worldpos
-	if (new_pos.x < 0) {
-		new_pos.x = 0;
-	} else if (new_pos.x >= 16) {
-		new_pos.x = 15;
-	}
-	if (new_pos.y < 0) {
-		new_pos.y = 0;
-	} else if (new_pos.y >= 16) {
-		new_pos.y = 15;
-	}
-	next_head_collision_pos = board.boardPosToWorldPos(new_pos);
-	*/
-
 	while (since_last_update > time_per_move) {
 		// Get tail, get head, place new head, remove tail if head moved into an empty space
-		SnakeSegment& head = segments.back();
-		SnakeSegment& tail = segments.front();
-		BoardObject::BoardPos new_pos = head.pos;
-		SnakeDir in_dir;
-		switch (next_dir) {
-		case SnakeDir::UP:
-			new_pos.y--;
-			in_dir = SnakeDir::DOWN;
-			break;
-		case SnakeDir::DOWN:
-			new_pos.y++;
-			in_dir = SnakeDir::UP;
-			break;
-		case SnakeDir::LEFT:
-			new_pos.x--;
-			in_dir = SnakeDir::RIGHT;
-			break;
-		case SnakeDir::RIGHT:
-			new_pos.x++;
-			in_dir = SnakeDir::LEFT;
-			break;
-		default:
-			new_pos.y--;
-			in_dir = SnakeDir::DOWN;
-			break;
-		}
+		auto [in_dir, new_pos] = getNextPos();
 		// Bounds checking
 		if (new_pos.x < 0 || new_pos.x >= 16 ||
 			new_pos.y < 0 || new_pos.y >= 16)
 		{
-			//scene.onDeath();
 			killSnake();
 			return;
 		}
@@ -161,30 +61,7 @@ void SnakeObject::updateSnake() {
 		case BoardObject::BoardTile::EMPTY:
 			if (!collected_apple) {
 				// Set the new tail to play a reverse animation of the segment shrinking
-				SnakeSegment& new_tail = segments.front();
-				u32 new_tail_id = new_tail.id;
-				SpriteAnim& new_tail_anim = world.ecs.getc<SpriteAnim>(new_tail_id);
-				new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
-				new_tail_anim.since_last_update = 0;
-				Transform& new_tail_transform = world.ecs.getc<Transform>(new_tail_id);
-				Transform& new_tail_next = world.ecs.getNextc(new_tail_id);
-				Sprite& new_tail_view = world.ecs.getc<Sprite>(new_tail_id);
-				if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
-					new_tail_transform.rot += 180;
-					new_tail_next.rot += 180;
-					new_tail_anim.current_frame = 15;
-				}
-				else {
-					new_tail_transform.rot += 90;
-					new_tail_next.rot += 90;
-					new_tail_anim.current_frame = 7;
-					if (new_tail_view.flip_flags == SpriteFlip::VERTICAL) {
-						new_tail_view.flip_flags = static_cast<SpriteFlip::SpriteFlip>(SpriteFlip::HORIZONTAL | SpriteFlip::VERTICAL);
-					}
-					else {
-						new_tail_view.flip_flags = SpriteFlip::VERTICAL;
-					}
-				}
+				reverseTailAnimation();
 			}
 			break;
 		case BoardObject::BoardTile::SNAKE:
@@ -192,8 +69,6 @@ void SnakeObject::updateSnake() {
 			killSnake();
 			return;
 		}
-		// remove collision from old head
-		//world.ecs.destroyComponent<CollisionBox>(segments.back().id);
 		u32 new_segment_id = createSnakeSegment({ 0, new_pos, in_dir, next_dir, SnakeSpriteType::STRAIGHT });
 		Transform& t = world.ecs.getc<Transform>(new_segment_id);
 		Transform& t_next = world.ecs.getNextc(new_segment_id);
@@ -226,7 +101,7 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 		},
 		Sprite{ 
 			.sprite_path = snake_sprite_path,
-			.sprite_id = world.texture_manager.getTextureid(snake_sprite_path),
+			.texture_id = world.texture_manager.getTextureid(snake_sprite_path),
 			.src_rect = {0, 0, 32, 32},
 			.zindex = 11,
 			.color_mod = snake_color
@@ -253,11 +128,41 @@ void SnakeObject::destroySnakeSegment() {
 	segments.pop_front();
 }
 
-BoardObject::BoardPos SnakeObject::get_head_pos() {
+BoardObject::BoardPos SnakeObject::getHeadPos() {
 	if (segments.size() < 1) {
 		return { 4, 8 };
 	}
 	return segments.back().pos;
+}
+
+std::tuple<SnakeObject::SnakeDir, BoardObject::BoardPos> SnakeObject::getNextPos() {
+	SnakeSegment& head = segments.back();
+	SnakeSegment& tail = segments.front();
+	BoardObject::BoardPos new_pos = head.pos;
+	SnakeDir in_dir;
+	switch (next_dir) {
+	case SnakeDir::UP:
+		new_pos.y--;
+		in_dir = SnakeDir::DOWN;
+		break;
+	case SnakeDir::DOWN:
+		new_pos.y++;
+		in_dir = SnakeDir::UP;
+		break;
+	case SnakeDir::LEFT:
+		new_pos.x--;
+		in_dir = SnakeDir::RIGHT;
+		break;
+	case SnakeDir::RIGHT:
+		new_pos.x++;
+		in_dir = SnakeDir::LEFT;
+		break;
+	default:
+		new_pos.y--;
+		in_dir = SnakeDir::DOWN;
+		break;
+	}
+	return { in_dir, new_pos };
 }
 
 void SnakeObject::killSnake() {
@@ -340,6 +245,79 @@ void SnakeObject::createHeadCollisionTimeline() {
 			},
 		}
 	);
+}
+
+void SnakeObject::reverseTailAnimation() {
+	SnakeSegment& new_tail = segments.front();
+	u32 new_tail_id = new_tail.id;
+	SpriteAnim& new_tail_anim = world.ecs.getc<SpriteAnim>(new_tail_id);
+	new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
+	new_tail_anim.since_last_update = 0;
+	Transform& new_tail_transform = world.ecs.getc<Transform>(new_tail_id);
+	Transform& new_tail_next = world.ecs.getNextc(new_tail_id);
+	Sprite& new_tail_view = world.ecs.getc<Sprite>(new_tail_id);
+	if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
+		new_tail_transform.rot += 180;
+		new_tail_next.rot += 180;
+		new_tail_anim.current_frame = 15;
+	}
+	else {
+		new_tail_transform.rot += 90;
+		new_tail_next.rot += 90;
+		new_tail_anim.current_frame = 7;
+		if (new_tail_view.flip_flags == SpriteFlip::VERTICAL) {
+			new_tail_view.flip_flags = static_cast<SpriteFlip::SpriteFlip>(SpriteFlip::HORIZONTAL | SpriteFlip::VERTICAL);
+		}
+		else {
+			new_tail_view.flip_flags = SpriteFlip::VERTICAL;
+		}
+	}
+}
+
+void SnakeObject::setDirection(SnakeDir new_direction) {
+	// Clean head dir, dont go backwards
+	if (segments.size() < 1) { // could be called when dead
+		return;
+	}
+	SnakeSegment& head = segments.back();
+	if (new_direction == head.in_dir) {
+		new_direction = head.out_dir;
+	}
+	head.out_dir = new_direction;
+
+	// Look at direction enum explicit values for why this works
+	if (static_cast<i32>(head.out_dir) + static_cast<i32>(head.in_dir) == 0) {
+		// Straight
+		if (head.curr_type != SnakeSpriteType::STRAIGHT) {
+			world.ecs.getc<Sprite>(head.id).flip_flags = SpriteFlip::NONE;
+			world.ecs.getc<SpriteAnim>(head.id).current_frame += 8;
+			head.curr_type = SnakeSpriteType::STRAIGHT;
+		}
+	}
+	else {
+		//curved
+		// Set flipping for curved sprites (it runs left-to-up, clockwise)
+		Sprite& hv = world.ecs.getc<Sprite>(head.id);
+		switch (head.in_dir) {
+		case SnakeDir::LEFT:
+			hv.flip_flags = head.out_dir == SnakeDir::DOWN ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
+			break;
+		case SnakeDir::RIGHT:
+			hv.flip_flags = head.out_dir == SnakeDir::UP ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
+			break;
+		case SnakeDir::UP:
+			hv.flip_flags = head.out_dir == SnakeDir::LEFT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
+			break;
+		case SnakeDir::DOWN:
+			hv.flip_flags = head.out_dir == SnakeDir::RIGHT ? SpriteFlip::VERTICAL : SpriteFlip::NONE;
+			break;
+		}
+		if (head.curr_type != SnakeSpriteType::CURVED) {
+			world.ecs.getc<SpriteAnim>(head.id).current_frame -= 8;
+			head.curr_type = SnakeSpriteType::CURVED;
+		}
+	}
+	next_dir = new_direction;
 }
 
 void SnakeObject::setSpeed(float new_speed) {

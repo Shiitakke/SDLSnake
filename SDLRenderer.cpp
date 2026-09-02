@@ -70,7 +70,7 @@ void SDLRenderer::render(float delta) {
 			src_rect.w * view_transform.scale.x * out_res_scale,
 			src_rect.h * view_transform.scale.y * out_res_scale
 		};
-		SDL_Texture* texture = static_cast<SDL_Texture*>(texture_manager.getTexture(view.sprite_id).t);
+		SDL_Texture* texture = static_cast<SDL_Texture*>(texture_manager.getTexture(view.texture_id).t);
 		SDL_SetTextureColorMod(texture, view.color_mod.r, view.color_mod.g, view.color_mod.b);
 		SDL_RenderCopyEx(
 			renderer,

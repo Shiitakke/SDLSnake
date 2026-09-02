@@ -21,12 +21,12 @@ void AISnakeController::update() {
     generatePath();
   }
   if (
-    curr_head_pos.x != controlled_snake.get_head_pos().x ||
-    curr_head_pos.y != controlled_snake.get_head_pos().y
+    curr_head_pos.x != controlled_snake.getHeadPos().x ||
+    curr_head_pos.y != controlled_snake.getHeadPos().y
   ) {
-    controlled_snake.next_dir = apple_path.back();
+    controlled_snake.setDirection(apple_path.back());
     apple_path.pop_back();
-    curr_head_pos = controlled_snake.get_head_pos();
+    curr_head_pos = controlled_snake.getHeadPos();
   };
 }
 
@@ -49,7 +49,7 @@ void AISnakeController::generatePath() {
   // breadth first search to apple
   bool found = false;
   std::queue<BoardObject::BoardPos> to_explore;
-  BoardObject::BoardPos initial_pos = controlled_snake.get_head_pos();
+  BoardObject::BoardPos initial_pos = controlled_snake.getHeadPos();
   visited[initial_pos.x][initial_pos.y] = true;
   to_explore.emplace(initial_pos);
   while (to_explore.size() > 0 && !found) {
@@ -111,6 +111,6 @@ void AISnakeController::generatePath() {
     curr_pos = path[curr_pos.x][curr_pos.y].pos;
   }
   curr_head_pos = initial_pos;
-  controlled_snake.next_dir = apple_path.back();
+  controlled_snake.setDirection(apple_path.back());
   apple_path.pop_back();  
 }

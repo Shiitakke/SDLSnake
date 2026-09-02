@@ -185,6 +185,7 @@
     <ClInclude Include="AISnakeController.hpp" />
     <ClInclude Include="AngularVelocity.hpp" />
     <ClInclude Include="assets.hpp" />
+    <ClInclude Include="BitmapFont.hpp" />
     <ClInclude Include="BoardObject.hpp" />
     <ClInclude Include="BuyController.hpp" />
     <ClInclude Include="BuyScreenObject.hpp" />

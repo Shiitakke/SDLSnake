@@ -19,7 +19,7 @@ void TitleScreenScene::initialise(World& world, TextureManager& texture_manager)
     Transform{ .scale = {31.25, 31.25}
     },
     Sprite{ .sprite_path = board_sprite_path,
-                .sprite_id = texture_manager.getTextureid(board_sprite_path),
+                .texture_id = texture_manager.getTextureid(board_sprite_path),
                 .src_rect = { 0, 0, texture_manager.getTexture(board_sprite_path).w, texture_manager.getTexture(board_sprite_path).h },
                 .zindex = 9
     }
@@ -31,7 +31,7 @@ void TitleScreenScene::initialise(World& world, TextureManager& texture_manager)
                .scale = {8, 8}
     },
     Sprite{ .sprite_path = snake_logo_sprite_path,
-                .sprite_id = texture_manager.getTextureid(snake_logo_sprite_path),
+                .texture_id = texture_manager.getTextureid(snake_logo_sprite_path),
                 .src_rect = { 0, 0, texture_manager.getTexture(snake_logo_sprite_path).w, texture_manager.getTexture(snake_logo_sprite_path).h },
                 .zindex = 10
     }
@@ -42,7 +42,7 @@ void TitleScreenScene::initialise(World& world, TextureManager& texture_manager)
                 .scale = {3, 3}
     },
     Sprite{ .sprite_path = start_sprite_path,
-                .sprite_id = texture_manager.getTextureid(start_sprite_path),
+                .texture_id = texture_manager.getTextureid(start_sprite_path),
                 .src_rect = { 0, 0, texture_manager.getTexture(start_sprite_path).w, texture_manager.getTexture(start_sprite_path).h },
                 .zindex = 10
     }
@@ -53,7 +53,7 @@ void TitleScreenScene::initialise(World& world, TextureManager& texture_manager)
                 .scale = {3, 3}
     },
     Sprite{ .sprite_path = quit_sprite_path,
-                .sprite_id = texture_manager.getTextureid(quit_sprite_path),
+                .texture_id = texture_manager.getTextureid(quit_sprite_path),
                 .src_rect = { 0, 0, texture_manager.getTexture(quit_sprite_path).w, texture_manager.getTexture(quit_sprite_path).h },
                 .zindex = 10
     }
@@ -64,7 +64,7 @@ void TitleScreenScene::initialise(World& world, TextureManager& texture_manager)
                 .scale = {2, 2}
     },
     Sprite{ .sprite_path = arrow_sprite_path,
-                .sprite_id = texture_manager.getTextureid(arrow_sprite_path),
+                .texture_id = texture_manager.getTextureid(arrow_sprite_path),
                 .src_rect = { 0, 0, texture_manager.getTexture(arrow_sprite_path).w, texture_manager.getTexture(arrow_sprite_path).h },
                 .zindex = 10
     }

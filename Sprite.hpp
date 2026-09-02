@@ -21,7 +21,7 @@ struct SpriteColorMod {
 
 struct Sprite {
   std::string sprite_path;
-  u32 sprite_id;
+  u32 texture_id;
   SDL_Rect src_rect;
   u32 zindex = 10;
   SpriteFlip::SpriteFlip  flip_flags = SpriteFlip::NONE;
