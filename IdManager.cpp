@@ -13,6 +13,13 @@ u32 IdManager::getNextId() {
   return front;
 }
 
+void IdManager::reset() {
+  for (u32 used_id : used_ids) {
+    ids.emplace_back(used_id);
+  }
+  used_ids.clear();
+}
+
 void IdManager::returnId(u32 id) {
   if (used_ids.contains(id)) {
     ids.emplace_back(id);

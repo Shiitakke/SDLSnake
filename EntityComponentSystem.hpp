@@ -73,6 +73,13 @@ public:
     return id_manager.getNextId();
   }
 
+  void reset() {
+    for (auto key : componentManagerMap) {
+      key.second->reset();
+    }
+    id_manager.reset();
+  }
+
   u32 returnId(u32 id) {
     id_manager.returnId(id);
   }

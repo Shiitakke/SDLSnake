@@ -5,3 +5,22 @@ void World::unloadScene() {
   delete current_scene;
   current_scene = nullptr;
 };
+
+void World::updateScene() {
+  current_scene->update();
+}
+
+// resets everything in the world except for the camera and scene
+// intended to be run while cleaning up scenes
+void World::reset() {
+  ecs.reset();
+  texture_manager.unloadAll();
+  timeline_manager.clearTimelines();
+  timer_manager.clearTimers();
+  for (IAIController* ai_controller : ai_controllers) {
+    delete ai_controller;
+  }
+  ai_controllers.clear();
+  paused = false;
+  camera.id = ecs.createEntity(Transform{});
+}

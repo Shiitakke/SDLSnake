@@ -12,6 +12,7 @@ class ComponentManagerInterface {
 public:
   virtual ~ComponentManagerInterface() = default;
   virtual void destroyEntity(u32 id) = 0;
+  virtual void reset() = 0;
 };
 
 template <typename T>
@@ -62,6 +63,10 @@ public:
     if (exists(id)) {
       destroyComponent(id);
     }
+  }
+
+  void reset() override {
+    n_components = 0;
   }
 
   u32 n_components = 0;
@@ -124,9 +129,10 @@ public:
       destroyComponent(id);
     }
   }
-
-  virtual void destroyEntity() {}
-
+  
+  void reset() override {
+    n_components = 0;
+  }
 
   u32 n_components = 0;
   std::array<Transform, 5000> components;
@@ -198,6 +204,10 @@ public:
     if (exists(id)) {
       destroyComponent(id);
     }
+  }
+
+  void reset() override {
+    n_components = 0;
   }
 
   u32 n_components = 0;

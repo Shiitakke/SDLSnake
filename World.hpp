@@ -24,10 +24,8 @@ public:
     current_scene->initialise(*this, this->texture_manager);
   };
   void unloadScene();
-
-  void updateScene() {
-    current_scene->update();
-  }
+  void updateScene();
+  void reset();
 
   EntityComponentSystem ecs;
   IScene* current_scene = nullptr;

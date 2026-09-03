@@ -99,39 +99,17 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 };
 
 void SnakeGameScene::deinitialise(World& world, TextureManager& texture_manager) {
-	texture_manager.unloadTexture(snake_sprite_path);
-	texture_manager.unloadTexture(apple_sprite_path);
-	texture_manager.unloadTexture(board_sprite_path);
-	
-	//for pause elements
-	world.texture_manager.unloadTexture(game_over_sprite_path);
-	world.texture_manager.unloadTexture(resume_sprite_path);
-	world.texture_manager.unloadTexture(menu_sprite_path);
-	world.texture_manager.unloadTexture(quit_sprite_path);
-	world.texture_manager.unloadTexture(arrow_sprite_path);
-	
 	for (SnakeObject* s : snakes) {
 		delete s;
 	}
 	snakes.clear();
-	for (auto particle : particles) {
-		ecs->destroyEntity(particle.first);
-		world.timer_manager.destroyTimer(particle.second);
-	}
-	for (u32 apple_id : apple_ids) {
-		ecs->destroyEntity(apple_id);
-	}
 	InputSystem::instance().clearContexts();
-	world.timer_manager.clearTimers();
-	world.timeline_manager.clearTimelines();
-	for (IAIController* ai_controller : world.ai_controllers) {
-		delete ai_controller;
-	}
-	world.ai_controllers.clear();
+
 	delete buy_screen;
 	buy_screen = nullptr;
 	this->world = nullptr;
 	this->texture_manager = nullptr;
+	world.reset();
 }
 
 void SnakeGameScene::update() {

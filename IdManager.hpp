@@ -11,6 +11,7 @@ public:
 
   u32 getNextId();
   void returnId(u32 id);
+  void reset();
 private:
   std::unordered_set<u32> used_ids;
   std::deque<u32> ids;

@@ -81,16 +81,7 @@ void TitleScreenScene::initialise(World& world, TextureManager& texture_manager)
 }
 
 void TitleScreenScene::deinitialise(World& world, TextureManager& texture_manager) {
-  texture_manager.unloadTexture(snake_logo_sprite_path);
-  texture_manager.unloadTexture(start_sprite_path);
-  texture_manager.unloadTexture(quit_sprite_path);
-  texture_manager.unloadTexture(arrow_sprite_path);
-  texture_manager.unloadTexture(board_sprite_path);
-  world.ecs.destroyEntity(snake_logo_id);
-  world.ecs.destroyEntity(start_option_id);
-  world.ecs.destroyEntity(quit_option_id);
-  world.ecs.destroyEntity(arrow_id);
-  world.ecs.destroyEntity(board_id);
+  world.reset();
   InputSystem::instance().popContext();
 }
 
