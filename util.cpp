@@ -75,7 +75,7 @@ BitmapFontWord makeBitmapWord(BitmapFont font, World& world, std::string word, T
   std::vector<u32> letter_ids;
   Transform curr_letter_transform = origin;
   u32 letter_width = font.cellw * origin.scale.x;
-  curr_letter_transform.pos.x -= (letter_width * word.size()) / 2;
+  curr_letter_transform.pos.x -= (letter_width * (word.size() - 1)) / 2;
   for (char c : word) {
     u32 sprite_sheet_index = font.glyph_map[c];
     i32 row = static_cast<u8>(sprite_sheet_index) / font.cols;

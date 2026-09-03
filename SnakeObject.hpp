@@ -34,6 +34,10 @@ public:
 	void setSpeed(float new_speed);
 	void setDirection(SnakeDir new_direction);
 	void updateSnake();
+	void updateCollectionIndicator(
+		u32 apple_particle_value,
+		BitmapFont testfont
+	);
 
 	BoardObject board; // public for ai snake controller
 	u32 running_collection_total = 0;

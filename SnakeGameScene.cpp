@@ -170,70 +170,11 @@ void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id, SnakeObject*
 				particle_t.pos = new_t.pos;
 			},
 			.on_end = [=]()->void {
-				if (snake->running_collection_indicator_exists) {
-					//clear old indicator
-					for (u32 id : snake->running_collection_indicator.sprite_ids) {
-						world->ecs.destroyEntity(id);
-					};
-					for (u32 id : snake->running_collection_indicator2.sprite_ids) {
-						world->ecs.destroyEntity(id);
-					};
-					world->timer_manager.destroyTimer(snake->running_collection_indicator_timer_id);
-					world->timer_manager.destroyTimer(snake->running_collection_indicator_timer_id2);
-				};
-				snake->running_collection_indicator_exists = true;
-				world->timer_manager.timers.components[world->timer_manager.timers.id_map[snake->running_collection_total_reset_timer_id]].since_last_update = 0;
-				snake->running_collection_total += apple_particle_value;
-				Transform word_transform = world->ecs.getc<Transform>(particle_id);
-				float word_scale = std::cbrt(snake->running_collection_total);
-				//float word_scale = 1 + std::log10(snake->running_collection_total + 0.1f);
-				word_transform.scale = {.x = word_scale + 0.5f, .y = word_scale + 0.5f};
-				word_transform.rot = 0;
-				Sprite letter_format = {
-					.zindex = 100,
-					.color_mod = {0, 0, 0},
-				};
-				BitmapFontWord word = makeBitmapWord(testfont, *world, std::to_string(snake->running_collection_total), word_transform, letter_format);
-				letter_format.color_mod = {255, 255, 255};
-				word_transform.scale.x -= 0.5;
-				word_transform.scale.y -= 0.5;
-				BitmapFontWord word2 = makeBitmapWord(testfont, *world, std::to_string(snake->running_collection_total), word_transform, letter_format);
-				snake->running_collection_indicator = word;
-				snake->running_collection_indicator2 = word2;
-
-				for (u32 letter_id : word.sprite_ids) {
-					world->ecs.createComponent<LinearVelocity>(letter_id,
-						LinearVelocity{
-							.velocity = {.x = 0, .y = 10},
-							.friction = 0.2f,
-						}
-					);
-					snake->running_collection_indicator_timer_id = world->timer_manager.createTimer(
-						Timer{
-							.interval = 600,
-							.callback = [=]()->void {
-								snake->running_collection_indicator_exists = false;
-								world->ecs.destroyEntity(letter_id);
-							}
-						}
-					);
-				}
-				for (u32 letter_id : word2.sprite_ids) {
-					world->ecs.createComponent<LinearVelocity>(letter_id,
-						LinearVelocity{
-							.velocity = {.x = 0, .y = 10},
-							.friction = 0.2f,
-						}
-						);
-					snake->running_collection_indicator_timer_id2 = world->timer_manager.createTimer(
-						Timer{
-							.interval = 600,
-							.callback = [=]()->void {
-								world->ecs.destroyEntity(letter_id);
-							}
-						}
-					);
-				}
+				snake->updateCollectionIndicator(
+					apple_particle_value,
+					testfont
+				);
+				// Clean up apple particle entity
 				ecs->destroyEntity(particle_id);
 				this->world->timer_manager.destroyTimer(this->particles[particle_id]);
 				this->particles.erase(particle_id);

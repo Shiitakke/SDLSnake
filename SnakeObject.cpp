@@ -3,6 +3,7 @@
 #include "assets.hpp"
 #include "BoardObject.hpp"
 #include "CollisionBox.hpp"
+#include "LinearVelocity.hpp"
 #include "SnakeGameScene.hpp"
 #include "Sprite.hpp"
 #include "SpriteAnim.hpp"
@@ -341,4 +342,82 @@ void SnakeObject::setSpeed(float new_speed) {
 	for (SnakeSegment& segment : segments) {
 		world.ecs.getc<SpriteAnim>(segment.id).framerate = anim_framerate;
 	}
+}
+
+void SnakeObject::updateCollectionIndicator(
+	u32 apple_particle_value,
+	BitmapFont testfont
+) {
+	// Clear old indicator if it exists
+	if (running_collection_indicator_exists) {
+		for (u32 id : running_collection_indicator.sprite_ids) {
+			world.ecs.destroyEntity(id);
+		};
+		for (u32 id : running_collection_indicator2.sprite_ids) {
+			world.ecs.destroyEntity(id);
+		};
+		world.timer_manager.destroyTimer(running_collection_indicator_timer_id);
+		world.timer_manager.destroyTimer(running_collection_indicator_timer_id2);
+		running_collection_indicator_exists = false;
+	};
+	// Create new indicator
+	// Setup words
+	running_collection_indicator_exists = true;
+	world.timer_manager.timers.components[world.timer_manager.timers.id_map[running_collection_total_reset_timer_id]].since_last_update = 0;
+	running_collection_total += apple_particle_value;
+	Transform word_transform = world.ecs.getc<Transform>(head_collision_id);
+	float word_scale = std::cbrt(running_collection_total);
+	word_transform.scale = { .x = word_scale + 1, .y = word_scale + 1 };
+	word_transform.rot = 0;
+	Sprite letter_format = {
+		.zindex = 255,
+		.color_mod = {0, 0, 0},
+	};
+	BitmapFontWord word = makeBitmapWord(testfont, world, std::to_string(running_collection_total), word_transform, letter_format);
+	letter_format.color_mod = { 255, 255, 255 };
+	word_transform.scale.x -= 1;
+	word_transform.scale.y -= 1;
+	BitmapFontWord word2 = makeBitmapWord(testfont, world, std::to_string(running_collection_total), word_transform, letter_format);
+	running_collection_indicator = word;
+	running_collection_indicator2 = word2;
+
+	// Now setup motion and destruction timer
+	for (u32 letter_id : word.sprite_ids) {
+		world.ecs.createComponent<LinearVelocity>(letter_id,
+			LinearVelocity{
+				.velocity = {.x = 0, .y = 10},
+				.friction = 0.2f,
+			}
+		);
+	}
+	running_collection_indicator_timer_id = world.timer_manager.createTimer(
+		Timer{
+			.interval = 600,
+			.callback = [=]()->void {
+				for (u32 letter_id : word.sprite_ids) {
+					world.ecs.destroyEntity(letter_id);
+				}
+				running_collection_indicator_exists = false;
+			}
+		}
+	);
+	for (u32 letter_id : word2.sprite_ids) {
+		world.ecs.createComponent<LinearVelocity>(letter_id,
+			LinearVelocity{
+				.velocity = {.x = 0, .y = 10},
+				.friction = 0.2f,
+			}
+		);
+	}
+	running_collection_indicator_timer_id2 = world.timer_manager.createTimer(
+		Timer{
+			.interval = 600,
+			.callback = [=]()->void {
+				for (u32 letter_id : word2.sprite_ids) {
+				world.ecs.destroyEntity(letter_id);
+				running_collection_indicator_exists = false;					
+				}
+			}
+		}
+	);
 }
