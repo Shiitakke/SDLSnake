@@ -186,7 +186,11 @@ void SnakeObject::killSnake() {
 	world.timer_manager.createTimer(
 		Timer	{ 
 			.interval = scene.respawn_timer,
-			.callback = [this]()->void {this->init(); this->paused = false; }
+			.callback = [this]()->void {
+				world.timer_manager.destroyTimer(running_collection_total_reset_timer_id);
+				this->init();
+				this->paused = false;
+			}
 		}
 	);
 }
@@ -225,7 +229,7 @@ void SnakeObject::init() {
 				if (world.ecs.exists<CollisionBox>(otherid) &&
 						world.ecs.getc<CollisionBox>(otherid).channels & SnakeGameScene::apple_particle_collision_channel
 				) {
-					scene.collectParticle(otherid, head_collision_id);
+					scene.collectParticle(otherid, head_collision_id, this);
 				}
 			}
 		}
@@ -233,6 +237,15 @@ void SnakeObject::init() {
 	prev_head_collision_pos = board.boardPosToWorldPos(ss1_pos);
 	next_head_collision_pos = board.boardPosToWorldPos(ss2_pos);
 	createHeadCollisionTimeline();
+	running_collection_total_reset_timer_id = world.timer_manager.createTimer(
+		Timer{
+			.interval = 500,
+			.callback = [=]()->void {
+				this->running_collection_total = 0;
+			},
+			.repeats = true,
+		}
+	);
 }
 
 void SnakeObject::createHeadCollisionTimeline() {

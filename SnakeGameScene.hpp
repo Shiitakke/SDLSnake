@@ -8,6 +8,7 @@
 #include "IScene.hpp"
 
 #include "EntityComponentSystem.hpp"
+#include "BitmapFont.hpp"
 #include "BoardObject.hpp"
 #include "ComponentManager.hpp"
 #include "TextureManager.hpp"
@@ -32,7 +33,7 @@ public:
 	
 	bool appleAt(BoardObject::BoardPos pos);
 	void collectAppleAt(BoardObject::BoardPos pos);
-	void collectParticle(u32 id, u32 snake_id);
+	void collectParticle(u32 id, u32 snake_id, SnakeObject* snake);
 	//void createRetryScreen();
 	void createNewAutoSnake();
 	void setSnakeSpeeds(float new_speed);
@@ -57,6 +58,7 @@ private:
 
 	//std::unordered_set<u32> particles = {};
 	std::unordered_map<u32, u32> particles = {};
+	BitmapFont testfont;
 	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;
 	TextureManager* texture_manager = nullptr;

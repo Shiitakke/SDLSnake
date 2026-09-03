@@ -2,6 +2,7 @@
 
 #include <deque>
 
+#include "BitmapFont.hpp"
 #include "BoardObject.hpp"
 #include "common.hpp"
 #include "Sprite.hpp"
@@ -35,6 +36,13 @@ public:
 	void updateSnake();
 
 	BoardObject board; // public for ai snake controller
+	u32 running_collection_total = 0;
+	u32 running_collection_total_reset_timer_id = 0;
+	BitmapFontWord running_collection_indicator;
+	u32 running_collection_indicator_timer_id;
+	BitmapFontWord running_collection_indicator2;
+	u32 running_collection_indicator_timer_id2;
+	bool running_collection_indicator_exists = false;
 private:
 	enum class SnakeSpriteType {
 		STRAIGHT,

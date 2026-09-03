@@ -71,7 +71,7 @@ std::tuple<u8, u8, u8> hsvTorgb(double h, double s, double v) {
   };
 }
 
-BitmapFontWord makeBitmapWord(BitmapFont font, World& world, std::string word, Transform origin) {
+BitmapFontWord makeBitmapWord(BitmapFont font, World& world, std::string word, Transform origin, Sprite format) {
   std::vector<u32> letter_ids;
   Transform curr_letter_transform = origin;
   u32 letter_width = font.cellw * origin.scale.x;
@@ -80,13 +80,13 @@ BitmapFontWord makeBitmapWord(BitmapFont font, World& world, std::string word, T
     u32 sprite_sheet_index = font.glyph_map[c];
     i32 row = static_cast<u8>(sprite_sheet_index) / font.cols;
     i32 col = static_cast<u8>(sprite_sheet_index) % font.cols;
+    Sprite letter_sprite = format;
+    letter_sprite.sprite_path = font.font_path;
+    letter_sprite.texture_id = world.texture_manager.getTextureid(font.font_path);
+    letter_sprite.src_rect = { .x = col * font.cellw, .y = row * font.cellh, .w = font.cellw, .h = font.cellh };
     letter_ids.emplace_back(world.ecs.createEntity(
       curr_letter_transform,
-      Sprite{
-      .sprite_path = font.font_path,
-      .texture_id = world.texture_manager.getTextureid(font.font_path),
-      .src_rect = {.x = col * font.cellw, .y = row * font.cellh, .w = font.cellw, .h = font.cellh},      
-      }
+      letter_sprite
     ));
     curr_letter_transform.pos.x += letter_width;
   }
