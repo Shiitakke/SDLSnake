@@ -93,9 +93,6 @@
     <ClCompile Include="PauseController.cpp">
       <Filter>Source Files\UserControllers</Filter>
     </ClCompile>
-    <ClCompile Include="IScene.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="TitleScreenScene.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>

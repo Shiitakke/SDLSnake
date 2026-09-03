@@ -6,17 +6,27 @@
 
 #include "Transform.hpp"
 
-Transform lerp(const Transform& a, const Transform& b, float delta) {
-	return Transform{ .pos = lerp(a.pos, b.pos, delta),
-										.scale = lerp(a.scale, b.scale, delta),
-										.rot = std::lerp(a.rot, b.rot, delta)
-									};
+Transform lerp(
+  const Transform& a, 
+  const Transform& b, 
+  float delta
+) {
+	return Transform { 
+    .pos = lerp(a.pos, b.pos, delta),
+		.scale = lerp(a.scale, b.scale, delta),
+		.rot = std::lerp(a.rot, b.rot, delta)
+	};
 }
 
-vec2 lerp(const vec2& a, const vec2& b, float delta) {
-	return vec2	{	.x = std::lerp(a.x, b.x, delta),
-								.y = std::lerp(a.y, b.y, delta)
-							};
+vec2 lerp(
+  const vec2& a, 
+  const vec2& b, 
+  float delta
+) {
+	return vec2	{	
+    .x = std::lerp(a.x, b.x, delta),
+		.y = std::lerp(a.y, b.y, delta)
+	};
 }
 
 // h as an angle, s and v as percentages
@@ -71,7 +81,13 @@ std::tuple<u8, u8, u8> hsvTorgb(double h, double s, double v) {
   };
 }
 
-BitmapFontWord makeBitmapWord(BitmapFont font, World& world, std::string word, Transform origin, Sprite format) {
+BitmapFontWord makeBitmapWord(
+  BitmapFont font, 
+  World& world, 
+  std::string word, 
+  Transform origin, 
+  Sprite format
+) {
   std::vector<u32> letter_ids;
   Transform curr_letter_transform = origin;
   u32 letter_width = font.cellw * origin.scale.x;

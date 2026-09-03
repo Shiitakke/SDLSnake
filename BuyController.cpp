@@ -29,6 +29,7 @@ void BuyController::handleEvent(const SDL_Event& e) {
 	}
 }
 
+// Moves camera to buy menu location, then adds a shop menu controller
 void BuyController::moveToBuyMenu() {
 	Transform& camera_transform = world.ecs.getNextc(world.camera.id);
 	Transform end_transform;

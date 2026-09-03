@@ -161,7 +161,6 @@
     <ClCompile Include="EntityComponentSystem.cpp" />
     <ClCompile Include="IdManager.cpp" />
     <ClCompile Include="InputSystem.cpp" />
-    <ClCompile Include="IScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PauseController.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />

@@ -32,6 +32,7 @@ SnakeObject::~SnakeObject() {
 	world.ecs.destroyEntity(head_collision_id);
 }
 
+// Moves if enough time has passed
 void SnakeObject::updateSnake() {
 	if (paused) {
 		return;
@@ -93,6 +94,7 @@ void SnakeObject::updateSnake() {
 	}
 }
 
+// Creates a new head for the snake
 u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 	const auto& [t_x, t_y] = board.boardPosToWorldPos(ss.pos);
 	u32 new_segment_id = world.ecs.createEntity(
@@ -121,6 +123,7 @@ u32 SnakeObject::createSnakeSegment(SnakeSegment ss) {
 	return new_segment_id;
 }
 
+// Destroys the tail of the snake
 void SnakeObject::destroySnakeSegment() {
 	u32 id = segments.front().id;
 	world.ecs.destroyEntity(id);
@@ -129,6 +132,7 @@ void SnakeObject::destroySnakeSegment() {
 	segments.pop_front();
 }
 
+// Gets the current position of the head
 BoardObject::BoardPos SnakeObject::getHeadPos() {
 	if (segments.size() < 1) {
 		return { 4, 8 };
@@ -136,6 +140,7 @@ BoardObject::BoardPos SnakeObject::getHeadPos() {
 	return segments.back().pos;
 }
 
+// Gets the board the head will be in next move
 std::tuple<SnakeObject::SnakeDir, BoardObject::BoardPos> SnakeObject::getNextPos() {
 	SnakeSegment& head = segments.back();
 	SnakeSegment& tail = segments.front();
@@ -166,24 +171,26 @@ std::tuple<SnakeObject::SnakeDir, BoardObject::BoardPos> SnakeObject::getNextPos
 	return { in_dir, new_pos };
 }
 
+// Kills the snake, destroying all segments and respawning it a while later
 void SnakeObject::killSnake() {
+	// segments
 	for (SnakeSegment& ss : segments) {
 		world.ecs.destroyEntity(ss.id);
 		board.board[ss.pos.x][ss.pos.y] = BoardObject::BoardTile::EMPTY;
 	}
+	segments.clear();
+	paused = true;
+	// head collision
 	world.timeline_manager.destroyTimelineChecked(head_collision_timeline_id);
 	world.ecs.destroyComponent<CollisionBox>(head_collision_id);
 	World* world_ref = &world;
-	u32 head_collision_id_clone = head_collision_id;
 	world.timer_manager.createTimer(
 		Timer{
 			.interval = scene.respawn_timer + 1000,
-			.callback = [=]()->void {world_ref->ecs.destroyEntity(head_collision_id_clone);}
+			.callback = [=, head_c_id = (this->head_collision_id)]()->void{world_ref->ecs.destroyEntity(head_c_id);}
 		}
 	);
-	segments.clear();
-	paused = true;
-	// just set a timer and respawn
+	// respawn timer
 	world.timer_manager.createTimer(
 		Timer	{ 
 			.interval = scene.respawn_timer,
@@ -249,6 +256,7 @@ void SnakeObject::init() {
 	);
 }
 
+// Animates a collisionbox to move alongside the head
 void SnakeObject::createHeadCollisionTimeline() {
 	head_collision_timeline_id = world.timeline_manager.createTimeline(
 		Timeline{
@@ -261,15 +269,15 @@ void SnakeObject::createHeadCollisionTimeline() {
 	);
 }
 
+// Reverses the animation of the tail segment
 void SnakeObject::reverseTailAnimation() {
 	SnakeSegment& new_tail = segments.front();
-	u32 new_tail_id = new_tail.id;
-	SpriteAnim& new_tail_anim = world.ecs.getc<SpriteAnim>(new_tail_id);
+	SpriteAnim& new_tail_anim = world.ecs.getc<SpriteAnim>(new_tail.id);
 	new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
 	new_tail_anim.since_last_update = 0;
-	Transform& new_tail_transform = world.ecs.getc<Transform>(new_tail_id);
-	Transform& new_tail_next = world.ecs.getNextc(new_tail_id);
-	Sprite& new_tail_view = world.ecs.getc<Sprite>(new_tail_id);
+	Transform& new_tail_transform = world.ecs.getc<Transform>(new_tail.id);
+	Transform& new_tail_next = world.ecs.getNextc(new_tail.id);
+	Sprite& new_tail_view = world.ecs.getc<Sprite>(new_tail.id);
 	if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
 		new_tail_transform.rot += 180;
 		new_tail_next.rot += 180;
@@ -288,6 +296,7 @@ void SnakeObject::reverseTailAnimation() {
 	}
 }
 
+// Sets the next direction the snake will take
 void SnakeObject::setDirection(SnakeDir new_direction) {
 	// Clean head dir, dont go backwards
 	if (segments.size() < 1) { // could be called when dead
@@ -334,6 +343,7 @@ void SnakeObject::setDirection(SnakeDir new_direction) {
 	next_dir = new_direction;
 }
 
+// Sets the speed, time per move, and updates all animations for the new speed
 void SnakeObject::setSpeed(float new_speed) {
 	// need to change speed, time per move, and anim speeds
 	speed = new_speed;
@@ -344,6 +354,7 @@ void SnakeObject::setSpeed(float new_speed) {
 	}
 }
 
+// Updates the number that appears when collecting apple particles
 void SnakeObject::updateCollectionIndicator(
 	u32 apple_particle_value,
 	BitmapFont testfont

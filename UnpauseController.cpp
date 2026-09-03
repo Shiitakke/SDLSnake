@@ -13,16 +13,16 @@ UnpauseController::UnpauseController(
   u32 _arrow_id
 ) :
   world(_world),
-  retry_logo_id(_retry_logo_id),
-  retry_option_id(_retry_option_id),
-  retry_menu_id(_retry_menu_id),
-  retry_quit_id(_retry_quit_id),
+  pause_logo_id(_retry_logo_id),
+  resume_option_id(_retry_option_id),
+  menu_option_id(_retry_menu_id),
+  quit_option_id(_retry_quit_id),
   arrow_id(_arrow_id)
 {
   Transform arrow_transform = world.ecs.getNextc(arrow_id);
-  selection_transforms[0] = world.ecs.getc<Transform>(retry_option_id);
-  selection_transforms[1] = world.ecs.getc<Transform>(retry_menu_id);
-  selection_transforms[2] = world.ecs.getc<Transform>(retry_quit_id);
+  selection_transforms[0] = world.ecs.getc<Transform>(resume_option_id);
+  selection_transforms[1] = world.ecs.getc<Transform>(menu_option_id);
+  selection_transforms[2] = world.ecs.getc<Transform>(quit_option_id);
   start_transform = arrow_transform;
   end_transform = arrow_transform;
 }
@@ -40,7 +40,7 @@ void UnpauseController::handleEvent(const SDL_Event& e) {
       break;
     case SDLK_RETURN:
       switch (selections[curr_selection]) {
-      case RetryMenuSelection::RETRY:
+      case RetryMenuSelection::RESUME:
         InputSystem::instance().popContext();
         break;
       case RetryMenuSelection::MENU:
@@ -64,10 +64,10 @@ UnpauseController::~UnpauseController() {
   world.paused = false;
   world.timeline_manager.destroyTimelineChecked(timeline_id);
   
-  world.ecs.destroyEntity(retry_logo_id);
-  world.ecs.destroyEntity(retry_option_id);
-  world.ecs.destroyEntity(retry_menu_id);
-  world.ecs.destroyEntity(retry_quit_id);
+  world.ecs.destroyEntity(pause_logo_id);
+  world.ecs.destroyEntity(resume_option_id);
+  world.ecs.destroyEntity(menu_option_id);
+  world.ecs.destroyEntity(quit_option_id);
   world.ecs.destroyEntity(arrow_id);
 }
 
@@ -77,6 +77,7 @@ void UnpauseController::changeSelection() {
   end_transform.pos.x -= 150;
   // Pausing the game pauses timelines
   // So for now, just teleport and figure out a better solution to pausing later
+  // Most likely will need to be resolved with a seperation of game world and ui world
   Transform& arrow_transform = world.ecs.getNextc(arrow_id);
   arrow_transform = end_transform;
   ///

@@ -140,10 +140,13 @@ void SnakeGameScene::update() {
 	}
 }
 
+// Returns whether and apple exists at the given position
 bool SnakeGameScene::appleAt(BoardObject::BoardPos pos) {
 	return board.board[pos.x][pos.y] == BoardObject::BoardTile::APPLE;
 }
 
+// collects the apple if it exists at the given position
+// does not check whether the apple actually exists
 void SnakeGameScene::collectAppleAt(BoardObject::BoardPos pos) {
 	board.board[pos.x][pos.y] = BoardObject::BoardTile::EMPTY;
 	u32 apple_id = apple_board[pos.x][pos.y];
@@ -154,20 +157,20 @@ void SnakeGameScene::collectAppleAt(BoardObject::BoardPos pos) {
 	current_score += apple_value;
 }
 
+// collects an apple particle, animating it toward what collected it
 void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id, SnakeObject* snake) {
+	// We remove collision, animate the particle, then finally destroy it and update indicators
 	ecs->destroyComponent<CollisionBox>(particle_id);
-	Transform snake_head_t = world->ecs.getc<Transform>(snake_id);
 	Transform particle_start_t = world->ecs.getc<Transform>(particle_id);
 	world->timeline_manager.createTimeline(
 		Timeline{
 			.length = 550,
 			.on_update = [=](float delta)->void {
 				Transform& particle_t = world->ecs.getNextc(particle_id);
-				Transform new_t = particle_t;
+				// Snake could be dead
 				if (world->ecs.exists<Transform>(snake_id)) {
-					new_t = lerp(particle_start_t, world->ecs.getNextc(snake_id), delta);
+					particle_t = lerp(particle_start_t, world->ecs.getNextc(snake_id), delta);
 				}
-				particle_t.pos = new_t.pos;
 			},
 			.on_end = [=]()->void {
 				snake->updateCollectionIndicator(
@@ -182,17 +185,19 @@ void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id, SnakeObject*
 			},
 			.delta_curve = [](float delta)->float {
 				return (-2 + std::pow((1 / (delta + 0.5) - 1), 2) + std::pow(2.9, delta));
-				return delta;
 			}		
 		}
 	);
 }
 
+// Creates a new apple on the board
+// does no error checking to ensure apple count matches
 void SnakeGameScene::createNewApple() {
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<i32> x_range{ 0, BOARD_WIDTH - 1 };
 	std::uniform_int_distribution<i32> y_range{ 0, BOARD_HEIGHT - 1 };
+	// place on board
 	bool placed = false;
 	i32 x, y;
 	while (!placed) {
@@ -207,6 +212,7 @@ void SnakeGameScene::createNewApple() {
 		}
 	}
 
+	// place in world
 	vec2 new_pos = board.boardPosToWorldPos({x, y});
 	u32 new_apple_id = ecs->createEntity(
 		Transform{ .pos = { new_pos.x, new_pos.y} },
@@ -221,6 +227,7 @@ void SnakeGameScene::createNewApple() {
 	apple_board[x][y] = new_apple_id;
 }
 
+// Creates a new snake in the scene and attaches and AISnakeController to it
 void SnakeGameScene::createNewAutoSnake() {
 	SnakeObject* new_snake = new SnakeObject(
 		(*world),
@@ -232,6 +239,8 @@ void SnakeGameScene::createNewAutoSnake() {
 	world->ai_controllers.push_back(new AISnakeController((*new_snake), (*this)));
 }
 
+// Spawns apple particles at the given entity's location
+// Does not check whether said entity is an apple
 void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 	const Transform apple_transform = ecs->getc<Transform>(apple_id);
 	std::random_device rd;
@@ -282,7 +291,15 @@ void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 			.interval = 500,
 			.callback = [this, apple_ids]()->void {
 				for (u32 id : apple_ids) {
-					this->world->ecs.createComponent(id, CollisionBox{ .extent = {.x = 15, .y = 15}, .channels = static_cast<CollisionChannel::Channel>(CollisionChannel::c1 | SnakeGameScene::apple_particle_collision_channel) });
+					this->world->ecs.createComponent(id, 
+						CollisionBox{ 
+							.extent = {.x = 15, .y = 15}, 
+							.channels = static_cast<CollisionChannel::Channel>(
+								CollisionChannel::c1 | 
+								SnakeGameScene::apple_particle_collision_channel
+							) 
+						}
+					);
 				}
 			},
 		}

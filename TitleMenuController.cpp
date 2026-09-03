@@ -1,6 +1,5 @@
 #include "TitleMenuController.hpp"
 
-#include <stdio.h>
 #include "SnakeGameScene.hpp"
 #include "util.hpp"
 
@@ -32,6 +31,7 @@ void TitleMenuController::handleEvent(const SDL_Event& e) {
   }
 }
 
+// Moves the cursor to the new selection
 void TitleMenuController::changeSelection() {
   start_pos = arrow_transform;
   next_pos = arrow_transform;

@@ -13,6 +13,7 @@ void PauseController::handleEvent(const SDL_Event& e) {
 	}
 }
 
+// pauses the game, creates the pause menu and an unpause controller
 void PauseController::changePause() {
 	world.paused = true;
 	// pause logo

@@ -9,19 +9,18 @@ class UnpauseController : public IUserController {
 public:
   UnpauseController(
     World& _world,
-    u32 _retry_logo_id,
-    u32 _retry_option_id,
-    u32 _retry_menu_id,
-    u32 _retry_quit_id,
+    u32 _pause_logo_id,
+    u32 _resume_option_id,
+    u32 _menu_option_id,
+    u32 _quit_option_id,
     u32 _arrow_id
   );
   ~UnpauseController();
   void handleEvent(const SDL_Event& e) override;
 
 private:
-  // There HAS to be a better way to make menu controllers...
   enum class RetryMenuSelection {
-    RETRY,
+    RESUME,
     MENU,
     QUIT
   };
@@ -30,16 +29,16 @@ private:
   void moveArrow(float delta);
 
   World& world;
-  u32 retry_logo_id;
-  u32 retry_option_id;
-  u32 retry_menu_id;
-  u32 retry_quit_id;
+  u32 pause_logo_id;
+  u32 resume_option_id;
+  u32 menu_option_id;
+  u32 quit_option_id;
   u32 arrow_id;
   Transform start_transform;
   Transform end_transform;
 
   RetryMenuSelection selections[3] = {
-    RetryMenuSelection::RETRY,
+    RetryMenuSelection::RESUME,
     RetryMenuSelection::MENU,
     RetryMenuSelection::QUIT
   };
