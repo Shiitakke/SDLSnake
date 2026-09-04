@@ -41,14 +41,19 @@ public:
 	BoardObject board;
 	bool paused = false; // public for buy menu controller
 	// publics for shop to set when upgrading (probably move to functions instead later)
-	u32 apple_count = 10;
-	u32 apple_particle_count = 10;
+	const u32 max_apple_count = 20;
+	const u32 max_particle_count = 20;
+	const u32 max_auto_snakes = 8;
+	const u32 max_snake_speed = 16;
+	const u32 max_snake_pickup_range = 300;
+	u32 apple_count = 20;
+	u32 apple_particle_count = 20;
 	u32 apple_particle_value = 1;
 	u32 apple_value = 1;
 	u32 current_score = 0;
 	u32 respawn_timer = 1000;
-	u32 auto_snake_count = 4;
-	u32 new_snake_speed = 8;
+	u32 auto_snake_count = 8;
+	u32 new_snake_speed = 16;
 
 private:
 	void createNewApple();

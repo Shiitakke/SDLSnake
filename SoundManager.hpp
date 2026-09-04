@@ -4,14 +4,19 @@
 #include <string>
 #include <unordered_map>
 
+class ISoundFactory;
+
 class SoundManager {
 public:
   SoundManager() = default;
   ~SoundManager() = default;
-  bool loadChunk(const std::string& path);
-  void unloadChunk(const std::string& path);
-  Mix_Chunk* getChunk(const std::string& path);
+  void* getSound(const std::string& path);
+  void loadSound(const std::string& path);
+  void setSoundFactory(ISoundFactory* _sound_factory);
+  void unloadAll();
+  void unloadSound(const std::string& path);
 private:
-  std::unordered_map<std::string, Mix_Chunk*> chunk_map;
+  std::unordered_map<std::string, void*> sound_map;
+  ISoundFactory* sound_factory;
 };
 

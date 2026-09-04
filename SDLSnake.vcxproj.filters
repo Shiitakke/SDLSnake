@@ -43,20 +43,8 @@
     <Filter Include="Header Files\Gameplay Objects">
       <UniqueIdentifier>{18482fcb-f4b0-4f06-a411-e45faaa29216}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderers">
-      <UniqueIdentifier>{f224a990-cdb5-49e5-930f-ec37c6068595}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Texture Factories">
-      <UniqueIdentifier>{bfa7f134-8b10-4283-bb12-67337a2fb305}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Utils">
       <UniqueIdentifier>{88b6c18f-a610-4076-8ac3-8cadec774014}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Renderers">
-      <UniqueIdentifier>{ad3d394e-9ecd-4e0b-8fae-7bae1f9c5314}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Texture Factories">
-      <UniqueIdentifier>{62b2482b-9b5f-4172-91b6-6462740c363c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{0b82c824-34ab-4ccc-862b-e72cac33c211}</UniqueIdentifier>
@@ -70,15 +58,42 @@
     <Filter Include="Source Files\AIControllers">
       <UniqueIdentifier>{17b30b51-222a-4aba-96d1-c1c2b29343e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Audio">
+      <UniqueIdentifier>{ceec3fb2-e65c-4074-b37b-33acbdb8ebca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Audio">
+      <UniqueIdentifier>{53a76e3d-85bf-4f48-b5f8-ea06e2f3d580}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Audio\Systems">
+      <UniqueIdentifier>{85c6aef3-6cc8-4fbd-b78c-158d584a4b1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Audio\Factories">
+      <UniqueIdentifier>{8518e850-aefc-40ba-a27f-812eec89dbbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Audio\Systems">
+      <UniqueIdentifier>{2de35ad5-290c-4c84-9164-56d8e6bbcef4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Audio\Factories">
+      <UniqueIdentifier>{a94afbf1-e89e-40de-b560-a7df643e0d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{4ff5ff8a-d76e-48c7-9d72-8cc1b2437e66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\Renderers">
+      <UniqueIdentifier>{addff264-0dc0-48cb-b9f1-cd901c7cf52a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\Factories">
+      <UniqueIdentifier>{8e8bc87a-a713-4456-9c44-9bf1d139a255}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{d46f6080-2f7b-4820-9093-a5ee0baac8ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IdManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="EntityComponentSystem.cpp">
@@ -114,12 +129,6 @@
     <ClCompile Include="SnakeObject.cpp">
       <Filter>Source Files\Gameplay Objects</Filter>
     </ClCompile>
-    <ClCompile Include="SDLRenderer.cpp">
-      <Filter>Source Files\Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="SDLTextureFactory.cpp">
-      <Filter>Source Files\Texture Factories</Filter>
-    </ClCompile>
     <ClCompile Include="TimerManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
@@ -147,11 +156,26 @@
     <ClCompile Include="PhysicsSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="SoundManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="AudioService.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="AudioSystem.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SDLAudioSystem.cpp">
+      <Filter>Source Files\Audio\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SDLSoundFactory.cpp">
+      <Filter>Source Files\Audio\Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="SDLRenderer.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SDLTextureFactory.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -177,9 +201,6 @@
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="IdManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureManager.hpp">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="EntityComponentSystem.hpp">
@@ -233,18 +254,6 @@
     <ClInclude Include="Camera.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="SDLRenderer.hpp">
-      <Filter>Header Files\Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="IRenderer.hpp">
-      <Filter>Header Files\Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="SDLTextureFactory.hpp">
-      <Filter>Header Files\Texture Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="ITextureFactory.hpp">
-      <Filter>Header Files\Texture Factories</Filter>
-    </ClInclude>
     <ClInclude Include="TimerManager.hpp">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
@@ -284,11 +293,38 @@
     <ClInclude Include="BitmapFont.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="SoundManager.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="AudioService.hpp">
+      <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="AudioSystem.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="SoundManager.hpp">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLAudioSystem.hpp">
+      <Filter>Header Files\Audio\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="IAudioSystem.hpp">
+      <Filter>Header Files\Audio\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="ISoundFactory.hpp">
+      <Filter>Header Files\Audio\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLSoundFactory.hpp">
+      <Filter>Header Files\Audio\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.hpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderer.hpp">
+      <Filter>Header Files\Rendering\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLRenderer.hpp">
+      <Filter>Header Files\Rendering\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="ITextureFactory.hpp">
+      <Filter>Header Files\Rendering\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLTextureFactory.hpp">
+      <Filter>Header Files\Rendering\Factories</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

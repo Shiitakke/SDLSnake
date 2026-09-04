@@ -4,21 +4,31 @@
 #include <string>
 #include <stdio.h>
 
+#include "ISoundFactory.hpp";
 
-bool SoundManager::loadChunk(const std::string& path) {
-  Mix_Chunk* chunk = Mix_LoadWAV(path.c_str());
-  if (chunk == nullptr) {
-    printf("Failed to load sfx. %s\n", Mix_GetError());
-    return false;
+void* SoundManager::getSound(const std::string& path) {
+  return sound_map[path];
+}
+
+void SoundManager::loadSound(const std::string& path) {
+  void* resource = sound_factory->loadSound(path);
+  sound_map.emplace(path, resource);
+}
+
+void SoundManager::unloadAll() {
+  for (auto key : sound_map) {
+    unloadSound(key.first);
   }
-  chunk_map.emplace(path, chunk);
-  return true;
 }
 
-void SoundManager::unloadChunk(const std::string& path) {
-  Mix_FreeChunk(getChunk(path));
+void SoundManager::setSoundFactory(ISoundFactory* _sound_factory) {
+  unloadAll();
+  if (sound_factory != nullptr) {
+    delete sound_factory;
+  }
+  sound_factory = _sound_factory;
 }
 
-Mix_Chunk* SoundManager::getChunk(const std::string& path) {
-  return chunk_map[path];
+void SoundManager::unloadSound(const std::string& path) {
+  sound_factory->unloadSound(sound_map[path]);
 }

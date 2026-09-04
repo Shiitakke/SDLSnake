@@ -10,14 +10,16 @@
 #include "util.hpp"
 
 #include "AngularVelocity.hpp"
-#include "AudioSystem.hpp"
+#include "AudioService.hpp"
 #include "CollisionBox.hpp"
 #include "ComponentManager.hpp"
 #include "EntityComponentSystem.hpp"
 #include "IAIController.hpp"
+#include "IAudioSystem.hpp"
 #include "InputSystem.hpp"
 #include "LinearVelocity.hpp"
 #include "PhysicsSystem.hpp"
+#include "SDLAudioSystem.hpp"
 #include "SDLRenderer.hpp"
 #include "SnakeGameScene.hpp"
 #include "Sprite.hpp"
@@ -101,7 +103,7 @@ int main(int argc, char* args[]) {
 					world.ecs.getComponentManager<AngularVelocity>()
 				);
 				physics_system->update();
-				AudioSystem::instance().resolve();
+				AudioService::service()->resolve();
 			}
 			period -= TIME_STEP;			
 		}
@@ -213,7 +215,8 @@ void init() {
 		world.ecs.getComponentManager<Transform>(),
 		world.ecs.getComponentManager<CollisionBox>()
 	);
-	AudioSystem::instance().setSoundManager(world.sound_manager);
+	IAudioSystem* audio_system = new SDLAudioSystem(world.sound_manager);
+	AudioService::registerService(audio_system);
 	world.loadScene<TitleScreenScene>();
 }
 

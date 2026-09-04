@@ -3,7 +3,7 @@
 #include <random>
 
 #include "AISnakeController.hpp"
-#include "AudioSystem.hpp"
+#include "AudioService.hpp"
 #include "common.hpp"
 #include "BuyController.hpp"
 #include "BuyScreenObject.hpp"
@@ -13,6 +13,7 @@
 #include "AngularVelocity.hpp"
 #include "CollisionBox.hpp"
 #include "World.hpp"
+#include "IAudioSystem.hpp"
 #include "InputSystem.hpp"
 #include "IUserController.hpp"
 #include "SnakeController.hpp"
@@ -37,9 +38,9 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	texture_manager.loadTexture(arrow_sprite_path);
 
 	//sound
-	world.sound_manager.loadChunk(explosion_1_sound_path);
-	world.sound_manager.loadChunk(explosion_2_sound_path);
-	world.sound_manager.loadChunk(thud_sound_path);
+	world.sound_manager.loadSound(explosion_1_sound_path);
+	world.sound_manager.loadSound(explosion_2_sound_path);
+	world.sound_manager.loadSound(thud_sound_path);
 
 	// setup font to use
 	texture_manager.loadTexture(font_test);
@@ -132,7 +133,7 @@ bool SnakeGameScene::appleAt(BoardObject::BoardPos pos) {
 // collects the apple if it exists at the given position
 // does not check whether the apple actually exists
 void SnakeGameScene::collectAppleAt(BoardObject::BoardPos pos) {
-	AudioSystem::instance().playSound(explosion_1_sound_path);
+	AudioService().service()->playSound(explosion_1_sound_path);
 	board.board[pos.x][pos.y] = BoardObject::BoardTile::EMPTY;
 	u32 apple_id = apple_board[pos.x][pos.y];
 	generateAppleParticles(apple_id);
@@ -162,7 +163,7 @@ void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id, SnakeObject*
 					apple_particle_value,
 					testfont
 				);
-				AudioSystem::instance().playSound(thud_sound_path);
+				AudioService::service()->playSound(thud_sound_path);
 				// Clean up apple particle entity
 				ecs->destroyEntity(particle_id);
 				this->world->timer_manager.destroyTimer(this->particles[particle_id]);
