@@ -1,5 +1,7 @@
 #include "SnakeObject.hpp"
 
+#include <random>
+
 #include "assets.hpp"
 #include "AudioSystem.hpp"
 #include "BoardObject.hpp"
@@ -381,7 +383,11 @@ void SnakeObject::updateCollectionIndicator(
 	Transform word_transform = world.ecs.getc<Transform>(head_collision_id);
 	float word_scale = std::cbrt(running_collection_total);
 	word_transform.scale = { .x = word_scale + 1, .y = word_scale + 1 };
-	word_transform.rot = 0;
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_real_distribution<float> vel_range{ -5.f, 5.f };
+	float word_rot = vel_range(mt);
+	word_transform.rot = word_rot;
 	Sprite letter_format = {
 		.zindex = 255,
 		.color_mod = {0, 0, 0},
@@ -393,14 +399,15 @@ void SnakeObject::updateCollectionIndicator(
 	BitmapFontWord word2 = makeBitmapWord(testfont, world, std::to_string(running_collection_total), word_transform, letter_format);
 	running_collection_indicator = word;
 	running_collection_indicator2 = word2;
-
+	LinearVelocity word_velocity = {
+		.velocity = {.x = 0, .y = 10},
+		.friction = 0.2f,
+	};
+	word_velocity.velocity = word_velocity.velocity.rotate(word_rot);
 	// Now setup motion and destruction timer
 	for (u32 letter_id : word.sprite_ids) {
 		world.ecs.createComponent<LinearVelocity>(letter_id,
-			LinearVelocity{
-				.velocity = {.x = 0, .y = 10},
-				.friction = 0.2f,
-			}
+			word_velocity
 		);
 	}
 	running_collection_indicator_timer_id = world.timer_manager.createTimer(
@@ -416,10 +423,7 @@ void SnakeObject::updateCollectionIndicator(
 	);
 	for (u32 letter_id : word2.sprite_ids) {
 		world.ecs.createComponent<LinearVelocity>(letter_id,
-			LinearVelocity{
-				.velocity = {.x = 0, .y = 10},
-				.friction = 0.2f,
-			}
+			word_velocity
 		);
 	}
 	running_collection_indicator_timer_id2 = world.timer_manager.createTimer(

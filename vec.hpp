@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <numbers>
 
 #include "common.hpp"
 
@@ -19,6 +20,16 @@ struct vec<2> {
     float inv_mag = 1.0f / std::sqrt(std::pow(x, 2) + std::pow(y, 2));
     x = x * inv_mag;
     y = y * inv_mag;
+  }
+  vec2 rotate(float angle) {
+    // make it clockwise to align with transform rotations
+    angle = -(angle * (std::numbers::pi / 180));
+    float cos_theta = std::cos(angle);
+    float sin_theta = std::sin(angle);
+    return {
+      .x = (cos_theta * x - sin_theta * y),
+      .y = (sin_theta * x + cos_theta * y)
+    };
   }
   vec2 operator+(const vec2& other) {
     return {

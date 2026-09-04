@@ -91,7 +91,12 @@ BitmapFontWord makeBitmapWord(
   std::vector<u32> letter_ids;
   Transform curr_letter_transform = origin;
   u32 letter_width = font.cellw * origin.scale.x;
-  curr_letter_transform.pos.x -= (letter_width * (word.size() - 1)) / 2;
+  vec2 letter_offset = {
+    .x = font.cellw * origin.scale.x,
+    .y = 0
+  };
+  letter_offset = letter_offset.rotate(origin.rot);
+  curr_letter_transform.pos = curr_letter_transform.pos - (letter_offset * (word.size() - 1)) / 2;
   for (char c : word) {
     u32 sprite_sheet_index = font.glyph_map[c];
     i32 row = static_cast<u8>(sprite_sheet_index) / font.cols;
@@ -104,9 +109,10 @@ BitmapFontWord makeBitmapWord(
       curr_letter_transform,
       letter_sprite
     ));
-    curr_letter_transform.pos.x += letter_width;
+    curr_letter_transform.pos = curr_letter_transform.pos + letter_offset;
   }
   return BitmapFontWord{
     letter_ids
   };
 }
+
