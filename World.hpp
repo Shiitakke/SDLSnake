@@ -5,6 +5,7 @@
 #include "TimelineManager.hpp"
 #include "IScene.hpp"
 #include "Camera.hpp"
+#include "SoundManager.hpp"
 #include "TimerManager.hpp"
 
 class IAIController;
@@ -31,6 +32,7 @@ public:
   IScene* current_scene = nullptr;
   Camera camera;
   TextureManager texture_manager;
+  SoundManager sound_manager;
   TimelineManager timeline_manager;
   TimerManager timer_manager;
   std::vector<IAIController*> ai_controllers;

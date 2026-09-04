@@ -1,6 +1,7 @@
 #include "SnakeObject.hpp"
 
 #include "assets.hpp"
+#include "AudioSystem.hpp"
 #include "BoardObject.hpp"
 #include "CollisionBox.hpp"
 #include "LinearVelocity.hpp"
@@ -173,6 +174,7 @@ std::tuple<SnakeObject::SnakeDir, BoardObject::BoardPos> SnakeObject::getNextPos
 
 // Kills the snake, destroying all segments and respawning it a while later
 void SnakeObject::killSnake() {
+	AudioSystem::instance().playSound(explosion_2_sound_path);
 	// segments
 	for (SnakeSegment& ss : segments) {
 		world.ecs.destroyEntity(ss.id);

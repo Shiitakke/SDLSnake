@@ -10,6 +10,7 @@
 #include "util.hpp"
 
 #include "AngularVelocity.hpp"
+#include "AudioSystem.hpp"
 #include "CollisionBox.hpp"
 #include "ComponentManager.hpp"
 #include "EntityComponentSystem.hpp"
@@ -211,6 +212,7 @@ void init() {
 		world.ecs.getComponentManager<Transform>(),
 		world.ecs.getComponentManager<CollisionBox>()
 	);
+	AudioSystem::instance().setSoundManager(world.sound_manager);
 	world.loadScene<TitleScreenScene>();
 }
 
