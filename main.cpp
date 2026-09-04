@@ -101,6 +101,7 @@ int main(int argc, char* args[]) {
 					world.ecs.getComponentManager<AngularVelocity>()
 				);
 				physics_system->update();
+				AudioSystem::instance().resolve();
 			}
 			period -= TIME_STEP;			
 		}

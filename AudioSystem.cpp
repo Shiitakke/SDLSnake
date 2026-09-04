@@ -10,9 +10,16 @@ AudioSystem& AudioSystem::instance() {
 }
 
 void AudioSystem::playSound(const std::string& path) {
-  if (Mix_PlayChannel(-1, sound_manager->getChunk(path), 0) == -1) {
-    printf("Could not play audio. %s\n", Mix_GetError());
-  };
+  queued_sounds.emplace(path);
+}
+
+void AudioSystem::resolve() {
+  for (std::string path : queued_sounds) {
+    if (Mix_PlayChannel(-1, sound_manager->getChunk(path), 0) == -1) {
+      printf("Could not play audio. %s\n", Mix_GetError());
+    };
+  }
+  queued_sounds.clear();
 }
 
 AudioSystem::AudioSystem() {
