@@ -5,29 +5,37 @@
 #include "util.hpp"
 
 #include "Transform.hpp"
-
-Transform lerp(
-  const Transform& a, 
-  const Transform& b, 
-  float delta
-) {
-	return Transform { 
-    .pos = lerp(a.pos, b.pos, delta),
-		.scale = lerp(a.scale, b.scale, delta),
-		.rot = std::lerp(a.rot, b.rot, delta)
-	};
-}
-
-vec2 lerp(
-  const vec2& a, 
-  const vec2& b, 
-  float delta
-) {
-	return vec2	{	
-    .x = std::lerp(a.x, b.x, delta),
-		.y = std::lerp(a.y, b.y, delta)
-	};
-}
+//
+//Transform lerp(
+//  const Transform& a, 
+//  const Transform& b, 
+//  float delta
+//) {
+//	return Transform { 
+//    .pos = lerp(a.pos, b.pos, delta),
+//		.scale = lerp(a.scale, b.scale, delta),
+//		.rot = std::lerp(a.rot, b.rot, delta)
+//	};
+//}
+//
+//vec2 lerp(
+//  const vec2& a, 
+//  const vec2& b, 
+//  float delta
+//) {
+//	return vec2	{	
+//    .x = lerp(a.x, b.x, delta),
+//		.y = lerp(a.y, b.y, delta)
+//	};
+//}
+//
+//float lerp(
+//  const float a,
+//  const float b,
+//  const float delta
+//) {
+//  return a + (b - a) * delta;
+//}
 
 // h as an angle, s and v as percentages
 std::tuple<u8, u8, u8> hsvTorgb(double h, double s, double v) {
