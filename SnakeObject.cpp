@@ -7,13 +7,13 @@
 #include "BoardObject.hpp"
 #include "CollisionBox.hpp"
 #include "IAudioSystem.hpp"
-#include "LinearVelocity.hpp"
 #include "SnakeGameScene.hpp"
 #include "Sprite.hpp"
 #include "SpriteAnim.hpp"
 #include "Transform.hpp"
 #include "util.hpp"
 #include "World.hpp"
+#include "Velocity.hpp"
 
 SnakeObject::SnakeObject(
 	World& _world,
@@ -186,24 +186,25 @@ void SnakeObject::killSnake() {
 	segments.clear();
 	paused = true;
 	// head collision
+	// Destroy box, but let transform linger for particle lerping
 	world.timeline_manager.destroyTimelineChecked(head_collision_timeline_id);
 	world.ecs.destroyComponent<CollisionBox>(head_collision_id);
-	World* world_ref = &world;
-	world.timer_manager.createTimer(
+	world.ecs.createEntity(
 		Timer{
-			.interval = scene.respawn_timer + 1000,
-			.callback = [=, head_c_id = (this->head_collision_id)]()->void{world_ref->ecs.destroyEntity(head_c_id);}
+			.interval = 5000,
+			.callback = [=, head_c_id = (this->head_collision_id)]()->void {world.ecs.destroyEntity(head_c_id);}
 		}
 	);
 	// respawn timer
-	world.timer_manager.createTimer(
-		Timer	{ 
+	world.ecs.createEntity(
+		Timer{
 			.interval = scene.respawn_timer,
 			.callback = [this]()->void {
-				world.timer_manager.destroyTimer(running_collection_total_reset_timer_id);
+				world.ecs.destroyEntity(running_collection_total_reset_timer_id);
 				this->init();
 				this->paused = false;
-			}
+			},
+			.repeats = false
 		}
 	);
 }
@@ -250,7 +251,8 @@ void SnakeObject::init() {
 	prev_head_collision_pos = board.boardPosToWorldPos(ss1_pos);
 	next_head_collision_pos = board.boardPosToWorldPos(ss2_pos);
 	createHeadCollisionTimeline();
-	running_collection_total_reset_timer_id = world.timer_manager.createTimer(
+
+	running_collection_total_reset_timer_id = world.ecs.createEntity(
 		Timer{
 			.interval = 500,
 			.callback = [=]()->void {
@@ -372,18 +374,18 @@ void SnakeObject::updateCollectionIndicator(
 		for (u32 id : running_collection_indicator2.sprite_ids) {
 			world.ecs.destroyEntity(id);
 		};
-		world.timer_manager.destroyTimer(running_collection_indicator_timer_id);
-		world.timer_manager.destroyTimer(running_collection_indicator_timer_id2);
+		world.ecs.destroyEntity(running_collection_indicator_timer_id);
+		world.ecs.destroyEntity(running_collection_indicator_timer_id2);
 		running_collection_indicator_exists = false;
 	};
 	// Create new indicator
 	// Setup words
 	running_collection_indicator_exists = true;
-	world.timer_manager.timers.components[world.timer_manager.timers.id_map[running_collection_total_reset_timer_id]].since_last_update = 0;
+	world.ecs.getc<Timer>(running_collection_total_reset_timer_id).since_last_update = 0.f;
 	running_collection_total += apple_particle_value;
 	Transform word_transform = world.ecs.getc<Transform>(head_collision_id);
 	float word_scale = std::cbrt(running_collection_total);
-	word_transform.scale = { .x = word_scale + 1, .y = word_scale + 1 };
+	word_transform.scale = { .x = word_scale, .y = word_scale};
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_real_distribution<float> vel_range{ -5.f, 5.f };
@@ -395,23 +397,31 @@ void SnakeObject::updateCollectionIndicator(
 	};
 	BitmapFontWord word = makeBitmapWord(testfont, world, std::to_string(running_collection_total), word_transform, letter_format);
 	letter_format.color_mod = { 255, 255, 255 };
-	word_transform.scale.x -= 1;
-	word_transform.scale.y -= 1;
 	BitmapFontWord word2 = makeBitmapWord(testfont, world, std::to_string(running_collection_total), word_transform, letter_format);
+	// increase scale of each letter of one word individually after the fact to make a semi stoke effect
+	for (u32 letter : word.sprite_ids) {
+		world.ecs.getc<Transform>(letter).scale.x += 1;
+		world.ecs.getc<Transform>(letter).scale.y += 1;
+		world.ecs.getNextc(letter).scale.x += 1;
+		world.ecs.getNextc(letter).scale.y += 1;
+	}
 	running_collection_indicator = word;
 	running_collection_indicator2 = word2;
-	LinearVelocity word_velocity = {
-		.velocity = {.x = 0, .y = 10},
-		.friction = 0.2f,
+	Velocity word_velocity = {
+		LinearVelocity{
+			.velocity = {.x = 0, .y = 10},
+			.friction = 0.2f,
+		}
 	};
-	word_velocity.velocity = word_velocity.velocity.rotate(word_rot);
+
+	word_velocity.linear_velocity.velocity = word_velocity.linear_velocity.velocity.rotate(word_rot);
 	// Now setup motion and destruction timer
 	for (u32 letter_id : word.sprite_ids) {
-		world.ecs.createComponent<LinearVelocity>(letter_id,
+		world.ecs.createComponent<Velocity>(letter_id,
 			word_velocity
 		);
 	}
-	running_collection_indicator_timer_id = world.timer_manager.createTimer(
+	running_collection_indicator_timer_id = world.ecs.createEntity(
 		Timer{
 			.interval = 600,
 			.callback = [=]()->void {
@@ -423,19 +433,19 @@ void SnakeObject::updateCollectionIndicator(
 		}
 	);
 	for (u32 letter_id : word2.sprite_ids) {
-		world.ecs.createComponent<LinearVelocity>(letter_id,
+		world.ecs.createComponent<Velocity>(letter_id,
 			word_velocity
 		);
 	}
-	running_collection_indicator_timer_id2 = world.timer_manager.createTimer(
+	running_collection_indicator_timer_id2 = world.ecs.createEntity(
 		Timer{
 			.interval = 600,
 			.callback = [=]()->void {
 				for (u32 letter_id : word2.sprite_ids) {
-				world.ecs.destroyEntity(letter_id);
-				running_collection_indicator_exists = false;					
+					world.ecs.destroyEntity(letter_id);
 				}
-			}
+				running_collection_indicator_exists = false;
+		}
 		}
 	);
 }

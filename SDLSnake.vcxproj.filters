@@ -179,9 +179,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AngularVelocity.hpp">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -192,9 +189,6 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="Transform.hpp">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="LinearVelocity.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="ComponentManager.hpp">
@@ -325,6 +319,9 @@
     </ClInclude>
     <ClInclude Include="SDLTextureFactory.hpp">
       <Filter>Header Files\Rendering\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="Velocity.hpp">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

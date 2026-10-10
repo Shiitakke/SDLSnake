@@ -15,14 +15,14 @@ u32 IdManager::getNextId() {
 
 void IdManager::reset() {
   for (u32 used_id : used_ids) {
-    ids.emplace_back(used_id);
+    ids.emplace_front(used_id);
   }
   used_ids.clear();
 }
 
 void IdManager::returnId(u32 id) {
   if (used_ids.contains(id)) {
-    ids.emplace_back(id);
+    ids.emplace_front(id);
     used_ids.erase(id);
   }
 }

@@ -34,7 +34,6 @@ public:
   TextureManager texture_manager;
   SoundManager sound_manager;
   TimelineManager timeline_manager;
-  TimerManager timer_manager;
   std::vector<IAIController*> ai_controllers;
   bool paused = false;
 

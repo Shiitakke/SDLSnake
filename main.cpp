@@ -2,14 +2,15 @@
 #include <SDL_timer.h>
 
 #include <stdio.h>
+#include <chrono>
 #include <unordered_map>
 #include <unordered_set>
+
 
 #include "assets.hpp"
 #include "common.hpp"
 #include "util.hpp"
 
-#include "AngularVelocity.hpp"
 #include "AudioService.hpp"
 #include "CollisionBox.hpp"
 #include "ComponentManager.hpp"
@@ -17,7 +18,6 @@
 #include "IAIController.hpp"
 #include "IAudioSystem.hpp"
 #include "InputSystem.hpp"
-#include "LinearVelocity.hpp"
 #include "PhysicsSystem.hpp"
 #include "SDLAudioSystem.hpp"
 #include "SDLRenderer.hpp"
@@ -28,12 +28,14 @@
 #include "TimerManager.hpp"
 #include "Transform.hpp"
 #include "TitleScreenScene.hpp"
+#include "Velocity.hpp"
 #include "World.hpp"
 
 void init();
 void deinit();
 void updateTimers(
-	TimerManager& timer_manager
+	EntityComponentSystem& ecs,
+	ComponentManager<Timer>& timers
 );
 void updateTimelines(
 	TimelineManager& timeline_manager
@@ -42,13 +44,9 @@ void updateAnims(
 	ComponentManager<SpriteAnim>& anims,
 	ComponentManager<Sprite>& sprites
 );
-void updateLinearVelocities(
+void updateVelocities(
 	ComponentManager<Transform>& transforms,
-	ComponentManager<LinearVelocity>& linear_velocities
-);
-void updateAngularVelocities(
-	ComponentManager<Transform>& transforms,
-	ComponentManager<AngularVelocity>& angular_velocities
+	ComponentManager<Velocity>& velocities
 );
 
 bool quit = false;
@@ -60,11 +58,14 @@ PhysicsSystem* physics_system;
 int main(int argc, char* args[]) {
 	init();
 
-	SDL_Event e;
-	u64 start = SDL_GetTicks64();
+	u64 start =
+		std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::steady_clock::now().time_since_epoch()
+		).count();
 	u64 end = start;
 	float period = 0;
-	
+
+	SDL_Event e;	
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
 			InputSystem::instance().queueEvent(e);
@@ -75,7 +76,7 @@ int main(int argc, char* args[]) {
 				rendering_system->handleWindowResize();
 			}
 		}
-			
+
 		while (period > TIME_STEP) {
 			InputSystem::instance().processEvents();
 			
@@ -88,19 +89,20 @@ int main(int argc, char* args[]) {
 
 			if (!world.paused) {
 				world.updateScene();
-				updateTimers(world.timer_manager);
-				updateTimelines(world.timeline_manager);
+				updateTimers(
+					world.ecs,
+					world.ecs.getComponentManager<Timer>()
+				);
+				updateTimelines(
+					world.timeline_manager
+				);
 				updateAnims(
 					world.ecs.getComponentManager<SpriteAnim>(),
 					world.ecs.getComponentManager<Sprite>()
 				);
-				updateLinearVelocities(
+				updateVelocities(
 					world.ecs.getComponentManager<Transform>(),
-					world.ecs.getComponentManager<LinearVelocity>()
-				);
-				updateAngularVelocities(
-					world.ecs.getComponentManager<Transform>(),
-					world.ecs.getComponentManager<AngularVelocity>()
+					world.ecs.getComponentManager<Velocity>()
 				);
 				physics_system->update();
 				AudioService::service()->resolve();
@@ -108,7 +110,11 @@ int main(int argc, char* args[]) {
 			period -= TIME_STEP;			
 		}
 		rendering_system->render(period / TIME_STEP);
-		end = SDL_GetTicks64();
+		
+		end = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::steady_clock::now().time_since_epoch()
+		).count();
+
 		period += (end - start) * game_speed_scalar;
 		start = end;
 	}
@@ -117,18 +123,29 @@ int main(int argc, char* args[]) {
 }
 
 void updateTimers(
-	TimerManager& timer_manager
+	EntityComponentSystem& ecs,
+	ComponentManager<Timer>& timers
 ) {
-	for (i32 i = 0; i < timer_manager.timers.n_components; ++i) {
-		Timer& timer = timer_manager.timers.components[i];
+	for (i32 i = 0; i < timers.n_components; ++i) {
+		Timer& timer = timers.components[i];
 		timer.since_last_update += TIME_STEP * !timer.paused;
 		while (timer.since_last_update >= timer.interval) {
-			timer.callback();
+			u32 timerid = timers.idFromIndex(i);
 			timer.since_last_update -= timer.interval;
+			// timer callback may destroy itself via destroyEntity()
+			// so we can save the callback, destroy it safely and we're good
+			// if the callback destroys itself via destroyComponent<timer>, 
+			// then thats just user error and lets not account for it
+			std::function<void()> callback = timer.callback;
 			if (!timer.repeats) {
-				timer_manager.destroyTimer(timer.id);
+				if (ecs.component_counts[timerid] == 1) {
+					ecs.destroyEntity(timerid);
+				} else {
+					timers.destroyComponent(timerid);
+				}
 				--i;
 			}
+			callback();
 		}
 	}
 }
@@ -172,36 +189,22 @@ void updateAnims(
 	}
 }
 
-void updateLinearVelocities(
+void updateVelocities(
 	ComponentManager<Transform>& transforms,
-	ComponentManager<LinearVelocity>& linear_velocities
+	ComponentManager<Velocity>& velocities
 ) {
 	#pragma omp parallel for
-	for (i32 i = 0; i < linear_velocities.n_components; ++i) {
-		LinearVelocity& v = linear_velocities.components[i];
-		Transform& t = transforms.getNextComponent(linear_velocities.idFromIndex(i));
-		t.pos = t.pos + v.velocity;
-		v.velocity = v.acceleration + v.velocity * (1 - v.friction);
-	}
-}
-
-void updateAngularVelocities(
-	ComponentManager<Transform>& transforms,
-	ComponentManager<AngularVelocity>& angular_velocities
-) {
-	#pragma omp parallel for
-	for (i32 i = 0; i < angular_velocities.n_components; ++i) {
-		AngularVelocity& v = angular_velocities.components[i];
-		Transform& t = transforms.getNextComponent(angular_velocities.idFromIndex(i));
-		t.rot = t.rot + v.velocity;
-		v.velocity = v.acceleration + v.velocity * (1 - v.friction);
+	for (i32 i = 0; i < velocities.n_components; ++i) {
+		Velocity& v = velocities.components[i];
+		Transform& t = transforms.getNextComponent(velocities.idFromIndex(i));
+		v.linear_velocity.velocity = v.linear_velocity.acceleration + v.linear_velocity.velocity * (1 - v.linear_velocity.friction);
+		t.pos = t.pos + v.linear_velocity.velocity;
+		v.angular_velocity.velocity = v.angular_velocity.acceleration + v.angular_velocity.velocity * (1 - v.angular_velocity.friction);
+		t.rot = t.rot + v.angular_velocity.velocity;
 	}
 }
 
 void init() {
-	u32 cameraid = world.ecs.getNextId();
-	world.camera.id = cameraid;
-	world.ecs.createComponent<Transform>(cameraid, { });
 	rendering_system = new SDLRenderer(
 		world.ecs.getComponentManager<Transform>(),
 		world.ecs.getComponentManager<Sprite>(),
@@ -215,8 +218,9 @@ void init() {
 		world.ecs.getComponentManager<Transform>(),
 		world.ecs.getComponentManager<CollisionBox>()
 	);
-	IAudioSystem* audio_system = new SDLAudioSystem(world.sound_manager);
-	AudioService::registerService(audio_system);
+	AudioService::registerService(
+		new SDLAudioSystem(world.sound_manager)
+	);
 	world.loadScene<TitleScreenScene>();
 }
 

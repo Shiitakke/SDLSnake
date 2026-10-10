@@ -9,8 +9,6 @@
 #include "BuyScreenObject.hpp"
 #include "Sprite.hpp"
 #include "SpriteAnim.hpp"
-#include "LinearVelocity.hpp"
-#include "AngularVelocity.hpp"
 #include "CollisionBox.hpp"
 #include "World.hpp"
 #include "IAudioSystem.hpp"
@@ -21,6 +19,7 @@
 #include "PauseController.hpp"
 #include "Timer.hpp"
 #include "util.hpp"
+#include "Velocity.hpp"
 
 void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	this->world = &(world);
@@ -69,7 +68,7 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	testfont.glyph_map[' '] = 88;
 
 	// board init
-	ecs->createEntity(
+	u32 boardid = ecs->createEntity(
 		Transform{ .scale = {31.25, 31.25} },
 		Sprite{ 
 			.sprite_path = board_sprite_path,
@@ -78,7 +77,8 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 			.zindex = 9
 		}
 	);
-	// Player snake
+
+	//Player snake
 	snakes.push_back(
 		new SnakeObject(
 			world,
@@ -166,8 +166,6 @@ void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id, SnakeObject*
 				AudioService::service()->playSound(thud_sound_path);
 				// Clean up apple particle entity
 				ecs->destroyEntity(particle_id);
-				this->world->timer_manager.destroyTimer(this->particles[particle_id]);
-				this->particles.erase(particle_id);
 				this->current_score += apple_particle_value;
 			},
 			.delta_curve = [](float delta)->float {
@@ -252,46 +250,54 @@ void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 				.texture_id = texture_manager->getTextureid(apple_sprite_path),
 				.src_rect = {view_range(mt), view_range(mt), 8, 8}
 			},
-			LinearVelocity{ 
-				.velocity = vel_vec,
-				.friction = 0.1f
-			},
-			AngularVelocity{ 
-				.velocity = rot_range(mt)
+			Velocity{
+				LinearVelocity{
+					.velocity = vel_vec,
+					.friction = 0.1f
+				},
+				AngularVelocity{
+					.velocity = rot_range(mt)
+				}
+			}
+			//Timer{
+			//	.interval = 120000,
+			//	.callback = [=]()->void {
+			//		this->ecs->destroyEntity(new_particle_id);
+			//	}
+			//}
+		);
+		ecs->createComponent<Timer>(new_particle_id,
+			Timer{
+				.interval = 120000,
+				.callback = [=]()->void {
+					this->ecs->destroyEntity(new_particle_id);
+				}
 			}
 		);
-	u32 particle_cleanup_timer_id = world->timer_manager.createTimer(
-		Timer{
-			.interval = 120000,
-			.callback = [=]()->void {
-				this->ecs->destroyEntity(new_particle_id);
-				this->particles.erase(new_particle_id);
-			},
-		}
-	);
-
-		particles.emplace(new_particle_id, particle_cleanup_timer_id);
 		apple_ids.push_back(new_particle_id);
 	}
-	world->timer_manager.createTimer(
-		Timer{	
-			.interval = 500,
-			.callback = [this, apple_ids]()->void {
-				for (u32 id : apple_ids) {
-					this->world->ecs.createComponent(id, 
-						CollisionBox{ 
-							.extent = {.x = 15, .y = 15}, 
-							.channels = static_cast<CollisionChannel::Channel>(
-								CollisionChannel::c1 | 
-								SnakeGameScene::apple_particle_collision_channel
-							) 
-						}
-					);
+
+	// delay particle collision creation
+	auto particle_collision_creation_timer = [this, apple_ids]()->void {
+		for (u32 id : apple_ids) {
+			this->world->ecs.createComponent(id,
+				CollisionBox{
+					.extent = {.x = 15, .y = 15},
+					.channels = static_cast<CollisionChannel::Channel>(
+						CollisionChannel::c1 |
+						SnakeGameScene::apple_particle_collision_channel
+					)
 				}
-			},
+			);
+		}
+	};
+
+	world->ecs.createEntity(
+		Timer{
+			.interval = 500,
+			.callback = particle_collision_creation_timer
 		}
 	);
-
 }
 
 SpriteColorMod SnakeGameScene::getNewSnakeColor() {

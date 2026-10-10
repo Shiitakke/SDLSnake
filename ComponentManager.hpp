@@ -67,6 +67,10 @@ public:
 
   void reset() override {
     n_components = 0;
+    for (i32 i = 0; i < 5000; ++i) {
+      id_map[i] = -1;
+      entity_map[i] = -1;
+    }
   }
 
   u32 n_components = 0;
@@ -132,6 +136,10 @@ public:
   
   void reset() override {
     n_components = 0;
+    for (i32 i = 0; i < 5000; ++i) {
+      id_map[i] = -1;
+      entity_map[i] = -1;
+    }
   }
 
   u32 n_components = 0;
@@ -208,6 +216,10 @@ public:
 
   void reset() override {
     n_components = 0;
+    for (i32 i = 0; i < 5000; ++i) {
+      id_map[i] = -1;
+      entity_map[i] = -1;
+    }
   }
 
   u32 n_components = 0;

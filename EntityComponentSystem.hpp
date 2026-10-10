@@ -35,11 +35,13 @@ public:
   template <typename T>
   void createComponent(u32 id, T component) {
     getComponentManager<T>().createComponent(id, component);
+    component_counts[id]++;
   }
 
   template <typename T>
   void destroyComponent(u32 id) {
     getComponentManager<T>().destroyComponent(id);
+    component_counts[id]++;
   }
 
   template <typename T>
@@ -61,6 +63,7 @@ public:
       key.second->destroyEntity(id);
     }
     id_manager.returnId(id);
+    component_counts[id] = 0;
   }
 
   template <typename T>
@@ -78,11 +81,16 @@ public:
       key.second->reset();
     }
     id_manager.reset();
+    for (i32 i = 0; i < 5000; ++i) {
+      component_counts[i] = 0;
+    }
   }
 
   u32 returnId(u32 id) {
     id_manager.returnId(id);
   }
+
+  std::array<i32, 5000> component_counts; // tracks number of components an entity has
 
 private:
   IdManager id_manager;

@@ -32,7 +32,7 @@ void ShopMenuController::handleEvent(const SDL_Event& e) {
 
 // Moves camera to game screen, and removes this ShopMenuController
 void ShopMenuController::moveToGameScreen() {
-	Transform& camera_transform = world.ecs.getNextc(world.camera.id);
+	Transform& camera_transform = world.camera.next;
 	Transform end_transform;
 	end_transform.pos = game_scene_origin;
 	// push to stop this from running twice, then we pop twice later on to return to the scene

@@ -31,7 +31,7 @@ void BuyController::handleEvent(const SDL_Event& e) {
 
 // Moves camera to buy menu location, then adds a shop menu controller
 void BuyController::moveToBuyMenu() {
-	Transform& camera_transform = world.ecs.getNextc(world.camera.id);
+	Transform& camera_transform = world.camera.next;
 	Transform end_transform;
 	end_transform.pos = buy_screen_origin;
 	InputSystem::instance().pushContext(); // stop this from running twice

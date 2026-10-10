@@ -61,8 +61,6 @@ private:
 	SpriteColorMod getNewSnakeColor();
 	void updateSnakes();
 
-	//std::unordered_set<u32> particles = {};
-	std::unordered_map<u32, u32> particles = {};
 	BitmapFont testfont;
 	World* world = nullptr;
 	EntityComponentSystem* ecs = nullptr;

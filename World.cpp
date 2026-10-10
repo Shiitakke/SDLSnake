@@ -16,11 +16,9 @@ void World::reset() {
   ecs.reset();
   texture_manager.unloadAll();
   timeline_manager.clearTimelines();
-  timer_manager.clearTimers();
   for (IAIController* ai_controller : ai_controllers) {
     delete ai_controller;
   }
   ai_controllers.clear();
   paused = false;
-  camera.id = ecs.createEntity(Transform{});
 }

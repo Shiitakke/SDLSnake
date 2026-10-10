@@ -186,7 +186,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AISnakeController.hpp" />
-    <ClInclude Include="AngularVelocity.hpp" />
     <ClInclude Include="assets.hpp" />
     <ClInclude Include="AudioService.hpp" />
     <ClInclude Include="BitmapFont.hpp" />
@@ -232,7 +231,7 @@
     <ClInclude Include="IUserController.hpp" />
     <ClInclude Include="util.hpp" />
     <ClInclude Include="vec.hpp" />
-    <ClInclude Include="LinearVelocity.hpp" />
+    <ClInclude Include="Velocity.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

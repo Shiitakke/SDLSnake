@@ -42,8 +42,8 @@ void SDLRenderer::render(float delta) {
 	SDL_RenderClear(renderer);
 
 	const Transform camera_transform = lerp(
-		transforms.getComponent(camera.id),
-		transforms.getNextComponent(camera.id),
+		camera.curr,
+		camera.next,
 		delta
 	);
 
