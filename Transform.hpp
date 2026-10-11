@@ -1,5 +1,4 @@
 #pragma once
-#include <SDL.h>
 
 #include "vec.hpp"
 
@@ -13,6 +12,6 @@ struct Transform {
       pos == other.pos &&
       scale == other.scale &&
       rot == other.rot
-      );
+    );
   }
 };

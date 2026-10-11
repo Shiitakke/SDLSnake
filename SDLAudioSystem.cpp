@@ -1,5 +1,7 @@
 #include "SDLAudioSystem.hpp"
 
+#include <SDL3_mixer/SDL_mixer.h>
+
 #include "SDLSoundFactory.hpp"
 #include "SoundManager.hpp"
 
@@ -8,17 +10,21 @@ SDLAudioSystem::SDLAudioSystem(
 ) :
   sound_manager(_sound_manager)
 {
-  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048)) {
-    printf("Failed to initialise SDL mixer. %s\m", Mix_GetError());
+  if (!MIX_Init()) {
+    printf("Failed to initialise SDL mixer. %s\m", SDL_GetError());
   };
-  Mix_AllocateChannels(64);
+  mixer = MIX_CreateMixerDevice(
+    SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK,
+    nullptr
+  );
+  MIX_CreateTrack(mixer);
   sound_manager.setSoundFactory(new SDLSoundFactory());
 }
 
 SDLAudioSystem::~SDLAudioSystem() {
   sound_manager.unloadAll();
-  Mix_CloseAudio();
-  Mix_Quit();
+  MIX_DestroyMixer(mixer);
+  MIX_Quit();
 }
 
 void SDLAudioSystem::playSound(const std::string& path) {
@@ -27,14 +33,12 @@ void SDLAudioSystem::playSound(const std::string& path) {
 
 void SDLAudioSystem::resolve() {
   for (std::string path : sound_queue) {
-    if (
-      Mix_PlayChannel(
-        -1, 
-        static_cast<Mix_Chunk*>(sound_manager.getSound(path)), 
-        0
-      ) == -1) {
-      printf("Could not play audio. %s\n", Mix_GetError());
-    };
+    if (!MIX_PlayAudio(
+      mixer,
+      static_cast<MIX_Audio*>(sound_manager.getSound(path))
+    )) {
+      printf("Could not play audio. %s\n", SDL_GetError());
+    }
   }
   sound_queue.clear();
 }

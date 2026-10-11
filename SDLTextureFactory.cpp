@@ -1,42 +1,47 @@
 #include "SDLTextureFactory.hpp"
 
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include "Texture.hpp"
 
 SDLTextureFactory::SDLTextureFactory(SDL_Renderer* _renderer) :
   renderer(_renderer)
 {
-  i32 img_flags = IMG_INIT_PNG;
-  if (!(IMG_Init(img_flags) & img_flags)) {
-    printf("Failed to initialize SDL image. %s\n", IMG_GetError());
-  };
+
 }
 
 SDLTextureFactory::~SDLTextureFactory() {
-  IMG_Quit();
 }
 
 Texture SDLTextureFactory::loadTexture(const std::string& path) {
   bool success = true;
   SDL_Surface* s = IMG_Load(path.c_str());
+  float w = 0;
+  float h = 0;
   if (s == nullptr) {
-    printf("Failed to load surface. %s\n", IMG_GetError());
-  }
+    printf("Failed to load surface. %s\n", SDL_GetError());
+  } else {
+    w = s->w;
+    h = s->h;
+  }  
 
   SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, s);
   if (t == nullptr) {
     printf("Failed to create texture from surface. %s\n", SDL_GetError());
+  } else {
+    SDL_SetTextureScaleMode(
+      t,
+      SDL_SCALEMODE_PIXELART
+    );
   }
 
-  i32 w = s->w;
-  i32 h = s->h;
-  SDL_FreeSurface(s);
+  SDL_DestroySurface(s);
 
-  return Texture{ .t = t,
-                  .w = s->w,
-                  .h = s->h
-                };
+  return Texture{ 
+    .t = t,
+    .w = w,
+    .h = h
+   };
 };
 
 void SDLTextureFactory::unloadTexture(Texture& texture) {

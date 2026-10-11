@@ -28,8 +28,8 @@ UnpauseController::UnpauseController(
 }
 
 void UnpauseController::handleEvent(const SDL_Event& e) {
-  if (e.type == SDL_KEYDOWN) {
-    switch (e.key.keysym.sym) {
+  if (e.type == SDL_EVENT_KEY_DOWN) {
+    switch (e.key.key) {
     case SDLK_LEFT:
       curr_selection = (std::max(curr_selection - 1, 0));
       changeSelection();
@@ -48,7 +48,7 @@ void UnpauseController::handleEvent(const SDL_Event& e) {
         break;
       case RetryMenuSelection::QUIT:
         SDL_Event quit_e;
-        quit_e.type = SDL_QUIT;
+        quit_e.type = SDL_EVENT_QUIT;
         SDL_PushEvent(&quit_e);
         break;
       }

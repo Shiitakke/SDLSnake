@@ -1,5 +1,7 @@
 #include "SDLRenderer.hpp"
 
+#include <SDL3/SDL.h>
+
 #include "util.hpp"
 
 SDLRenderer::SDLRenderer(
@@ -19,11 +21,19 @@ SDLRenderer::SDLRenderer(
 	internal_screen_width(_internal_screen_width),
 	internal_screen_height(_internal_screen_height)
 {
-	window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, internal_screen_width, internal_screen_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow(
+		"Snake", 
+		internal_screen_width, 
+		internal_screen_height, 
+		SDL_WINDOW_RESIZABLE
+	);
 	if (window == nullptr) {
 		printf("Failed to create window. %s", SDL_GetError());
 	}
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	renderer = SDL_CreateRenderer(
+		window,
+		nullptr
+	);
 	if (renderer == nullptr) {
 		printf("Failed to create renderer. %s", SDL_GetError());
 	}
@@ -31,7 +41,7 @@ SDLRenderer::SDLRenderer(
 };
 
 SDLRenderer::~SDLRenderer() {
-	texture_manager.setRenderer(nullptr);
+	//texture_manager.setRenderer(nullptr);
 	texture_manager.unloadAll();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -54,9 +64,9 @@ void SDLRenderer::render(float delta) {
 			transforms.getNextComponent(views.idFromIndex(i)),
 			delta
 		);
-		const SDL_Rect src_rect = view.src_rect;
+		const SDL_FRect src_rect = view.src_rect;
 		// Start at middle of viewport, translate by camera, then translate by position, center based on scale, multiply to scale from internal to actual size
-		const SDL_Rect dst_rect = {
+		const SDL_FRect dst_rect = {
 			(internal_screen_width / 2 -
 			(camera_transform.pos.x * view.parallax_factor) + view_transform.pos.x -
 			(src_rect.w * view_transform.scale.x / 2.f))
@@ -72,14 +82,14 @@ void SDLRenderer::render(float delta) {
 		};
 		SDL_Texture* texture = static_cast<SDL_Texture*>(texture_manager.getTexture(view.texture_id).t);
 		SDL_SetTextureColorMod(texture, view.color_mod.r, view.color_mod.g, view.color_mod.b);
-		SDL_RenderCopyEx(
+		SDL_RenderTextureRotated(
 			renderer,
 			texture,
 			&src_rect,
 			&dst_rect,
 			view_transform.rot,
 			NULL,
-			static_cast<SDL_RendererFlip>(view.flip_flags)
+			static_cast<SDL_FlipMode>(view.flip_flags)
 		);
 	}
 #ifdef _DEBUG
@@ -137,5 +147,5 @@ void SDLRenderer::handleWindowResize() {
 	const u32 vp_width = internal_screen_width * out_res_scale;
 	const u32 vp_height = internal_screen_height * out_res_scale;
 	SDL_Rect vp = { (external_screen_width / 2) - vp_width / 2, (external_screen_height / 2) - vp_height / 2, vp_width, vp_height };
-	SDL_RenderSetViewport(renderer, &vp);
+	SDL_SetRenderViewport(renderer, &vp);
 }

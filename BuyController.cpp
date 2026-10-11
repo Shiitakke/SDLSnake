@@ -20,9 +20,9 @@ BuyController::BuyController(
 };
 
 void BuyController::handleEvent(const SDL_Event& e) {
-	if (e.type == SDL_KEYDOWN) {
-		switch (e.key.keysym.sym) {
-		case SDLK_b:
+	if (e.type == SDL_EVENT_KEY_DOWN) {
+		switch (e.key.key) {
+		case SDLK_B:
 			moveToBuyMenu();
 			break;
 		}

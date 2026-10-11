@@ -1,6 +1,7 @@
 #pragma once
 
-#include <SDL.h>
+#include <SDL3/SDL_events.h>
+
 #include "common.hpp"
 #include "IUserController.hpp"
 

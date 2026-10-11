@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL3_mixer/SDL_mixer.h>
+
 #include <string>
 #include <unordered_set>
 
@@ -18,5 +20,6 @@ public:
 private:
   SoundManager& sound_manager;
   std::unordered_set<std::string> sound_queue;
+  MIX_Mixer* mixer;
 };
 

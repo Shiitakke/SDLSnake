@@ -1,5 +1,4 @@
-#include <SDL.h>
-#include <SDL_timer.h>
+#include <SDL3/SDL.h>
 
 #include <stdio.h>
 #include <chrono>
@@ -65,14 +64,16 @@ int main(int argc, char* args[]) {
 	u64 end = start;
 	float period = 0;
 
-	SDL_Event e;	
+	SDL_Event e;
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
 			InputSystem::instance().queueEvent(e);
-			if (e.type == SDL_QUIT) {
+			if (e.type == SDL_EVENT_QUIT) {
 				quit = true;
 			}
-			if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED) {
+			if (
+				e.type == SDL_EVENT_WINDOW_RESIZED
+			) {
 				rendering_system->handleWindowResize();
 			}
 		}

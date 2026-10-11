@@ -3,8 +3,8 @@
 #include "SnakeObject.hpp"
 
 void SnakeController::handleEvent(const SDL_Event& e) {
-	if (e.type == SDL_KEYDOWN) {
-		switch (e.key.keysym.sym) {
+	if (e.type == SDL_EVENT_KEY_DOWN) {
+		switch (e.key.key) {
 			case SDLK_UP:
 				controlled_snake.setDirection(SnakeObject::SnakeDir::UP);
 				break;

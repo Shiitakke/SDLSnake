@@ -1,8 +1,6 @@
 #include "SoundManager.hpp"
 
-#include <SDL_mixer.h>
 #include <string>
-#include <stdio.h>
 
 #include "ISoundFactory.hpp";
 

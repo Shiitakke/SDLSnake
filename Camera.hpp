@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SDL.h>
-
 #include "Transform.hpp"
 
 struct Camera {

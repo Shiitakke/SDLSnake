@@ -4,8 +4,8 @@
 #include "util.hpp"
 
 void TitleMenuController::handleEvent(const SDL_Event& e) {
-  if (e.type == SDL_KEYDOWN) {
-    switch (e.key.keysym.sym) {
+  if (e.type == SDL_EVENT_KEY_DOWN) {
+    switch (e.key.key) {
       case SDLK_DOWN:
         if (current_selection == MenuSelection::START) {
           current_selection = MenuSelection::END;
@@ -23,7 +23,7 @@ void TitleMenuController::handleEvent(const SDL_Event& e) {
           world.loadScene<SnakeGameScene>();
         } else {
           SDL_Event quit_e;
-          quit_e.type = SDL_QUIT;
+          quit_e.type = SDL_EVENT_QUIT;
           SDL_PushEvent(&quit_e);
         }
         break;

@@ -230,7 +230,7 @@ void SnakeGameScene::generateAppleParticles(u32 apple_id) {
 	const Transform apple_transform = ecs->getc<Transform>(apple_id);
 	std::random_device rd;
 	std::mt19937 mt(rd());
-	std::uniform_int_distribution<i32> view_range{ 0, 56 };
+	std::uniform_real_distribution<float> view_range{ 0, 56 };
 	std::uniform_real_distribution<float> vel_range{ -10., 10. };
 	std::uniform_real_distribution<float> vel_mag_range{ 3.5, 8.5 };
 	std::uniform_real_distribution<float> scale_range{ 1., 3. };

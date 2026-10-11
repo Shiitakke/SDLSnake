@@ -12,8 +12,8 @@ struct BitmapFont {
   // sprte sheet cell setup
   i32 rows;
   i32 cols;
-  i32 cellw;
-  i32 cellh;
+  float cellw;
+  float cellh;
   u8 glyph_map[128]; // maps acsii char value to font index
 };
 

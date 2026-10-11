@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL.h>
+#include <SDL3/SDL_rect.h>
 #include <String>
 
 #include "common.hpp"
@@ -22,7 +22,7 @@ struct SpriteColorMod {
 struct Sprite {
   std::string sprite_path;
   u32 texture_id;
-  SDL_Rect src_rect;
+  SDL_FRect src_rect; // TODO: Remove mention of sdl here
   u32 zindex = 10;
   SpriteFlip::SpriteFlip  flip_flags = SpriteFlip::NONE;
   float parallax_factor = 1.0f;

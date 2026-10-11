@@ -4,6 +4,6 @@
 
 struct Texture {
   void* t = nullptr; // static casted to needed underlying type in renderers
-  i32 w = 0;
-  i32 h = 0;
+  float w = 0;
+  float h = 0;
 };
