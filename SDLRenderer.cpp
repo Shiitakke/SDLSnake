@@ -102,7 +102,7 @@ void SDLRenderer::render(float delta) {
 			delta
 		);
 		// Start at middle of viewport, translate by camera, then translate by position, center based on scale, multiply to scale from internal to actual size
-		const SDL_Rect dst_rect = {
+		const SDL_FRect dst_rect = {
 			(internal_screen_width / 2 -
 			(camera_transform.pos.x) + box_transform.pos.x -
 			(box.extent.x / 2.f))
@@ -123,7 +123,7 @@ void SDLRenderer::render(float delta) {
 		else {
 			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 		}
-		SDL_RenderDrawRect(renderer, &dst_rect);
+		SDL_RenderRect(renderer, &dst_rect);
 	}
 #endif
 

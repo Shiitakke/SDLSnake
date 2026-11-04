@@ -42,30 +42,7 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	world.sound_manager.loadSound(thud_sound_path);
 
 	// setup font to use
-	texture_manager.loadTexture(font_test);
-	u32 font_id = world.texture_manager.getTextureid(font_test);
-
-	testfont.texture_id = font_id;
-	testfont.font_path = font_test;
-	testfont.rows = 7;
-	testfont.cols = 13;
-	testfont.cellw = 6;
-	testfont.cellh = 10;
-
-	i32 i = 0;
-	for (char c = 'A'; c <= 'Z'; ++c) {
-		testfont.glyph_map[c] = i;
-		++i;
-	}
-	for (char c = 'a'; c <= 'z'; ++c) {
-		testfont.glyph_map[c] = i;
-		++i;
-	}
-	for (char c = '0'; c <= '9'; ++c) {
-		testfont.glyph_map[c] = i;
-		++i;
-	}
-	testfont.glyph_map[' '] = 88;
+	testfont = loadBitmapFontFromXML("./assets/fonts/CleanBasic.xml", world.texture_manager).value();
 
 	// board init
 	u32 boardid = ecs->createEntity(

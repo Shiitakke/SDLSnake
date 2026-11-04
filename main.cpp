@@ -5,10 +5,12 @@
 #include <unordered_map>
 #include <unordered_set>
 
-
 #include "assets.hpp"
 #include "common.hpp"
 #include "util.hpp"
+
+#define PUGIXML_NO_EXCEPTIONS
+#include "pugixml.hpp"
 
 #include "AudioService.hpp"
 #include "CollisionBox.hpp"
@@ -29,6 +31,8 @@
 #include "TitleScreenScene.hpp"
 #include "Velocity.hpp"
 #include "World.hpp"
+
+#include "TestScene.hpp"
 
 void init();
 void deinit();
@@ -222,7 +226,7 @@ void init() {
 	AudioService::registerService(
 		new SDLAudioSystem(world.sound_manager)
 	);
-	world.loadScene<TitleScreenScene>();
+	world.loadScene<SnakeGameScene>();
 }
 
 void deinit() {

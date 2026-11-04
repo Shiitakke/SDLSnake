@@ -21,14 +21,14 @@ struct vec<2> {
     x = x * inv_mag;
     y = y * inv_mag;
   }
-  vec2 rotate(float angle) {
+  vec2 rotate(double angle) {
     // make it clockwise to align with transform rotations
     angle = -(angle * (std::numbers::pi / 180));
-    float cos_theta = std::cos(angle);
-    float sin_theta = std::sin(angle);
+    double cos_theta = std::cos(angle);
+    double sin_theta = std::sin(angle);
     return {
-      .x = (cos_theta * x - sin_theta * y),
-      .y = (sin_theta * x + cos_theta * y)
+      .x = float(cos_theta * x - sin_theta * y),
+      .y = float(sin_theta * x + cos_theta * y)
     };
   }
   vec2 operator+(const vec2& other) {
@@ -57,6 +57,16 @@ struct vec<2> {
       x == other.x &&
       y == other.y
     );
+  }
+  vec2& operator+=(const vec2& other) {
+    this->x += other.x;
+    this->y += other.y;
+    return *this;
+  }
+  vec2& operator-=(const vec2& other) {
+    this->x -= other.x;
+    this->y -= other.y;
+    return *this;
   }
 };
 

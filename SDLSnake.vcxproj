@@ -75,8 +75,8 @@
     <LibraryPath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_image-2.8.8\lib\x64;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_mixer-2.8.1\lib\x64;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2-2.32.10\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_image-2.8.8\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_mixer-2.8.1\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2-2.32.10\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_image-2.8.8\lib\x86;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_mixer-2.8.1\lib\x86;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2-2.32.10\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL3_mixer-3.2.4\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL3_image-3.4.8\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL3-3.4.18\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL3-3.4.18\lib\x86;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL3_image-3.4.8\lib\x86;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL3_mixer-3.2.4\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_image-2.8.8\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2_mixer-2.8.1\include;C:\Users\shiitakke\Documents\VisualStudioLibs\SDL2-2.32.10\include;$(IncludePath)</IncludePath>
@@ -100,7 +100,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_mixer.LIB;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL3.lib;SDL3_mixer.lib;SDL3_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -165,10 +165,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PauseController.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
+    <ClCompile Include="pugixml.cpp" />
     <ClCompile Include="SDLAudioSystem.cpp" />
     <ClCompile Include="SDLRenderer.cpp" />
     <ClCompile Include="SDLSoundFactory.cpp" />
     <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="UnpauseController.cpp" />
     <ClCompile Include="SDLTextureFactory.cpp" />
     <ClCompile Include="ShopMenuController.cpp" />
@@ -207,10 +209,13 @@
     <ClInclude Include="ITextureFactory.hpp" />
     <ClInclude Include="PauseController.hpp" />
     <ClInclude Include="PhysicsSystem.hpp" />
+    <ClInclude Include="pugiconfig.hpp" />
+    <ClInclude Include="pugixml.hpp" />
     <ClInclude Include="SDLAudioSystem.hpp" />
     <ClInclude Include="SDLRenderer.hpp" />
     <ClInclude Include="SDLSoundFactory.hpp" />
     <ClInclude Include="SoundManager.hpp" />
+    <ClInclude Include="TestScene.hpp" />
     <ClInclude Include="UnpauseController.hpp" />
     <ClInclude Include="SDLTextureFactory.hpp" />
     <ClInclude Include="ShopMenuController.hpp" />

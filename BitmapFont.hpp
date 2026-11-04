@@ -6,16 +6,25 @@
 #include "common.hpp"
 #include "Texture.hpp"
 
+struct BitmapChar {
+  u8 x;
+  u8 y;
+  u8 width;
+  u8 height;
+  i8 x_offset;
+  i8 y_offset;
+  u8 x_advance;
+};
+
 struct BitmapFont {
   u32 texture_id;
   std::string font_path;
-  // sprte sheet cell setup
-  i32 rows;
-  i32 cols;
-  float cellw;
-  float cellh;
-  u8 glyph_map[128]; // maps acsii char value to font index
+  u32 base = 0;
+  i8 x_spacing = 0;
+  i8 y_spacing = 0;
+  BitmapChar char_map[128];
 };
+
 
 // Word made from a bitmap font
 struct BitmapFontWord {

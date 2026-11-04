@@ -88,6 +88,18 @@
     <Filter Include="Source Files\Rendering">
       <UniqueIdentifier>{d46f6080-2f7b-4820-9093-a5ee0baac8ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Libraries">
+      <UniqueIdentifier>{fa45d146-985c-4f1a-9656-510955efa7e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Libraries\pugixml">
+      <UniqueIdentifier>{04c6fd20-bb0d-4926-8470-4165f2bd51ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Libraries">
+      <UniqueIdentifier>{1c1640a7-b4c5-4de7-a55d-46e8dcc7eee4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Libraries\pugixlm">
+      <UniqueIdentifier>{e129effc-7f80-492a-8975-8661266c9e4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -176,6 +188,12 @@
     </ClCompile>
     <ClCompile Include="SDLTextureFactory.cpp">
       <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pugixml.cpp">
+      <Filter>Source Files\Libraries\pugixlm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -322,6 +340,15 @@
     </ClInclude>
     <ClInclude Include="Velocity.hpp">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="TestScene.hpp">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="pugiconfig.hpp">
+      <Filter>Header Files\Libraries\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml.hpp">
+      <Filter>Header Files\Libraries\pugixml</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

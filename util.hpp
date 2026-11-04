@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <string>
 #include <tuple>
 
@@ -49,3 +50,8 @@ float lerp(
 ) {
   return a + (b - a) * delta;
 }
+
+std::optional<BitmapFont>loadBitmapFontFromXML(
+  std::string path,
+  TextureManager& texture_manager
+);
