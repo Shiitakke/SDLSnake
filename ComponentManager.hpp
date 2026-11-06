@@ -5,6 +5,8 @@
 #include <optional>
 
 #include "common.hpp"
+#include "Events.hpp"
+#include "EventSystem.hpp"
 #include "Transform.hpp"
 #include "Sprite.hpp"
 
@@ -53,6 +55,9 @@ public:
     entity_map[index_to_remove] = last_entity;
     --n_components;
     id_map[entity_to_remove] = -1;
+    EventSystem::instance().pub<OnComponentDestroy<T>>(
+      { .id = entity_to_remove }
+    );
   }
 
   void destroyEntity(u32 id) override {
@@ -118,6 +123,9 @@ public:
     entity_map[index_to_remove] = last_entity;
     --n_components;
     id_map[entity_to_remove] = -1;
+    EventSystem::instance().pub<OnComponentDestroy<Transform>>(
+      { .id = entity_to_remove }
+    );
   }
   
   bool exists(u32 id) {
@@ -148,8 +156,6 @@ public:
   std::array<i32, 5000> id_map; // maps entity ids to index
   std::array<i32, 5000> entity_map; // maps index to entity id
 };
-
-
 
 template <>
 class ComponentManager<Sprite> : public ComponentManagerInterface {
@@ -196,8 +202,10 @@ public:
       components[i] = components[i+1];
       entity_map[i] = entity_map[i+1];
       id_map[entity_map[i]]--;
-      
     }
+    EventSystem::instance().pub<OnComponentDestroy<Sprite>>(
+      { .id = entity_to_remove }
+    );
   }
 
   bool exists(u32 id) {

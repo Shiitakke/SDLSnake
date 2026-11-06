@@ -100,6 +100,9 @@
     <Filter Include="Source Files\Libraries\pugixlm">
       <UniqueIdentifier>{e129effc-7f80-492a-8975-8661266c9e4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Events">
+      <UniqueIdentifier>{bf13b601-8a27-4c84-91d0-d2f24f94058a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -349,6 +352,12 @@
     </ClInclude>
     <ClInclude Include="pugixml.hpp">
       <Filter>Header Files\Libraries\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="Events.hpp">
+      <Filter>Header Files\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="EventSystem.hpp">
+      <Filter>Header Files\Systems</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

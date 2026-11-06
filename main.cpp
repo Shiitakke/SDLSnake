@@ -33,6 +33,9 @@
 #include "World.hpp"
 
 #include "TestScene.hpp"
+#include "EventSystem.hpp"
+#include "Events.hpp"
+
 
 void init();
 void deinit();

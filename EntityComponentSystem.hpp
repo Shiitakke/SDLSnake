@@ -41,7 +41,7 @@ public:
   template <typename T>
   void destroyComponent(u32 id) {
     getComponentManager<T>().destroyComponent(id);
-    component_counts[id]++;
+    component_counts[id]--;
   }
 
   template <typename T>

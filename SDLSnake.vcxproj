@@ -199,6 +199,8 @@
     <ClInclude Include="common.hpp" />
     <ClInclude Include="ComponentManager.hpp" />
     <ClInclude Include="EntityComponentSystem.hpp" />
+    <ClInclude Include="Events.hpp" />
+    <ClInclude Include="EventSystem.hpp" />
     <ClInclude Include="IAIController.hpp" />
     <ClInclude Include="IAudioSystem.hpp" />
     <ClInclude Include="IdManager.hpp" />

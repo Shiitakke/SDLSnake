@@ -3,6 +3,9 @@
 #include <functional>
 #include <vector>
 
+#include "Events.hpp"
+#include "EventSystem.hpp"
+
 PhysicsSystem::PhysicsSystem(
   ComponentManager<Transform>& _transforms,
   ComponentManager<CollisionBox>& _colliders
@@ -10,7 +13,10 @@ PhysicsSystem::PhysicsSystem(
   transforms(_transforms),
   colliders(_colliders)
 {
-
+	EventSystem::instance().sub<OnComponentDestroy<CollisionBox>>([=](void* e)->void{
+		OnComponentDestroy<CollisionBox>* event = static_cast<OnComponentDestroy<CollisionBox>*>(e);
+		removeCollisionBox(event->id);
+	});
 }
 
 void PhysicsSystem::update() {
@@ -88,6 +94,7 @@ void PhysicsSystem::checkCollisions() {
 							) {
 							//Collision just ended
 							currently_colliding[entity_id].erase(currently_colliding[entity_id].find(other_id));
+							currently_colliding[other_id].erase(currently_colliding[other_id].find(entity_id));
 							callbacks.push_back({ box1.on_end_collision, other_id });
 							callbacks.push_back({ box2.on_end_collision, entity_id });
 						}
@@ -114,6 +121,17 @@ void PhysicsSystem::constructPartition() {
       spatial_partition[modified_t.pos].emplace(entity_id);
     }
   }
+}
+
+void PhysicsSystem::removeCollisionBox(u32 id) {
+	// iterate over the entire set, remove any entry mentioning it
+	if (currently_colliding.contains(id)) {
+		auto to_remove_from = currently_colliding[id];
+		for (auto removing_from : to_remove_from) {
+			currently_colliding[removing_from].erase(id);
+		}
+		currently_colliding.erase(currently_colliding.find(id));
+	};
 }
 
 Transform PhysicsSystem::roundTransformToCell(Transform t) {
