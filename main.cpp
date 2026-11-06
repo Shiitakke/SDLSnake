@@ -93,7 +93,7 @@ int main(int argc, char* args[]) {
 			}
 
 			ComponentManager<Transform>& transforms = world.ecs.getComponentManager<Transform>();
-			transforms.components = transforms.next_transforms;
+			rendering_system->updateState();
 
 			if (!world.paused) {
 				world.updateScene();
@@ -204,7 +204,7 @@ void updateVelocities(
 	#pragma omp parallel for
 	for (i32 i = 0; i < velocities.n_components; ++i) {
 		Velocity& v = velocities.components[i];
-		Transform& t = transforms.getNextComponent(velocities.idFromIndex(i));
+		Transform& t = transforms.getComponent(velocities.idFromIndex(i));
 		v.linear_velocity.velocity = v.linear_velocity.acceleration + v.linear_velocity.velocity * (1 - v.linear_velocity.friction);
 		t.pos = t.pos + v.linear_velocity.velocity;
 		v.angular_velocity.velocity = v.angular_velocity.acceleration + v.angular_velocity.velocity * (1 - v.angular_velocity.friction);

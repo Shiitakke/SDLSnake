@@ -11,6 +11,8 @@
 #include "util.hpp"
 
 #include "BitmapFont.hpp"
+#include "Events.hpp"
+#include "EventSystem.hpp"
 #include "TextureManager.hpp"
 #include "Transform.hpp"
 
@@ -169,7 +171,9 @@ BitmapFontWord makeBitmapWord(
   pos_delta.y = -(font.base / 2.0f);
   for (auto letterid : letter_ids) {
     world.ecs.getc<Transform>(letterid).pos -= pos_delta;
-    world.ecs.getNextc(letterid).pos -= pos_delta;
+    EventSystem::instance().pub<OverridePrevState>(
+      { .id = letterid }
+    );
   }
   return BitmapFontWord{
     letter_ids

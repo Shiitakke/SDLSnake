@@ -19,7 +19,7 @@ UnpauseController::UnpauseController(
   quit_option_id(_retry_quit_id),
   arrow_id(_arrow_id)
 {
-  Transform arrow_transform = world.ecs.getNextc(arrow_id);
+  Transform arrow_transform = world.ecs.getc<Transform>(arrow_id);
   selection_transforms[0] = world.ecs.getc<Transform>(resume_option_id);
   selection_transforms[1] = world.ecs.getc<Transform>(menu_option_id);
   selection_transforms[2] = world.ecs.getc<Transform>(quit_option_id);
@@ -72,13 +72,13 @@ UnpauseController::~UnpauseController() {
 }
 
 void UnpauseController::changeSelection() {
-  start_transform = world.ecs.getNextc(arrow_id);
+  start_transform = world.ecs.getc<Transform>(arrow_id);
   end_transform = selection_transforms[curr_selection];
   end_transform.pos.x -= 150;
   // Pausing the game pauses timelines
   // So for now, just teleport and figure out a better solution to pausing later
   // Most likely will need to be resolved with a seperation of game world and ui world
-  Transform& arrow_transform = world.ecs.getNextc(arrow_id);
+  Transform& arrow_transform = world.ecs.getc<Transform>(arrow_id);
   arrow_transform = end_transform;
   ///
   ///
@@ -92,6 +92,6 @@ void UnpauseController::changeSelection() {
 
 void UnpauseController::moveArrow(float delta) {
   Transform curr_pos = lerp(start_transform, end_transform, delta);
-  Transform& arrow_transform = world.ecs.getNextc(arrow_id);
+  Transform& arrow_transform = world.ecs.getc<Transform>(arrow_id);
   arrow_transform.pos = curr_pos.pos;
 }

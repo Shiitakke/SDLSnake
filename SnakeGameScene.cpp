@@ -129,10 +129,10 @@ void SnakeGameScene::collectParticle(u32 particle_id, u32 snake_id, SnakeObject*
 		Timeline{
 			.length = 550,
 			.on_update = [=](float delta)->void {
-				Transform& particle_t = world->ecs.getNextc(particle_id);
+				Transform& particle_t = world->ecs.getc<Transform>(particle_id);
 				// Snake could be dead
 				if (world->ecs.exists<Transform>(snake_id)) {
-					particle_t = lerp(particle_start_t, world->ecs.getNextc(snake_id), delta);
+					particle_t = lerp(particle_start_t, world->ecs.getc<Transform>(snake_id), delta);
 				}
 			},
 			.on_end = [=]()->void {

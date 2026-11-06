@@ -11,3 +11,8 @@ template <typename T>
 struct OnComponentDestroy {
   u32 id;
 };
+
+// Used when needing to disable rendering interpolation for a given entity
+struct OverridePrevState {
+  u32 id;
+};

@@ -49,9 +49,9 @@ public:
     return getComponentManager<T>().getComponent(id);
   }
 
-  Transform& getNextc(u32 id) {
-    return getComponentManager<Transform>().getNextComponent(id);
-  }
+  //Transform& getNextc(u32 id) {
+  //  return getComponentManager<Transform>().getNextComponent(id);
+  //}
 
   template <typename T>
   bool exists(u32 id) {

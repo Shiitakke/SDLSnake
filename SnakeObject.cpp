@@ -6,6 +6,8 @@
 #include "AudioService.hpp"
 #include "BoardObject.hpp"
 #include "CollisionBox.hpp"
+#include "Events.hpp"
+#include "EventSystem.hpp"
 #include "IAudioSystem.hpp"
 #include "SnakeGameScene.hpp"
 #include "Sprite.hpp"
@@ -77,20 +79,19 @@ void SnakeObject::updateSnake() {
 		}
 		u32 new_segment_id = createSnakeSegment({ 0, new_pos, in_dir, next_dir, SnakeSpriteType::STRAIGHT });
 		Transform& t = world.ecs.getc<Transform>(new_segment_id);
-		Transform& t_next = world.ecs.getNextc(new_segment_id);
 		switch (in_dir) {
 		case SnakeDir::DOWN:
 			t.rot += 90;
-			t_next.rot += 90;
 			[[fallthrough]];
 		case SnakeDir::RIGHT:
 			t.rot += 90;
-			t_next.rot += 90;
 			[[fallthrough]];
 		case SnakeDir::UP:
 			t.rot += 90;
-			t_next.rot += 90;
 		}
+		EventSystem::instance().pub<OverridePrevState>(
+			{ .id = new_segment_id }
+		);
 		prev_head_collision_pos = next_head_collision_pos;
 		next_head_collision_pos = board.boardPosToWorldPos(segments.back().pos);
 		createHeadCollisionTimeline();
@@ -216,7 +217,9 @@ void SnakeObject::init() {
 	u32 ss1_id = createSnakeSegment({ 0, ss1_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
 	createSnakeSegment({ 0, ss2_pos, SnakeDir::LEFT, SnakeDir::RIGHT, SnakeSpriteType::STRAIGHT });
 	world.ecs.getc<Transform>(ss1_id).rot = 180;
-	world.ecs.getNextc(ss1_id).rot = 180;
+	EventSystem::instance().pub<OverridePrevState>(
+		{ .id = ss1_id }
+	);
 
 	SpriteAnim& ss1_anim = world.ecs.getc<SpriteAnim>(ss1_id);
 	ss1_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
@@ -269,7 +272,7 @@ void SnakeObject::createHeadCollisionTimeline() {
 		Timeline{
 			.length = time_per_move,
 			.on_update = [=](float delta)->void {
-				Transform& t = world.ecs.getNextc(head_collision_id);
+				Transform& t = world.ecs.getc<Transform>(head_collision_id);
 				t.pos = lerp(prev_head_collision_pos, next_head_collision_pos, delta);
 			},
 		}
@@ -283,16 +286,13 @@ void SnakeObject::reverseTailAnimation() {
 	new_tail_anim.anim_graph = { 0, 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14 };
 	new_tail_anim.since_last_update = 0;
 	Transform& new_tail_transform = world.ecs.getc<Transform>(new_tail.id);
-	Transform& new_tail_next = world.ecs.getNextc(new_tail.id);
 	Sprite& new_tail_view = world.ecs.getc<Sprite>(new_tail.id);
 	if (new_tail.curr_type == SnakeSpriteType::STRAIGHT) {
 		new_tail_transform.rot += 180;
-		new_tail_next.rot += 180;
 		new_tail_anim.current_frame = 15;
 	}
 	else {
 		new_tail_transform.rot += 90;
-		new_tail_next.rot += 90;
 		new_tail_anim.current_frame = 7;
 		if (new_tail_view.flip_flags == SpriteFlip::VERTICAL) {
 			new_tail_view.flip_flags = static_cast<SpriteFlip::SpriteFlip>(SpriteFlip::HORIZONTAL | SpriteFlip::VERTICAL);
@@ -301,6 +301,9 @@ void SnakeObject::reverseTailAnimation() {
 			new_tail_view.flip_flags = SpriteFlip::VERTICAL;
 		}
 	}
+	EventSystem::instance().pub<OverridePrevState>(
+		{.id = new_tail.id}
+	);
 }
 
 // Sets the next direction the snake will take
@@ -402,8 +405,6 @@ void SnakeObject::updateCollectionIndicator(
 	for (u32 letter : word.sprite_ids) {
 		world.ecs.getc<Transform>(letter).scale.x += 1;
 		world.ecs.getc<Transform>(letter).scale.y += 1;
-		world.ecs.getNextc(letter).scale.x += 1;
-		world.ecs.getNextc(letter).scale.y += 1;
 	}
 	running_collection_indicator = word;
 	running_collection_indicator2 = word2;

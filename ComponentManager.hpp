@@ -31,6 +31,9 @@ public:
     id_map[id] = n_components;
     entity_map[n_components] = id;
     ++n_components;
+    EventSystem::instance().pub<OnComponentCreate<T>>(
+      { .id = id }
+    );
   }
 
   T& getComponent(u32 id) {
@@ -85,79 +88,6 @@ public:
 };
 
 template <>
-class ComponentManager<Transform> : public ComponentManagerInterface {
-public:
-  ComponentManager<Transform>() {
-    id_map.fill(-1);
-    entity_map.fill(-1);
-  };
-  ~ComponentManager<Transform>() = default;
-
-  void createComponent(u32 id, const Transform& component) {
-    components[n_components] = component;
-    next_transforms[n_components] = component;
-    id_map[id] = n_components;
-    entity_map[n_components] = id;
-    ++n_components;
-  }
-
-  Transform& getComponent(u32 id) {
-    return components[id_map[id]];
-  }
-  Transform& getNextComponent(u32 id) {
-    return next_transforms[id_map[id]];
-  }
-
-  // Given an index into the components array, returns the id of the component at the index
-  u32 idFromIndex(u32 index) {
-    return entity_map[index];
-  }
-
-  void destroyComponent(u32 entity_to_remove) {
-    u32 index_to_remove = id_map[entity_to_remove];
-    u32 last_index = n_components - 1;
-    components[index_to_remove] = components[last_index];
-    next_transforms[index_to_remove] = next_transforms[last_index];
-    u32 last_entity = entity_map[last_index];
-    id_map[last_entity] = index_to_remove;
-    entity_map[index_to_remove] = last_entity;
-    --n_components;
-    id_map[entity_to_remove] = -1;
-    EventSystem::instance().pub<OnComponentDestroy<Transform>>(
-      { .id = entity_to_remove }
-    );
-  }
-  
-  bool exists(u32 id) {
-    return id_map[id] != -1;
-  }
-
-  void destroyEntity(u32 id) override {
-    destroyComponentChecked(id);
-  }
-
-  void destroyComponentChecked(u32 id) {
-    if (exists(id)) {
-      destroyComponent(id);
-    }
-  }
-  
-  void reset() override {
-    n_components = 0;
-    for (i32 i = 0; i < 5000; ++i) {
-      id_map[i] = -1;
-      entity_map[i] = -1;
-    }
-  }
-
-  u32 n_components = 0;
-  std::array<Transform, 5000> components;
-  std::array<Transform, 5000> next_transforms;
-  std::array<i32, 5000> id_map; // maps entity ids to index
-  std::array<i32, 5000> entity_map; // maps index to entity id
-};
-
-template <>
 class ComponentManager<Sprite> : public ComponentManagerInterface {
 public:
   ComponentManager<Sprite>() {
@@ -183,6 +113,9 @@ public:
     id_map[id] = i;
     entity_map[i] = id;
     ++n_components;
+    EventSystem::instance().pub<OnComponentCreate<Sprite>>(
+      { .id = id }
+    );
   }
 
   Sprite& getComponent(u32 id) {

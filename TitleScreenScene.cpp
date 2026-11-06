@@ -73,7 +73,7 @@ void TitleScreenScene::initialise(World& world, TextureManager& texture_manager)
   IUserController* menu_controller = new TitleMenuController(
     ecs.getc<Transform>(start_option_id),
     ecs.getc<Transform>(quit_option_id),
-    ecs.getNextc(arrow_id),
+    ecs.getc<Transform>(arrow_id),
     world
   );
   InputSystem::instance().pushContext();

@@ -28,7 +28,9 @@ public:
 
   void render(float delta) override;
   void handleWindowResize();
+  void updateState();
 private:
+  ComponentManager<Transform> prev_state;
   ComponentManager<Transform>& transforms;
   ComponentManager<Sprite>& views;
   ComponentManager<CollisionBox>& collisions;

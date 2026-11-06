@@ -3,6 +3,9 @@
 #include <SDL3/SDL.h>
 
 #include "util.hpp"
+#include "Events.hpp"
+#include "EventSystem.hpp"
+
 
 SDLRenderer::SDLRenderer(
 	ComponentManager<Transform>& _transforms,
@@ -38,6 +41,27 @@ SDLRenderer::SDLRenderer(
 		printf("Failed to create renderer. %s", SDL_GetError());
 	}
 	texture_manager.setTextureFactory(new SDLTextureFactory(renderer));
+	
+	// When a sprite is created, we clone its transform into prev state
+	// TODO: a sprite may be created before its transform, so this could crash, fix that somehow
+	// Maybe hold all newly created sprites in a vector, then run through the vector post gameplay update
+	EventSystem::instance().sub<OnComponentCreate<Sprite>>(
+		[=](void* e)->void {
+			OnComponentCreate<Sprite> event = *static_cast<OnComponentCreate<Sprite>*>(e);
+			if (this->prev_state.exists(event.id)) {
+				this->prev_state.getComponent(event.id) = this->transforms.getComponent(event.id);
+			} else {
+				this->prev_state.createComponent(event.id, this->transforms.getComponent(event.id));
+			}
+		}
+	);
+	// Move current state into prev state in the case something needs to teleport
+	EventSystem::instance().sub<OverridePrevState>(
+		[=](void* e)->void {
+			OverridePrevState event = *static_cast<OverridePrevState*>(e);
+			this->prev_state.getComponent(event.id) = this->transforms.getComponent(event.id);
+		}
+	);
 };
 
 SDLRenderer::~SDLRenderer() {
@@ -60,8 +84,8 @@ void SDLRenderer::render(float delta) {
 	for (u32 i = 0; i < views.n_components; ++i) {
 		const Sprite& view = views.components[i];
 		const Transform view_transform = lerp(
+			prev_state.getComponent(views.idFromIndex(i)),
 			transforms.getComponent(views.idFromIndex(i)),
-			transforms.getNextComponent(views.idFromIndex(i)),
 			delta
 		);
 		const SDL_FRect src_rect = view.src_rect;
@@ -97,8 +121,8 @@ void SDLRenderer::render(float delta) {
 	for (u32 i = 0; i < collisions.n_components; ++i) {
 		const CollisionBox& box = collisions.components[i];
 		const Transform box_transform = lerp(
+			prev_state.getComponent(collisions.idFromIndex(i)),
 			transforms.getComponent(collisions.idFromIndex(i)),
-			transforms.getNextComponent(collisions.idFromIndex(i)),
 			delta
 		);
 		// Start at middle of viewport, translate by camera, then translate by position, center based on scale, multiply to scale from internal to actual size
@@ -149,3 +173,7 @@ void SDLRenderer::handleWindowResize() {
 	SDL_Rect vp = { (external_screen_width / 2) - vp_width / 2, (external_screen_height / 2) - vp_height / 2, vp_width, vp_height };
 	SDL_SetRenderViewport(renderer, &vp);
 }
+
+void SDLRenderer::updateState() {
+	prev_state = transforms;
+};
