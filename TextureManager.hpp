@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -13,7 +14,7 @@ class TextureManager {
 public:
   TextureManager() = default;
   ~TextureManager() = default;
-  bool loadTexture(const std::string& path);
+  std::optional<u32> loadTexture(const std::string& path);
   void unloadTexture(const std::string& path);
   Texture& getTexture(const std::string& path);
   Texture& getTexture(u32 id);
@@ -26,6 +27,4 @@ private:
   std::vector<Texture> textures = {};
   std::unordered_map<std::string, u32> texture_map;
   ITextureFactory* texture_factory = nullptr;
-  //SDL_Renderer* renderer = nullptr;
 };
-

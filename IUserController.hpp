@@ -2,9 +2,11 @@
 
 #include <SDL3/SDL_events.h>
 
+enum class InputAction;
+
 class IUserController {
 public:
   virtual ~IUserController() = default;
-  virtual void handleEvent(const SDL_Event& e) = 0;
+  virtual void handleEvent(InputAction ia) = 0;
 };
 

@@ -357,7 +357,7 @@ void SnakeObject::setDirection(SnakeDir new_direction) {
 void SnakeObject::setSpeed(float new_speed) {
 	// need to change speed, time per move, and anim speeds
 	speed = new_speed;
-	time_per_move = 1000. / speed;
+	time_per_move = 1000.f / speed;
 	anim_framerate = 1000 / static_cast<i32>(time_per_move / 8);
 	for (SnakeSegment& segment : segments) {
 		world.ecs.getc<SpriteAnim>(segment.id).framerate = anim_framerate;

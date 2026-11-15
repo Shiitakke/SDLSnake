@@ -1,22 +1,21 @@
 #include "SnakeController.hpp"
 
+#include "InputSystem.hpp"
 #include "SnakeObject.hpp"
 
-void SnakeController::handleEvent(const SDL_Event& e) {
-	if (e.type == SDL_EVENT_KEY_DOWN) {
-		switch (e.key.key) {
-			case SDLK_UP:
-				controlled_snake.setDirection(SnakeObject::SnakeDir::UP);
-				break;
-			case SDLK_DOWN:
-				controlled_snake.setDirection(SnakeObject::SnakeDir::DOWN);
-				break;
-			case SDLK_LEFT:
-				controlled_snake.setDirection(SnakeObject::SnakeDir::LEFT);
-				break;
-			case SDLK_RIGHT:
-				controlled_snake.setDirection(SnakeObject::SnakeDir::RIGHT);
-				break;
-		}
+void SnakeController::handleEvent(InputAction ia) {
+	switch (ia) {
+	case InputAction::move_up:
+		controlled_snake.setDirection(SnakeObject::SnakeDir::UP);
+		break;
+	case InputAction::move_down:
+		controlled_snake.setDirection(SnakeObject::SnakeDir::DOWN);
+		break;
+	case InputAction::move_left:
+		controlled_snake.setDirection(SnakeObject::SnakeDir::LEFT);
+		break;
+	case InputAction::move_right:
+		controlled_snake.setDirection(SnakeObject::SnakeDir::RIGHT);
+		break;
 	}
 }

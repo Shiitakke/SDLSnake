@@ -16,3 +16,5 @@ struct OnComponentDestroy {
 struct OverridePrevState {
   u32 id;
 };
+
+struct OnTickStart {};

@@ -23,7 +23,7 @@ public:
   {
     timeline_id = world.timeline_manager.createTimeline({ .length = 1000 });
   }
-  void handleEvent(const SDL_Event& e);
+  void handleEvent(InputAction ia);
 private:
   enum class MenuSelection {
     START = 1,

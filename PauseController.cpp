@@ -3,13 +3,12 @@
 #include "InputSystem.hpp"
 #include "UnpauseController.hpp"
 
-void PauseController::handleEvent(const SDL_Event& e) {
-	if (e.type == SDL_EVENT_KEY_DOWN) {
-		switch (e.key.key) {
-			case SDLK_ESCAPE:
-				changePause();
-				break;
-		}
+void PauseController::handleEvent(InputAction ia) {
+	switch (ia) {
+	case InputAction::pause:
+		printf("paused\n");
+		changePause();
+		break;
 	}
 }
 
@@ -93,5 +92,5 @@ void PauseController::changePause() {
 		arrow_id
 	);
 	InputSystem::instance().pushContext();
-	InputSystem::instance().addToCurrentContext(retry_controller);
+	InputSystem::instance().addControllerToContext(retry_controller);
 }

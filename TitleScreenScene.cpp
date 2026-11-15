@@ -77,7 +77,7 @@ void TitleScreenScene::initialise(World& world, TextureManager& texture_manager)
     world
   );
   InputSystem::instance().pushContext();
-  InputSystem::instance().addToCurrentContext(menu_controller);
+  InputSystem::instance().addControllerToContext(menu_controller);
 }
 
 void TitleScreenScene::deinitialise(World& world, TextureManager& texture_manager) {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 
 struct Texture;
@@ -7,7 +8,7 @@ struct Texture;
 class ITextureFactory {
 public:
   virtual ~ITextureFactory() {};
-  virtual Texture loadTexture(const std::string& path) = 0;
+  virtual std::optional<Texture> loadTexture(const std::string& path) = 0;
   virtual void unloadTexture(Texture& texture) = 0;
 };
 

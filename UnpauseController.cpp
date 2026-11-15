@@ -27,36 +27,35 @@ UnpauseController::UnpauseController(
   end_transform = arrow_transform;
 }
 
-void UnpauseController::handleEvent(const SDL_Event& e) {
-  if (e.type == SDL_EVENT_KEY_DOWN) {
-    switch (e.key.key) {
-    case SDLK_LEFT:
-      curr_selection = (std::max(curr_selection - 1, 0));
-      changeSelection();
-      break;
-    case SDLK_RIGHT:
-      curr_selection = (std::min(curr_selection + 1, 2));
-      changeSelection();
-      break;
-    case SDLK_RETURN:
-      switch (selections[curr_selection]) {
-      case RetryMenuSelection::RESUME:
-        InputSystem::instance().popContext();
-        break;
-      case RetryMenuSelection::MENU:
-        world.loadScene<TitleScreenScene>();
-        break;
-      case RetryMenuSelection::QUIT:
-        SDL_Event quit_e;
-        quit_e.type = SDL_EVENT_QUIT;
-        SDL_PushEvent(&quit_e);
-        break;
-      }
-      break;
-    case SDLK_ESCAPE:
+void UnpauseController::handleEvent(InputAction ia) {
+  switch (ia) {
+  case InputAction::move_left:
+    curr_selection = (std::max(curr_selection - 1, 0));
+    changeSelection();
+    break;
+  case InputAction::move_right:
+    curr_selection = (std::min(curr_selection + 1, 2));
+    changeSelection();
+    break;
+  case InputAction::select_item:
+    switch (selections[curr_selection]) {
+    case RetryMenuSelection::RESUME:
       InputSystem::instance().popContext();
       break;
+    case RetryMenuSelection::MENU:
+      world.loadScene<TitleScreenScene>();
+      break;
+    case RetryMenuSelection::QUIT:
+      SDL_Event quit_e;
+      quit_e.type = SDL_EVENT_QUIT;
+      SDL_PushEvent(&quit_e);
+      break;
     }
+    break;
+  case InputAction::unpause:
+    printf("unpaused\n");
+    InputSystem::instance().popContext();
+    break;
   }
 }
 

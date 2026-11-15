@@ -1,33 +1,33 @@
 #include "TitleMenuController.hpp"
 
+#include "InputSystem.hpp"
 #include "SnakeGameScene.hpp"
 #include "util.hpp"
 
-void TitleMenuController::handleEvent(const SDL_Event& e) {
-  if (e.type == SDL_EVENT_KEY_DOWN) {
-    switch (e.key.key) {
-      case SDLK_DOWN:
-        if (current_selection == MenuSelection::START) {
-          current_selection = MenuSelection::END;
-          changeSelection();
-        }
-        break;
-      case SDLK_UP:
-        if (current_selection == MenuSelection::END) {
-          current_selection = MenuSelection::START;
-          changeSelection();
-        }
-        break;
-      case SDLK_RETURN:
-        if (current_selection == MenuSelection::START) {
-          world.loadScene<SnakeGameScene>();
-        } else {
-          SDL_Event quit_e;
-          quit_e.type = SDL_EVENT_QUIT;
-          SDL_PushEvent(&quit_e);
-        }
-        break;
+void TitleMenuController::handleEvent(InputAction ia) {
+  switch (ia) {
+  case InputAction::select_item:
+    if (current_selection == MenuSelection::START) {
+      world.loadScene<SnakeGameScene>();
     }
+    else {
+      SDL_Event quit_e;
+      quit_e.type = SDL_EVENT_QUIT;
+      SDL_PushEvent(&quit_e);
+    }
+    break;
+  case InputAction::move_down:
+    if (current_selection == MenuSelection::START) {
+      current_selection = MenuSelection::END;
+      changeSelection();
+    }
+    break;
+  case InputAction::move_up:
+    if (current_selection == MenuSelection::END) {
+      current_selection = MenuSelection::START;
+      changeSelection();
+    }
+    break;
   }
 }
 

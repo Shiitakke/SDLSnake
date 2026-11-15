@@ -7,18 +7,18 @@
 #include "Texture.hpp"
 
 struct BitmapChar {
-  u8 x;
-  u8 y;
-  u8 width;
-  u8 height;
-  i8 x_offset;
-  i8 y_offset;
-  u8 x_advance;
+  u8 x = 0;
+  u8 y = 0;
+  u8 width = 0;
+  u8 height = 0;
+  i8 x_offset = 0;
+  i8 y_offset = 0;
+  u8 x_advance = 0;
 };
 
 struct BitmapFont {
-  u32 texture_id;
-  std::string font_path;
+  u32 texture_id = 0;
+  std::string font_path = "";
   u32 base = 0;
   i8 x_spacing = 0;
   i8 y_spacing = 0;

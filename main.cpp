@@ -36,13 +36,10 @@
 #include "EventSystem.hpp"
 #include "Events.hpp"
 
-
-void init();
-void deinit();
 void updateTimers(
 	EntityComponentSystem& ecs,
 	ComponentManager<Timer>& timers
-);
+); 
 void updateTimelines(
 	TimelineManager& timeline_manager
 );
@@ -57,46 +54,100 @@ void updateVelocities(
 
 bool quit = false;
 constexpr float game_speed_scalar = 1.0f;
+// keep big state off stack
 World world;
-IRenderer* rendering_system;
-PhysicsSystem* physics_system;
+SDLRenderer rendering_system = SDLRenderer(
+	world.ecs.getComponentManager<Transform>(),
+	world.ecs.getComponentManager<Sprite>(),
+	world.texture_manager,
+	world.camera,
+	world.ecs.getComponentManager<CollisionBox>(),
+	1000,
+	1000
+);
 
 int main(int argc, char* args[]) {
-	init();
+	// Engine initialisation
+	PhysicsSystem physics_system = PhysicsSystem(
+		world.ecs.getComponentManager<Transform>(),
+		world.ecs.getComponentManager<CollisionBox>()
+	);
+	AudioService::registerService(
+		new SDLAudioSystem(world.sound_manager)
+	);
+	// Game initialisation
+	world.loadScene<TitleScreenScene>();
 
-	u64 start =
-		std::chrono::duration_cast<std::chrono::milliseconds>(
-			std::chrono::steady_clock::now().time_since_epoch()
-		).count();
+	// TODO: add creating InputMap from file
+	// also move this input map creation logic somewhere else nice (maybe in scenes?)
+	// not sure how i can relate strings to inputaction or sdl enums generically though
+	// may require handing the creation function a giant map of strings or something
+	{
+		InputMap im;
+		im.mapTo(SDL_GAMEPAD_BUTTON_DPAD_DOWN, InputAction::move_down);
+		im.mapTo(SDL_GAMEPAD_BUTTON_DPAD_UP, InputAction::move_up);
+		im.mapTo(SDL_GAMEPAD_BUTTON_DPAD_LEFT, InputAction::move_left);
+		im.mapTo(SDL_GAMEPAD_BUTTON_DPAD_RIGHT, InputAction::move_right);
+		im.mapTo(SDL_GAMEPAD_BUTTON_START, InputAction::pause);
+		im.mapTo(SDL_GAMEPAD_BUTTON_START, InputAction::unpause);
+		im.mapTo(SDL_GAMEPAD_BUTTON_SOUTH, InputAction::select_item);
+
+		im.mapTo(SDL_SCANCODE_UP, InputAction::move_up);
+		im.mapTo(SDL_SCANCODE_DOWN, InputAction::move_down);
+		im.mapTo(SDL_SCANCODE_LEFT, InputAction::move_left);
+		im.mapTo(SDL_SCANCODE_RIGHT, InputAction::move_right);
+		im.mapTo(SDL_SCANCODE_W, InputAction::move_up);
+		im.mapTo(SDL_SCANCODE_S, InputAction::move_down);
+		im.mapTo(SDL_SCANCODE_A, InputAction::move_left);
+		im.mapTo(SDL_SCANCODE_D, InputAction::move_right);
+		im.mapTo(SDL_SCANCODE_ESCAPE, InputAction::pause);
+		im.mapTo(SDL_SCANCODE_ESCAPE, InputAction::unpause);
+		im.mapTo(SDL_SCANCODE_RETURN, InputAction::select_item);
+
+		InputSystem::instance().addInputMapping(im);
+	}
+
+	u64 start = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()
+	).count();
 	u64 end = start;
 	float period = 0;
 
 	SDL_Event e;
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
-			InputSystem::instance().queueEvent(e);
-			if (e.type == SDL_EVENT_QUIT) {
+			InputSystem::instance().queueSDLEvent(e);
+			switch (e.type) {
+			case SDL_EVENT_QUIT:
 				quit = true;
-			}
-			if (
-				e.type == SDL_EVENT_WINDOW_RESIZED
-			) {
-				rendering_system->handleWindowResize();
+				break;
+			case SDL_EVENT_WINDOW_RESIZED:
+				rendering_system.handleWindowResize();
+				break;
+
 			}
 		}
 
 		while (period > TIME_STEP) {
+			//TODO: update InputSystem to support axes and allow different triggers
+			// eg started, ended and continuing actionsk when holding or releasing buttons
 			InputSystem::instance().processEvents();
+
 			
+			// TODO: make a real AI system
+			// probably should have finite state machines and full behaviour trees
 			for (IAIController* ai_controller : world.ai_controllers) {
 				ai_controller->update();
 			}
 
-			ComponentManager<Transform>& transforms = world.ecs.getComponentManager<Transform>();
-			rendering_system->updateState();
+			rendering_system.updateState();
 
 			if (!world.paused) {
+				// TODO: figure out a better way to run generic code than this
+				// Maybe having frame events is ideal, for example 'OnStartTick', 'OnEndTick'
+				// anything can then just sub to these events, and granularity can be added easily
 				world.updateScene();
+				EventSystem::instance().pub<OnTickStart>({});
 				updateTimers(
 					world.ecs,
 					world.ecs.getComponentManager<Timer>()
@@ -108,16 +159,20 @@ int main(int argc, char* args[]) {
 					world.ecs.getComponentManager<SpriteAnim>(),
 					world.ecs.getComponentManager<Sprite>()
 				);
+				// TODO: let physics system handle integration so it can manage its partition better
+				// Important note, entities that are moved directly by modifying transform location
+				// would still need to be handled somehow, events dont really cut it since the ecs
+				// hands out direct references and doesnt use a setter or anything
 				updateVelocities(
 					world.ecs.getComponentManager<Transform>(),
 					world.ecs.getComponentManager<Velocity>()
 				);
-				physics_system->update();
+				physics_system.update();
 				AudioService::service()->resolve();
 			}
 			period -= TIME_STEP;			
 		}
-		rendering_system->render(period / TIME_STEP);
+		rendering_system.render(period / TIME_STEP);
 		
 		end = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::steady_clock::now().time_since_epoch()
@@ -126,7 +181,6 @@ int main(int argc, char* args[]) {
 		period += (end - start) * game_speed_scalar;
 		start = end;
 	}
-	deinit();
 	return 0;
 }
 
@@ -210,28 +264,4 @@ void updateVelocities(
 		v.angular_velocity.velocity = v.angular_velocity.acceleration + v.angular_velocity.velocity * (1 - v.angular_velocity.friction);
 		t.rot = t.rot + v.angular_velocity.velocity;
 	}
-}
-
-void init() {
-	rendering_system = new SDLRenderer(
-		world.ecs.getComponentManager<Transform>(),
-		world.ecs.getComponentManager<Sprite>(),
-		world.texture_manager,
-		world.camera,
-		world.ecs.getComponentManager<CollisionBox>(),
-		1000,
-		1000
-	);
-	physics_system = new PhysicsSystem(
-		world.ecs.getComponentManager<Transform>(),
-		world.ecs.getComponentManager<CollisionBox>()
-	);
-	AudioService::registerService(
-		new SDLAudioSystem(world.sound_manager)
-	);
-	world.loadScene<SnakeGameScene>();
-}
-
-void deinit() {
-	delete rendering_system;
 }

@@ -17,6 +17,6 @@ public:
   void unloadSound(const std::string& path);
 private:
   std::unordered_map<std::string, void*> sound_map;
-  ISoundFactory* sound_factory;
+  ISoundFactory* sound_factory = nullptr;
 };
 

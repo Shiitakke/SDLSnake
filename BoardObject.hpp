@@ -20,7 +20,7 @@ public:
   ~BoardObject() = default;
   vec2 boardPosToWorldPos(BoardPos pos);
   
-  BoardTile board[16][16];
+  BoardTile board[16][16] = {BoardTile::EMPTY};
 private:
   vec2 origin;
   u32 rows = 16;

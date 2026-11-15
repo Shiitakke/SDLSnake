@@ -3,17 +3,21 @@
 #include "Texture.hpp"
 #include "ITextureFactory.hpp"
 
-bool TextureManager::loadTexture(const std::string& path) {
+std::optional<u32> TextureManager::loadTexture(const std::string& path) {
   if (texture_map.contains(path)) {
     return false;
   }
 
-  Texture new_texture = texture_factory->loadTexture(path);
+  std::optional<Texture> new_texture_opt = texture_factory->loadTexture(path);
+  if (!new_texture_opt.has_value()) {
+    return {};
+  }
+  Texture new_texture = new_texture_opt.value();
   textures.push_back(new_texture);
   texture_map.emplace(path, n_textures);
   ++n_textures;
 
-  return true;
+  return {n_textures - 1};
 }
 
 void TextureManager::unloadTexture(const std::string& path) {

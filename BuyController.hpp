@@ -18,7 +18,7 @@ public:
     vec2 _buy_screen_origin,
     vec2 _game_screen_origin
   );
-  void handleEvent(const SDL_Event& e) override;
+  void handleEvent(InputAction ia) override;
 private:
   void moveToBuyMenu();
 

@@ -65,7 +65,6 @@ SDLRenderer::SDLRenderer(
 };
 
 SDLRenderer::~SDLRenderer() {
-	//texture_manager.setRenderer(nullptr);
 	texture_manager.unloadAll();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -116,7 +115,7 @@ void SDLRenderer::render(float delta) {
 			static_cast<SDL_FlipMode>(view.flip_flags)
 		);
 	}
-#ifdef _DEBUG
+#ifdef _BUG_FIXED_LOL
 	// Collision box rendering
 	for (u32 i = 0; i < collisions.n_components; ++i) {
 		const CollisionBox& box = collisions.components[i];

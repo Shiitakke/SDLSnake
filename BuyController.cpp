@@ -19,13 +19,11 @@ BuyController::BuyController(
 {
 };
 
-void BuyController::handleEvent(const SDL_Event& e) {
-	if (e.type == SDL_EVENT_KEY_DOWN) {
-		switch (e.key.key) {
-		case SDLK_B:
-			moveToBuyMenu();
-			break;
-		}
+void BuyController::handleEvent(InputAction ia) {
+	switch (ia) {
+	case InputAction::open_shop:
+		moveToBuyMenu();
+		break;
 	}
 }
 
@@ -46,7 +44,7 @@ void BuyController::moveToBuyMenu() {
 				},
 			.on_end = [=]()->void {
 				IUserController* shop_menu_controller = new ShopMenuController(game_scene, world, game_screen_origin);
-				InputSystem::instance().addToCurrentContext(shop_menu_controller);			
+				InputSystem::instance().addControllerToContext(shop_menu_controller);			
 			},
 			.delta_curve = [](float delta)->float {return 4 * delta * std::pow(1.f / (1.f + delta), 2);}
 		}

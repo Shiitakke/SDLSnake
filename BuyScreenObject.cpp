@@ -17,7 +17,7 @@ BuyScreenObject::BuyScreenObject(
   game_screen_origin(_game_screen_origin)
 {
   IUserController* buy_controller = new BuyController(scene, world, buy_screen_origin, game_screen_origin);
-  InputSystem::instance().addToCurrentContext(buy_controller);
+  InputSystem::instance().addControllerToContext(buy_controller);
 }
 
 BuyScreenObject::~BuyScreenObject() {

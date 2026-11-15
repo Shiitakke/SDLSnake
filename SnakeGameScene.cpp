@@ -69,8 +69,8 @@ void SnakeGameScene::initialise(World& world, TextureManager& texture_manager) {
 	IUserController* snake_controller = new SnakeController(*snakes.back());
 	IUserController* pause_controller = new PauseController(*this, world);
 	InputSystem::instance().pushContext();
-	InputSystem::instance().addToCurrentContext(snake_controller);
-	InputSystem::instance().addToCurrentContext(pause_controller);
+	InputSystem::instance().addControllerToContext(snake_controller);
+	InputSystem::instance().addControllerToContext(pause_controller);
 
 	for (i32 i = 0; i < apple_count; ++i) {
 		createNewApple();

@@ -16,7 +16,7 @@ public:
     World& _world,
     vec2 _game_scene_origin
   );
-  void handleEvent(const SDL_Event& e) override;
+  void handleEvent(InputAction ia) override;
 private:
   void moveToGameScreen();
 

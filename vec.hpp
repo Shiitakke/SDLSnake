@@ -12,6 +12,10 @@ struct vec<2>;
 typedef vec<2> vec2;
 
 template<>
+struct vec<3>;
+typedef vec<3> vec3;
+
+template<>
 struct vec<2> {
   float x = 0.f;
   float y = 0.f;
@@ -78,4 +82,12 @@ template<> struct std::hash<vec2> {
     std::size_t h2 = std::hash<float>{}(s.y);
     return h1 ^ (h2 << 1);
   }
+};
+
+
+template<>
+struct vec<3> {
+  float x = 0.0f;
+  float y = 0.0f;
+  float z = 0.0f;
 };
