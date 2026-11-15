@@ -16,7 +16,11 @@ public:
     World& _world,
     vec2 _game_scene_origin
   );
-  void handleEvent(InputAction ia) override;
+  void handleEvent(
+    InputAction ia, 
+    InputActionState state,
+    InputActionValue value
+  ) override;
 private:
   void moveToGameScreen();
 

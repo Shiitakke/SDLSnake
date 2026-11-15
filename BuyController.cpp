@@ -19,7 +19,11 @@ BuyController::BuyController(
 {
 };
 
-void BuyController::handleEvent(InputAction ia) {
+void BuyController::handleEvent(
+	InputAction ia, 
+	InputActionState state,
+	InputActionValue value
+) {
 	switch (ia) {
 	case InputAction::open_shop:
 		moveToBuyMenu();

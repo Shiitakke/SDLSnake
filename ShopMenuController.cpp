@@ -18,7 +18,11 @@ ShopMenuController::ShopMenuController(
 
 };
 
-void ShopMenuController::handleEvent(InputAction ia) {
+void ShopMenuController::handleEvent(
+	InputAction ia, 
+	InputActionState state,
+	InputActionValue value
+) {
 	switch (ia) {
 	case InputAction::close_shop:
 		moveToGameScreen();

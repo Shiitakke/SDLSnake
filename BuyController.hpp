@@ -18,7 +18,11 @@ public:
     vec2 _buy_screen_origin,
     vec2 _game_screen_origin
   );
-  void handleEvent(InputAction ia) override;
+  void handleEvent(
+    InputAction ia, 
+    InputActionState state,
+    InputActionValue value
+  ) override;
 private:
   void moveToBuyMenu();
 

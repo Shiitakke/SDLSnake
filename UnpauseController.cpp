@@ -27,7 +27,11 @@ UnpauseController::UnpauseController(
   end_transform = arrow_transform;
 }
 
-void UnpauseController::handleEvent(InputAction ia) {
+void UnpauseController::handleEvent(
+  InputAction ia, 
+  InputActionState state,
+  InputActionValue value
+) {
   switch (ia) {
   case InputAction::move_left:
     curr_selection = (std::max(curr_selection - 1, 0));
@@ -53,7 +57,6 @@ void UnpauseController::handleEvent(InputAction ia) {
     }
     break;
   case InputAction::unpause:
-    printf("unpaused\n");
     InputSystem::instance().popContext();
     break;
   }

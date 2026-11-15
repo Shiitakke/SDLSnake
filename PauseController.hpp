@@ -9,7 +9,11 @@
 class PauseController : public IUserController {
 public:
   PauseController(SnakeGameScene& _snake, World& _world) : snake(_snake), world(_world) {};
-  void handleEvent(InputAction ia) override;
+  void handleEvent(
+    InputAction ia, 
+    InputActionState state,
+    InputActionValue value
+  ) override;
   void changePause();
 private:
   u32 pause_id = 0;

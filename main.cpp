@@ -104,6 +104,9 @@ int main(int argc, char* args[]) {
 		im.mapTo(SDL_SCANCODE_ESCAPE, InputAction::unpause);
 		im.mapTo(SDL_SCANCODE_RETURN, InputAction::select_item);
 
+		im.mapTo(SDL_GAMEPAD_AXIS_LEFTX, InputAction::move_left_right);
+		im.mapTo(SDL_GAMEPAD_AXIS_LEFTY, InputAction::move_up_down);
+
 		InputSystem::instance().addInputMapping(im);
 	}
 

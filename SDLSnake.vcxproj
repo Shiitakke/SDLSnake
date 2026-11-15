@@ -201,6 +201,7 @@
     <ClInclude Include="EntityComponentSystem.hpp" />
     <ClInclude Include="Events.hpp" />
     <ClInclude Include="EventSystem.hpp" />
+    <ClInclude Include="InputAction.hpp" />
     <ClInclude Include="IAIController.hpp" />
     <ClInclude Include="IAudioSystem.hpp" />
     <ClInclude Include="IdManager.hpp" />

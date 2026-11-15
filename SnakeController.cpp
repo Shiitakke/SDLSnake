@@ -3,7 +3,11 @@
 #include "InputSystem.hpp"
 #include "SnakeObject.hpp"
 
-void SnakeController::handleEvent(InputAction ia) {
+void SnakeController::handleEvent(
+	InputAction ia, 
+	InputActionState state,
+	InputActionValue value
+) {
 	switch (ia) {
 	case InputAction::move_up:
 		controlled_snake.setDirection(SnakeObject::SnakeDir::UP);

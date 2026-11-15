@@ -16,7 +16,11 @@ public:
     u32 _arrow_id
   );
   ~UnpauseController();
-  void handleEvent(InputAction ia) override;
+  void handleEvent(
+    InputAction ia, 
+    InputActionState state,
+    InputActionValue value
+  ) override;
 
 private:
   enum class RetryMenuSelection {

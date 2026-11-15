@@ -115,15 +115,12 @@ void SDLRenderer::render(float delta) {
 			static_cast<SDL_FlipMode>(view.flip_flags)
 		);
 	}
-#ifdef _BUG_FIXED_LOL
+#ifdef _DEBUG
 	// Collision box rendering
 	for (u32 i = 0; i < collisions.n_components; ++i) {
 		const CollisionBox& box = collisions.components[i];
-		const Transform box_transform = lerp(
-			prev_state.getComponent(collisions.idFromIndex(i)),
-			transforms.getComponent(collisions.idFromIndex(i)),
-			delta
-		);
+		const Transform& box_transform = transforms.getComponent(collisions.idFromIndex(i));
+
 		// Start at middle of viewport, translate by camera, then translate by position, center based on scale, multiply to scale from internal to actual size
 		const SDL_FRect dst_rect = {
 			(internal_screen_width / 2 -

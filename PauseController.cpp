@@ -3,10 +3,13 @@
 #include "InputSystem.hpp"
 #include "UnpauseController.hpp"
 
-void PauseController::handleEvent(InputAction ia) {
+void PauseController::handleEvent(
+	InputAction ia, 
+	InputActionState state,
+	InputActionValue value
+) {
 	switch (ia) {
 	case InputAction::pause:
-		printf("paused\n");
 		changePause();
 		break;
 	}

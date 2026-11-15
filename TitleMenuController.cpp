@@ -4,7 +4,34 @@
 #include "SnakeGameScene.hpp"
 #include "util.hpp"
 
-void TitleMenuController::handleEvent(InputAction ia) {
+void TitleMenuController::handleEvent(
+  InputAction ia, 
+  InputActionState state,
+  InputActionValue value
+) {
+  switch (state) {
+  case InputActionState::STARTED:
+    printf("down\n");
+    break;
+  case InputActionState::FINISHED:
+    printf("up\n");
+    break;
+  case InputActionState::CONTINUED:
+    printf("still down\n");
+    break;
+  case InputActionState::RESTED:
+    printf("still up\n");
+    break;
+  }
+  if (ia == InputAction::move_up_down) {
+    float value_float = std::get<float>(value);
+    if (value_float > 0.1f) {
+      ia = InputAction::move_down;
+    }
+    else if (value_float < -0.1f) {
+      ia = InputAction::move_up;
+    }
+  }
   switch (ia) {
   case InputAction::select_item:
     if (current_selection == MenuSelection::START) {

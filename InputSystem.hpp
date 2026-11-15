@@ -10,35 +10,7 @@
 #include "IUserController.hpp"
 
 #include "vec.hpp"
-
-// Modify this enum to change the available actions
-enum class InputAction {
-	move_up,
-	move_down,
-	move_left,
-	move_right,
-	pause,
-	unpause,
-	open_shop,
-	close_shop,
-	select_item
-};
-
-// When subscribing a controller to an event, you must also specify the state it subscribes to
-enum class InputActionState {
-	triggered,	// Fires events regardless of previous state
-	started,		// Action not active last frame, but is now
-	finished,		// Action was active last frame, but isnt now
-	continued,	// Action was active last frame, and is now
-	resting			// Action not active  last frame, and isnt now
-};
-
-using InputActionValue = std::variant<
-	bool,		// digital, for button press
-	float,	// analog, for single axis (analog triggers)
-	vec2,		// two, for two axes (control sticks)
-	vec3		// three, for three axes (motion controls)
->;
+#include "InputAction.hpp"
 
 // Input action events are what controllers should eventually receive
 struct InputActionEvent {
@@ -78,6 +50,13 @@ public:
 	) {
 		action_map.emplace(Trigger{ button }, ia);
 	};
+
+	void mapTo(
+		SDL_GamepadAxis axis,
+		InputAction ia
+	) {
+		action_map.emplace(Trigger{ axis }, ia);
+	}
 
 	std::unordered_multimap<
 		Trigger,
@@ -125,4 +104,6 @@ private:
 	std::vector<InputMap> mappings = {};
 	std::vector<std::vector<IUserController*>> context_stack = { {} };
 	std::vector<std::pair<SDL_JoystickID, SDL_Gamepad*>> gamepads;
+	std::unordered_map<InputAction, bool> prev_action_states;
+	std::unordered_map<InputAction, bool> action_states;
 };
